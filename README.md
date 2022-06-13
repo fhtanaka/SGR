@@ -1,1 +1,1 @@
-# single_genome_robots
+# Single Genome Robots (SGR)
