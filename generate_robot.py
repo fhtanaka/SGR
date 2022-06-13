@@ -24,6 +24,11 @@ def generate_robot_CPPN_like(net, robot_size=5):
             robot[i][j] = node
     return robot
 
+def generate_robot(net, params):
+    if params["robot_substrate"] == "CPPN":
+        return generate_robot_CPPN_like(net, params["robot_size"])
+    else:
+        return generate_robot_in_1_out_robot(net, params["robot_size"])
 
 def premade_robot():
     a = [

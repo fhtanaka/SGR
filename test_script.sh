@@ -1,17 +1,52 @@
-python sgr_main.py -g 500 -s 500 -e Walker-v0 --save_to results/single_gen_hyperNEAT_walker/run_1 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 500 -e Walker-v0 --save_to results/single_gen_hyperNEAT_walker/run_2 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 500 -e Walker-v0 --save_to results/single_gen_hyperNEAT_walker/run_3 --cpu 11 --pop 128
+python sgr_main.py -s 500 -e Carrier-v0 --save_to results/Carrier-v0/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 500 -e Carrier-v0 --save_to results/Carrier-v0/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 300 -e Thrower-v0 --save_to results/Thrower-v0/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 300 -e Thrower-v0 --save_to results/Thrower-v0/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e AreaMinimizer-v0 --save_to results/AreaMinimizer-v0/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e AreaMinimizer-v0 --save_to results/AreaMinimizer-v0/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 500 -e Walker-v0 --save_to results/Walker-v0/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 500 -e Walker-v0 --save_to results/Walker-v0/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e UpStepper-v0 --save_to results/UpStepper-v0/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e UpStepper-v0 --save_to results/UpStepper-v0/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 400 -e Climber-v2 --save_to results/Climber-v2/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 400 -e Climber-v2 --save_to results/Climber-v2/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e Flipper-v0 --save_to results/Flipper-v0/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e Flipper-v0 --save_to results/Flipper-v0/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e Balancer-v1 --save_to results/Balancer-v1/run_1 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e Balancer-v1 --save_to results/Balancer-v1/run_CPPN_1 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+############################################################################################################################################################
+
+python sgr_main.py -s 500 -e Carrier-v0 --save_to results/Carrier-v0/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 500 -e Carrier-v0 --save_to results/Carrier-v0/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 300 -e Thrower-v0 --save_to results/Thrower-v0/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 300 -e Thrower-v0 --save_to results/Thrower-v0/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e AreaMinimizer-v0 --save_to results/AreaMinimizer-v0/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e AreaMinimizer-v0 --save_to results/AreaMinimizer-v0/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 500 -e Walker-v0 --save_to results/Walker-v0/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 500 -e Walker-v0 --save_to results/Walker-v0/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e UpStepper-v0 --save_to results/UpStepper-v0/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e UpStepper-v0 --save_to results/UpStepper-v0/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 400 -e Climber-v2 --save_to results/Climber-v2/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 400 -e Climber-v2 --save_to results/Climber-v2/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e Flipper-v0 --save_to results/Flipper-v0/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e Flipper-v0 --save_to results/Flipper-v0/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
+
+python sgr_main.py -s 600 -e Balancer-v1 --save_to results/Balancer-v1/run_2 --cpu 11 --pop 128
+python sgr_main.py -s 600 -e Balancer-v1 --save_to results/Balancer-v1/run_CPPN_2 --cpu 11 --pop 128 --robot_substrate CPPN --neat_config configs/hyperNEAT_config_CPPN_robot 
 
 
-python sgr_main.py -g 500 -s 600 -e UpStepper-v0 --save_to results/single_gen_hyperNEAT_ladder/run_1 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 600 -e UpStepper-v0 --save_to results/single_gen_hyperNEAT_ladder/run_2 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 600 -e UpStepper-v0 --save_to results/single_gen_hyperNEAT_ladder/run_3 --cpu 11 --pop 128
 
-
-python sgr_main.py -g 500 -s 400 -e Climber-v0 --save_to results/single_gen_hyperNEAT_climber/run_1 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 400 -e Climber-v0 --save_to results/single_gen_hyperNEAT_climber/run_2 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 400 -e Climber-v0 --save_to results/single_gen_hyperNEAT_climber/run_3 --cpu 11 --pop 128
-
-python sgr_main.py -g 500 -s 600 -e ObstacleTraverser-v1 --save_to results/single_gen_hyperNEAT_obstacle/run_1 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 600 -e ObstacleTraverser-v1 --save_to results/single_gen_hyperNEAT_obstacle/run_2 --cpu 11 --pop 128
-python sgr_main.py -g 500 -s 600 -e ObstacleTraverser-v1 --save_to results/single_gen_hyperNEAT_obstacle/run_3 --cpu 11 --pop 128

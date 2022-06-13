@@ -6,6 +6,8 @@ import dill
 import neat
 import time
 import neat.nn
+import pathlib
+
 from pathos.multiprocessing import ProcessPool
 from evogym import is_connected, has_actuator
 
@@ -13,8 +15,8 @@ from hyperneat.new_hyperNEAT import create_phenotype_network
 from custom_reporter import CustomReporter, remove_reporters
 from arg_parser import parse_args
 from body_speciation import new_distance
-from substrates import morph_substrate_in_1_out_robot, control_substrate
-from generate_robot import generate_robot_in_1_out_robot
+from substrates import morph_substrate, control_substrate
+from generate_robot import generate_robot
 from evogym_sim import simulate_env
 
 
@@ -33,9 +35,9 @@ def single_genome_fit(genome, params, neat_config, render=False):
     if hasattr(genome, 'robot'):
         robot = genome.robot
     else:
-        design_substrate = morph_substrate_in_1_out_robot(params)
+        design_substrate = morph_substrate(params)
         design_net = create_phenotype_network(cppn, design_substrate)
-        robot = generate_robot_in_1_out_robot(design_net, params["robot_size"])
+        robot = generate_robot(design_net, params)
 
     if not eval_genome_constraint(robot):
         return -10000, False
@@ -104,7 +106,7 @@ def main():
     config_path = os.path.join(local_dir, params["neat_config"])
    
     defaultGen = neat.DefaultGenome
-    f = lambda self, other, config: new_distance(params, morph_substrate_in_1_out_robot(params), generate_robot_in_1_out_robot, self, other, config)
+    f = lambda self, other, config: new_distance(params, morph_substrate(params), generate_robot, self, other, config)
     defaultGen.distance = f
 
     neat_config = neat.Config(defaultGen, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
@@ -116,6 +118,7 @@ def main():
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
     if params["save_to"] is not "":
+        pathlib.Path("/".join(params["save_to"].split("/")[:-1])).mkdir(parents=True, exist_ok=True) 
         pop.add_reporter(CustomReporter(True, params["save_to"] + "_out.txt", params["save_to"] + "_table.csv"))
     pop.add_reporter(neat.StdOutReporter(True))
 

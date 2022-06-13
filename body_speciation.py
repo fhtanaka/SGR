@@ -9,7 +9,7 @@ def robot_from_genome(genome, params, substrate, robot_func, config):
     cppn = neat.nn.FeedForwardNetwork.create(genome, TempConfig(config))
 
     design_net = create_phenotype_network(cppn, substrate)
-    robot = robot_func(design_net, params["robot_size"])
+    robot = robot_func(design_net, params)
     
     if not eval_genome_constraint(robot):
         robot = np.zeros((params["robot_size"], params["robot_size"]))

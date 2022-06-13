@@ -11,7 +11,7 @@ def calc_layer(*coords):
     last_coord = [coords[-1]]
     return tuple(it.product(*coord_arr, last_coord))
 
-def morph_substrate_in_1_out_robot(params):
+def morph_substrate_3D_out(params):
     design_in_layer = calc_layer(1, 1, 1, 1)
     design_h1 = calc_layer(params["robot_size"], params["robot_size"], 1, 2)
     design_out_layer = calc_layer(params["robot_size"], params["robot_size"], 5, 3)
@@ -26,9 +26,29 @@ def morph_substrate_CPPN_like():
     design_substrate = Substrate(design_in_layer, design_out_layer, [design_h1])
     return design_substrate
 
-def control_substrate(params, robot):
+def morph_substrate(params):
+    if params["robot_substrate"] == "CPPN":
+        return morph_substrate_CPPN_like()
+    else:
+        return morph_substrate_3D_out(params)
+
+def control_substrate_CPPN_like(params, robot):
+    controller_in_layer = calc_layer(1, get_obs_size(robot, params), -1)
+    controller_h1 = calc_layer(params["robot_size"], params["robot_size"], -2)
+    controller_out_layer = calc_layer(params["robot_size"], params["robot_size"], -3)
+    controller_substrate = Substrate(controller_in_layer, controller_out_layer, [controller_h1])
+    return controller_substrate
+
+def control_substrate_3D_out(params, robot):
     controller_in_layer = calc_layer(1, get_obs_size(robot, params), 1, -1)
     controller_h1 = calc_layer(params["robot_size"], params["robot_size"], 1, -2)
     controller_out_layer = calc_layer(params["robot_size"], params["robot_size"], 1, -3)
     controller_substrate = Substrate(controller_in_layer, controller_out_layer, [controller_h1])
     return controller_substrate
+
+
+def control_substrate(params, robot):
+    if params["robot_substrate"] == "CPPN":
+        return control_substrate_CPPN_like(params, robot)
+    else:
+        return control_substrate_3D_out(params, robot)
