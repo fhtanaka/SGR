@@ -10,7 +10,7 @@ from pathos.multiprocessing import ProcessPool
 from evogym import is_connected, has_actuator
 
 from hyperneat.new_hyperNEAT import create_phenotype_network
-from custom_reporter import CustomReporter
+from custom_reporter import CustomReporter, remove_reporters
 from arg_parser import parse_args
 from body_speciation import new_distance
 from substrates import morph_substrate_in_1_out_robot, control_substrate
@@ -19,9 +19,9 @@ from evogym_sim import simulate_env
 
 
 N_TYPES = ['empty', 'rigid', 'soft', 'hori', 'vert']
-NEAT_CONFIG_FILE = "configs/hyperNEAT_config"
 BEST_FIT = -10000
 STAG = 0
+POPULATION = None
 
 def eval_genome_constraint(robot):
     validity = is_connected(robot) and has_actuator(robot)
@@ -93,12 +93,15 @@ def fit_func(genomes, neat_config, params):
         print("!!!!!!!!!!!!!!!!!!!!! POPULATION STAGNATED !!!!!!!!!!!!!!!!!!!")
         if params["save_to"] is not "":
             dill.dump(genomes, open(params["save_to"] + "_genomes.pkl", mode='wb'))
+            global POPULATION
+            remove_reporters(POPULATION)
+            dill.dump(POPULATION, open(params["save_to"] + "_population.pkl", mode='wb'))
         exit()
 
 def main():
     params = parse_args()
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, NEAT_CONFIG_FILE)
+    config_path = os.path.join(local_dir, params["neat_config"])
    
     defaultGen = neat.DefaultGenome
     f = lambda self, other, config: new_distance(params, morph_substrate_in_1_out_robot(params), generate_robot_in_1_out_robot, self, other, config)
@@ -108,6 +111,8 @@ def main():
     neat_config.pop_size = params["pop_size"]
 
     pop = neat.Population(neat_config)
+    global POPULATION
+    POPULATION = pop
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
     if params["save_to"] is not "":
@@ -119,6 +124,7 @@ def main():
     print('\nBest genome:\n{!s}'.format(winner))
 
     if params["save_to"] is not "":
+        remove_reporters(pop)
         dill.dump(pop, open(params["save_to"] + "_pop.pkl", mode='wb'))
 
 

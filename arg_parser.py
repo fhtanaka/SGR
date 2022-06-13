@@ -14,6 +14,7 @@ def parse_args():
     goal_fit = 10
     pop_size = 64
     max_stag = 50
+    neat_config = "configs/hyperNEAT_config"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", nargs="?", default=config_path, help="", type=str)
@@ -25,7 +26,9 @@ def parse_args():
     parser.add_argument("--save_to", nargs="?", default=save_to, help="", type=str) 
     parser.add_argument("--goal_fit", nargs="?", default=goal_fit, help="", type=float) 
     parser.add_argument("--pop", nargs="?", default=pop_size, help="", type=int) 
-    parser.add_argument("--max_stag", nargs="?", default=max_stag, help="", type=int) 
+    parser.add_argument("--max_stag", nargs="?", default=max_stag, help="", type=int)
+    parser.add_argument("--neat_config", nargs="?", default=neat_config, help="", type=str) 
+
 
     command_line_args = parser.parse_args()
 
@@ -39,7 +42,7 @@ def parse_args():
     args_dict["goal_fit"] = command_line_args.goal_fit
     args_dict["pop_size"] = command_line_args.pop
     args_dict["max_stag"] = command_line_args.max_stag
-
+    args_dict["neat_config"] = command_line_args.neat_config
 
     # if report is not None:
     for k, v in args_dict.items():
