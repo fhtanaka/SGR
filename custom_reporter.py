@@ -4,6 +4,7 @@ import time
 
 from neat.math_util import mean, stdev
 from neat.six_util import itervalues, iterkeys
+from neat.reporting import ReporterSet
 import neat
 
 class CustomReporter():
@@ -88,3 +89,6 @@ class CustomReporter():
 
     def info(self, msg):
         self.txt.write(msg+"\n")
+
+def remove_reporters(pop: neat.Population):
+    pop.reporters = ReporterSet()
