@@ -1,3 +1,4 @@
+import multiprocessing
 import neat
 import os
 import numpy as np
@@ -8,6 +9,7 @@ import time
 import neat.nn
 import pathlib
 
+import pathos
 from pathos.multiprocessing import ProcessPool
 from evogym import is_connected, has_actuator
 
@@ -42,9 +44,10 @@ def single_genome_fit(genome, params, neat_config, render=False):
     if not eval_genome_constraint(robot):
         return -10000, False
 
-    # robot = premade_robot()
-
-    controller_substrate = control_substrate(params, robot)
+    try:
+        controller_substrate = control_substrate(params, robot)
+    except IndexError: # Sometimes the environment just implodes
+        return -10000, False
 
     controller_net = create_phenotype_network(cppn, controller_substrate)
 
@@ -66,12 +69,14 @@ def fit_func(genomes, neat_config, params):
     start_t = time.time()
     try:
         pool = ProcessPool(nodes=params["cpu"])
-        results = pool.map(
+        results_map = pool.amap(
             fit_func_thread,
             np.array_split(genomes, params["cpu"]),
             [params for _ in range(params["cpu"])],
             [neat_config for _ in range(params["cpu"])],
         )
+        
+        results = results_map.get(timeout=15*60)
 
         fitness_dict = {}
         for result_dict in results:
@@ -84,7 +89,7 @@ def fit_func(genomes, neat_config, params):
                 STAG = 0
 
 
-    except IOError as e:
+    except IOError as e:  # Sometimes the environment just implodes
         if e.errno == errno.EPIPE:
             print("Problem with broken pipe")
         else:
