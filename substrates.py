@@ -27,10 +27,7 @@ def morph_substrate_CPPN_like():
     return design_substrate
 
 def morph_substrate(params):
-    if params["robot_substrate"] == "CPPN":
-        return morph_substrate_CPPN_like()
-    else:
-        return morph_substrate_3D_out(params)
+    return morph_substrate_CPPN_like()
 
 def control_substrate_CPPN_like(params, robot):
     controller_in_layer = calc_layer(1, get_obs_size(robot, params), -1)
@@ -48,7 +45,4 @@ def control_substrate_3D_out(params, robot):
 
 
 def control_substrate(params, robot):
-    if params["robot_substrate"] == "CPPN":
-        return control_substrate_CPPN_like(params, robot)
-    else:
-        return control_substrate_3D_out(params, robot)
+    return control_substrate_CPPN_like(params, robot)
