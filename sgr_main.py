@@ -31,7 +31,7 @@ def eval_genome_constraint(robot):
     validity = is_connected(robot) and has_actuator(robot)
     return validity
 
-def single_genome_fit(genome, params, neat_config, render=False):
+def single_genome_fit(genome, params, neat_config, render=False, save_gif=False):
     cppn = neat.nn.FeedForwardNetwork.create(genome, neat_config)
 
     if hasattr(genome, 'robot'):
@@ -51,7 +51,7 @@ def single_genome_fit(genome, params, neat_config, render=False):
 
     controller_net = create_phenotype_network(cppn, controller_substrate)
 
-    reward, done = simulate_env(robot, controller_net, params, render)
+    reward, done = simulate_env(robot, controller_net, params, render, save_gif)
 
     genome.robot = robot
     return reward, done
