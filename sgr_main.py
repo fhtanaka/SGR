@@ -102,7 +102,7 @@ def fit_func(genomes, neat_config, params):
             dill.dump(genomes, open(params["save_to"] + "_genomes.pkl", mode='wb'))
             global POPULATION
             remove_reporters(POPULATION)
-            dill.dump(POPULATION, open(params["save_to"] + "_population.pkl", mode='wb'))
+            dill.dump(POPULATION, open(params["save_to"] + "_pop.pkl", mode='wb'))
         exit()
 
 def main():
