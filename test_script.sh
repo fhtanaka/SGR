@@ -1,4 +1,4 @@
-ython sgr_main.py -s 500 -e Carrier-v0 --save_to results/Carrier-v0/run_1 --cpu 11 --pop 256
+python sgr_main.py -s 500 -e Carrier-v0 --save_to results/Carrier-v0/run_1 --cpu 11 --pop 256
 python sgr_main.py -s 300 -e Thrower-v0 --save_to results/Thrower-v0/run_1 --cpu 11 --pop 256
 python sgr_main.py -s 600 -e AreaMinimizer-v0 --save_to results/AreaMinimizer-v0/run_1 --cpu 11 --pop 256
 python sgr_main.py -s 500 -e Walker-v0 --save_to results/Walker-v0/run_1 --cpu 11 --pop 256
