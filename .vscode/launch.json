@@ -5,12 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "sgr_main",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "sgr_main.py",
+            "args": [
+                "--pop",
+                "16",
+                "--cpu",
+                "1"
+            ],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": false
         }
     ]
 }

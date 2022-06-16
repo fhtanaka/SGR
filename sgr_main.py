@@ -64,7 +64,7 @@ def fit_func_thread(genomes, params, neat_config):
     return results_dict
 
 def fit_func(genomes, neat_config, params):
-    global BEST_FIT, STAG
+    global BEST_FIT, STAG, POPULATION
     STAG += 1
     start_t = time.time()
     try:
@@ -82,13 +82,17 @@ def fit_func(genomes, neat_config, params):
         for result_dict in results:
             for k, v in result_dict.items():
                 fitness_dict[k] = v
+
+        surviving_genomes = {}
         for g_id, genome in genomes:
             genome.fitness = fitness_dict[g_id]
             if genome.fitness > BEST_FIT:
                 BEST_FIT = genome.fitness
                 STAG = 0
+            if genome.fitness > -2:
+                surviving_genomes[g_id] = genome
 
-
+        POPULATION.population = surviving_genomes
     except IOError as e:  # Sometimes the environment just implodes
         if e.errno == errno.EPIPE:
             print("Problem with broken pipe")
@@ -100,7 +104,6 @@ def fit_func(genomes, neat_config, params):
         print("!!!!!!!!!!!!!!!!!!!!! POPULATION STAGNATED !!!!!!!!!!!!!!!!!!!")
         if params["save_to"] is not "":
             dill.dump(genomes, open(params["save_to"] + "_genomes.pkl", mode='wb'))
-            global POPULATION
             remove_reporters(POPULATION)
             dill.dump(POPULATION, open(params["save_to"] + "_pop.pkl", mode='wb'))
         exit()

@@ -21,7 +21,7 @@ def morph_substrate_3D_out(params):
 
 def morph_substrate_CPPN_like():
     design_in_layer = calc_layer(1, 2, 1)
-    design_h1 = calc_layer(1, 4, 2)
+    design_h1 = calc_layer(2, 2, 2)
     design_out_layer = calc_layer(1, 5, 3)
     design_substrate = Substrate(design_in_layer, design_out_layer, [design_h1])
     return design_substrate
