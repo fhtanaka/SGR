@@ -1,4 +1,3 @@
-import multiprocessing
 import neat
 import os
 import numpy as np
@@ -9,7 +8,6 @@ import time
 import neat.nn
 import pathlib
 
-import pathos
 from pathos.multiprocessing import ProcessPool
 from evogym import is_connected, has_actuator
 
@@ -89,7 +87,7 @@ def fit_func(genomes, neat_config, params):
             if genome.fitness > BEST_FIT:
                 BEST_FIT = genome.fitness
                 STAG = 0
-            if genome.fitness > -2:
+            if genome.fitness > -10000:
                 surviving_genomes[g_id] = genome
 
         POPULATION.population = surviving_genomes
