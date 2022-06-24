@@ -1,3 +1,4 @@
+from pickle import GLOBAL, POP
 import neat
 import os
 import numpy as np
@@ -17,6 +18,10 @@ from multiple_genome_arg_parser import parse_args
 from generate_robot import generate_robot_CPPN_like
 from evogym_sim import simulate_env, get_obs_size
 from sgr_main import eval_genome_constraint, N_TYPES
+
+BEST_FIT = -10000
+STAG = 0
+POPULATION = None
 
 class  RobotController:
     def __init__(self, controllers) -> None:
@@ -91,6 +96,9 @@ def optimize_control(controller_pop, robot, params):
 
 def structure_fit_func(genomes, config, params, robot_dict: Dict[str, RobotController]):
 
+    global BEST_FIT, STAG, POPULATION
+    STAG += 1
+
     for robot in robot_dict.values():
         robot.evaluated_this_gen = False
 
@@ -113,6 +121,18 @@ def structure_fit_func(genomes, config, params, robot_dict: Dict[str, RobotContr
         robot_controllers.best_fit = best_fit
         robot_controllers.evaluated_this_gen = True
 
+        if genome.fitness > BEST_FIT:
+            BEST_FIT = genome.fitness
+            STAG = 0
+    
+    if STAG > params["max_stag"]:
+        print("!!!!!!!!!!!!!!!!!!!!! POPULATION STAGNATED !!!!!!!!!!!!!!!!!!!")
+        if params["save_to"] is not "":
+            dill.dump(POPULATION, open(params["save_to"] + "_pop.pkl", mode='wb'))
+            dill.dump(robot_dict, open(params["save_to"] + "_robot_dict.pkl", mode='wb'))
+        exit()
+
+
 def main():
     params = parse_args()
     local_dir = os.path.dirname(__file__)
@@ -131,6 +151,9 @@ def main():
         pop.add_reporter(CustomReporter(True, params["save_to"] + "_out.txt", params["save_to"] + "_table.csv"))
     pop.add_reporter(neat.StdOutReporter(True))
 
+    global POPULATION
+    POPULATION = pop
+
     robot_dict = {}
     f = lambda genomes, config: structure_fit_func(genomes, config, params, robot_dict)
     winner = pop.run(f, params["gens"])
@@ -138,7 +161,8 @@ def main():
 
     if params["save_to"] is not "":
         remove_reporters(pop)
-        dill.dump(pop, open(params["save_to"] + "_pop.pkl", mode='wb'))
+        dill.dump(pop, open(params["save_to"] + "_structure_pop.pkl", mode='wb'))
+        dill.dump(robot_dict, open(params["save_to"] + "_robot_dict.pkl", mode='wb'))
 
 if __name__ == "__main__":
     main()
