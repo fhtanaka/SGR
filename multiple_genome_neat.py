@@ -1,4 +1,3 @@
-from pickle import GLOBAL, POP
 import neat
 import os
 import numpy as np
@@ -9,15 +8,15 @@ import time
 import neat.nn
 import pathlib
 
-from typing import Dict, List, Tuple
+from typing import Dict
 from pathos.multiprocessing import ProcessPool
 from evogym import hashable
 
 from custom_reporter import CustomReporter, remove_reporters
-from multiple_genome_arg_parser import parse_args
+from alt_arg_parser import parse_args
 from generate_robot import generate_robot_CPPN_like
 from evogym_sim import simulate_env, get_obs_size
-from sgr_main import eval_genome_constraint, N_TYPES
+from sgr_main import eval_genome_constraint
 
 BEST_FIT = -10000
 STAG = 0
