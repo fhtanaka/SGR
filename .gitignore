@@ -129,3 +129,10 @@ dmypy.json
 .pyre/
 
 *.gif
+
+results_multiple_neat/Balancer-v1/*.pkl
+results_multiple_neat/Carrier-v0/*.pkl
+results_multiple_neat/Climber-v2/*.pkl
+results_multiple_neat/ObstacleTraverser-v1/*.pkl
+results_multiple_neat/Thrower-v0/*.pkl
+results_multiple_neat/Walker-v0/*.pkl
