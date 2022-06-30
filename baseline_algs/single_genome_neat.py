@@ -7,12 +7,13 @@ import neat
 import time
 import neat.nn
 import pathlib
-
+import sys
 from typing import Dict
 from pathos.multiprocessing import ProcessPool
 from evogym import get_full_connectivity
 import evogym.envs
 
+sys.path.append('../')
 from custom_reporter import CustomReporter, remove_reporters
 from alt_arg_parser import parse_args
 from evogym_sim import get_obs_size

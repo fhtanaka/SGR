@@ -18,14 +18,14 @@ def parse_args():
     controller_in_between_gens = 1
     pop_size = 64
     pad = 0
-    neat_config = "configs/hyperNEAT_config_CPPN_robot"
+    neat_config = "../configs/hyperNEAT_config_CPPN_robot"
 
 
 
 
 
-    neat_controller_config = "configs/neat_controller.cfg"
-    neat_structure_config = "configs/neat_structure.cfg"
+    neat_controller_config = "../configs/neat_controller.cfg"
+    neat_structure_config = "../configs/neat_structure.cfg"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gens", nargs="?", default=gens, help="", type=int) 
