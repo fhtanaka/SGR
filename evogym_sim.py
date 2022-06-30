@@ -41,4 +41,5 @@ def simulate_env(robot, net, params, render = False, save_gif= False):
     del env
     if save_gif:
         imageio.mimsave(params["save_to"] + ".gif", imgs, duration=(1/60))
+        return reward, finished, imgs
     return reward, finished
