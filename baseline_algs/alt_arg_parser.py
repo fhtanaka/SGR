@@ -18,7 +18,7 @@ def parse_args():
     controller_in_between_gens = 1
     pop_size = 64
     pad = 0
-    neat_config = "../configs/hyperNEAT_config_CPPN_robot"
+    neat_config = "../configs/hyperNEAT_CPPN_robot.cfg"
 
 
 

@@ -4,16 +4,16 @@ def parse_args():
     args_dict = {}
 
     # Default Values
-    gens = 500
+    gens = 100
     robot_size = 5
-    steps = 600
+    steps = 400
     env = "Climber-v2"     # env_names = ["CaveCrawler-v0", "UpStepper-v0", "ObstacleTraverser-v0"]
     n_threads = 4
     save_to = ""
     goal_fit = 10
-    pop_size = 64
+    pop_size = 32
     max_stag = 100
-    neat_config = "configs/hyperNEAT_config_CPPN_robot"
+    neat_config = "configs/hyperNEAT_CPPN_robot.cfg"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gens", nargs="?", default=gens, help="", type=int) 
