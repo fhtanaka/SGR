@@ -25,7 +25,7 @@ def generate_robot_CPPN_like(net, robot_size=5):
     return robot
 
 def generate_robot(net, params):
-    return generate_robot_CPPN_like(net, params["robot_size"])
+    return generate_robot_3D_out(net, params["robot_size"])
 
 def premade_robot():
     a = [

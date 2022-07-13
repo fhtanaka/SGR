@@ -13,7 +13,7 @@ def parse_args():
     goal_fit = 10
     pop_size = 32
     max_stag = 100
-    neat_config = "configs/hyperNEAT_CPPN_robot.cfg"
+    neat_config = "configs/hyperNEAT_3D_out_robot.cfg"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gens", nargs="?", default=gens, help="", type=int) 
