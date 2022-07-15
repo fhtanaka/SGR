@@ -27,7 +27,7 @@ def morph_substrate_CPPN_like():
     return design_substrate
 
 def morph_substrate(params):
-    return morph_substrate_CPPN_like()
+    return morph_substrate_3D_out(params)
 
 def control_substrate_CPPN_like(params, robot):
     controller_in_layer = calc_layer(1, get_obs_size(robot, params), -1)
@@ -45,4 +45,4 @@ def control_substrate_3D_out(params, robot):
 
 
 def control_substrate(params, robot):
-    return control_substrate_CPPN_like(params, robot)
+    return control_substrate_3D_out(params, robot)
