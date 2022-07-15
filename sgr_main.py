@@ -68,7 +68,7 @@ def fit_func(genomes, neat_config, params):
     start_t = time.time()
     if params["env"] == "dynamic":
         create_ObstacleTraverser_JSON()
-        
+
     try:
         pool = ProcessPool(nodes=params["cpu"])
         results_map = pool.amap(
@@ -78,7 +78,7 @@ def fit_func(genomes, neat_config, params):
             [neat_config for _ in range(params["cpu"])],
         )
         
-        results = results_map.get(timeout=30*60)
+        results = results_map.get(timeout=60*60)
 
         fitness_dict = {}
         for result_dict in results:

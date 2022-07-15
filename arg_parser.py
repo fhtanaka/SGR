@@ -4,17 +4,17 @@ def parse_args():
     args_dict = {}
 
     # Default Values
-    gens = 100
-    robot_size = 5
+    gens = 250
+    robot_size = 7
     steps = 400
     env = "dynamic"     # env_names = ["CaveCrawler-v0", "UpStepper-v0", "ObstacleTraverser-v0"]
     n_threads = 4
     save_to = ""
     goal_fit = 10
     pop_size = 32
-    max_stag = 100
+    max_stag = 200
     neat_config = "configs/hyperNEAT_3D_out_robot.cfg"
-    save_gen_interval = 1000
+    save_gen_interval = 20
     spec_genotype_weight = .8
     spec_phenotype_weight = 5
 

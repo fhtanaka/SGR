@@ -2,13 +2,10 @@ import numpy as np
 
 N_TYPES = ['empty', 'rigid', 'soft', 'hori', 'vert']
 
-def generate_robot_3D_out(net, robot_size=5):
+def generate_robot_3D_out(net, robot_size):
     graph_out = net.activate([1997])
     formated_output = np.reshape(graph_out, (robot_size, robot_size, len(N_TYPES)), "F")
-    robot = np.argmax(formated_output, 0)
-    for i in range(len(robot)):
-        for j in range(len(robot[i])):
-            robot[i][j] = robot[i][j]
+    robot = np.argmax(formated_output, 2)
     return robot
 
 
