@@ -18,12 +18,13 @@ from body_speciation import new_distance
 from substrates import morph_substrate, control_substrate
 from generate_robot import generate_robot
 from evogym_sim import simulate_env
+from dynamic_env.generateJSON import create_ObstacleTraverser_JSON
 
 
 N_TYPES = ['empty', 'rigid', 'soft', 'hori', 'vert']
 BEST_FIT = -10000
 STAG = 0
-POPULATION = None
+POPULATION: neat.Population = None
 
 def eval_genome_constraint(robot):
     validity = is_connected(robot) and has_actuator(robot)
@@ -65,6 +66,9 @@ def fit_func(genomes, neat_config, params):
     global BEST_FIT, STAG, POPULATION
     STAG += 1
     start_t = time.time()
+    if params["env"] == "dynamic":
+        create_ObstacleTraverser_JSON()
+        
     try:
         pool = ProcessPool(nodes=params["cpu"])
         results_map = pool.amap(
@@ -74,7 +78,7 @@ def fit_func(genomes, neat_config, params):
             [neat_config for _ in range(params["cpu"])],
         )
         
-        results = results_map.get(timeout=15*60)
+        results = results_map.get(timeout=30*60)
 
         fitness_dict = {}
         for result_dict in results:
@@ -101,10 +105,10 @@ def fit_func(genomes, neat_config, params):
     if STAG > params["max_stag"]:
         print("!!!!!!!!!!!!!!!!!!!!! POPULATION STAGNATED !!!!!!!!!!!!!!!!!!!")
         if params["save_to"] is not "":
-            dill.dump(genomes, open(params["save_to"] + "_genomes.pkl", mode='wb'))
-            remove_reporters(POPULATION)
             dill.dump(POPULATION, open(params["save_to"] + "_pop.pkl", mode='wb'))
         exit()
+    if (POPULATION.generation+1)%params["save_gen_interval"] == 0:
+        dill.dump(POPULATION, open(f"{params['save_to']}_pop_gen_{POPULATION.generation}.pkl", mode='wb'))
 
 def main():
     params = parse_args()

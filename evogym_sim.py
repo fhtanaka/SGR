@@ -3,9 +3,18 @@ import evogym.envs
 import imageio
 import numpy as np
 
+from dynamic_env.traverser import ObstacleTraverser
+
+def get_env(robot, connections, env_name):
+    if env_name == "dynamic":
+        env = ObstacleTraverser(body=robot, connections=connections)
+    else:
+        env = evogym.envs.gym.make(env_name, body=robot, connections=connections)
+    return env
+
 def get_obs_size(robot, params):
     connections = get_full_connectivity(robot)
-    env = evogym.envs.gym.make(params["env"], body=robot, connections=connections)
+    env = get_env(robot, connections, params["env"])
     obs = env.reset()
     env.close()
     del env
@@ -13,8 +22,7 @@ def get_obs_size(robot, params):
 
 def simulate_env(robot, net, params, render = False, save_gif= False):
     connections = get_full_connectivity(robot)
-    env = evogym.envs.gym.make(params["env"], body=robot, connections=connections)
-
+    env = get_env(robot, connections, params["env"])
     reward = 0
 
     obs = env.reset()

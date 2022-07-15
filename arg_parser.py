@@ -7,13 +7,16 @@ def parse_args():
     gens = 100
     robot_size = 5
     steps = 400
-    env = "Climber-v2"     # env_names = ["CaveCrawler-v0", "UpStepper-v0", "ObstacleTraverser-v0"]
+    env = "dynamic"     # env_names = ["CaveCrawler-v0", "UpStepper-v0", "ObstacleTraverser-v0"]
     n_threads = 4
     save_to = ""
     goal_fit = 10
     pop_size = 32
     max_stag = 100
     neat_config = "configs/hyperNEAT_CPPN_robot.cfg"
+    save_gen_interval = 1000
+    spec_genotype_weight = .8
+    spec_phenotype_weight = 5
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--gens", nargs="?", default=gens, help="", type=int) 
@@ -26,6 +29,9 @@ def parse_args():
     parser.add_argument("--pop", nargs="?", default=pop_size, help="", type=int) 
     parser.add_argument("--max_stag", nargs="?", default=max_stag, help="", type=int)
     parser.add_argument("--neat_config", nargs="?", default=neat_config, help="", type=str) 
+    parser.add_argument("--save_gen_interval", nargs="?", default=save_gen_interval, help="", type=int)
+    parser.add_argument("--spec_genotype_weight", nargs="?", default=spec_genotype_weight, help="", type=float) 
+    parser.add_argument("--spec_phenotype_weight", nargs="?", default=spec_phenotype_weight, help="", type=float) 
 
 
     command_line_args = parser.parse_args()
@@ -40,6 +46,10 @@ def parse_args():
     args_dict["pop_size"] = command_line_args.pop
     args_dict["max_stag"] = command_line_args.max_stag
     args_dict["neat_config"] = command_line_args.neat_config
+    args_dict["save_gen_interval"] = command_line_args.save_gen_interval
+    args_dict["spec_genotype_weight"] = command_line_args.spec_genotype_weight
+    args_dict["spec_phenotype_weight"] = command_line_args.spec_phenotype_weight
+
 
     # if report is not None:
     for k, v in args_dict.items():

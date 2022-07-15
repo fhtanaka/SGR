@@ -88,4 +88,4 @@ def new_distance(params, substrate, robot_func, self: neat.DefaultGenome, other:
     new_distance = diff/(params["robot_size"]**2) # Normalizing between 0 and 1
     original_dist = old_distance(self, other, config)
 
-    return original_dist + 3*new_distance
+    return params["spec_genotype_weight"]*original_dist + params["spec_phenotype_weight"]*new_distance
