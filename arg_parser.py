@@ -5,7 +5,7 @@ def parse_args():
 
     # Default Values
     gens = 250
-    robot_size = 7
+    robot_size = 5
     steps = 400
     env = "dynamic"     # env_names = ["CaveCrawler-v0", "UpStepper-v0", "ObstacleTraverser-v0"]
     n_threads = 4

@@ -20,7 +20,7 @@ def base_json(width, height):
 def generate_env(width, height, barrier_interval, barrier_height_prob):
     env = np.zeros((height, width))
     env[0][:] = FIXED_VX # building the ground
-    for j in range(5, width, barrier_interval):
+    for j in range(12, width, barrier_interval):
         r = np.random.random()
         h = 1
         acc_prob = 0
@@ -36,7 +36,8 @@ def generate_env(width, height, barrier_interval, barrier_height_prob):
 def ij_to_index(i, j, width):
     return j + i*width
 
-def env2json(width=90, height=10, barrier_interval=1, barrier_height_prob=[.2,.6,.2]):
+
+def env2json(width=90, height=10, barrier_interval=1, barrier_height_prob=[.6,.2,.2]):
     ground = {
         "indices": [],
         "types": [],

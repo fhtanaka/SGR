@@ -13,7 +13,7 @@ def calc_layer(*coords):
 
 def morph_substrate_3D_out(params):
     design_in_layer = calc_layer(1, 1, 1, 1)
-    design_h1 = calc_layer(params["robot_size"], params["robot_size"], 1, 2)
+    design_h1 = calc_layer(params["robot_size"]//2, params["robot_size"]//2, 1, 2)
     design_out_layer = calc_layer(params["robot_size"], params["robot_size"], 5, 3)
     design_substrate = Substrate(design_in_layer, design_out_layer, [design_h1])
     return design_substrate
