@@ -114,13 +114,24 @@ def main():
     params = parse_args()
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, params["neat_config"])
-   
+    morphology_coords = morph_substrate(params)
+
     defaultGen = neat.DefaultGenome
-    f = lambda self, other, config: new_distance(params, morph_substrate(params), generate_robot, self, other, config)
+    f = lambda self, other, config: new_distance(params, morphology_coords, generate_robot, self, other, config)
     defaultGen.distance = f
 
     neat_config = neat.Config(defaultGen, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+    
+    # ovewriting pop_size from the neat config file
     neat_config.pop_size = params["pop_size"]
+
+    # overwriting the num_inputs and num_outputs from the neat config file to fit the substrate
+    input_size = morphology_coords.dimensions*2 + 1 # two coordinates plus the bias
+    neat_config.genome_config.num_inputs = input_size
+    neat_config.genome_config.input_keys = [-1*i for i in range(1, input_size+1)]
+    neat_config.genome_config.num_outputs = 1
+    neat_config.genome_config.output_keys = [1]
+
 
     pop = neat.Population(neat_config)
     global POPULATION
