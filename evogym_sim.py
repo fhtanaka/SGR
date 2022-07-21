@@ -1,3 +1,4 @@
+import math
 from evogym import get_full_connectivity
 import evogym.envs
 import imageio
@@ -27,6 +28,8 @@ def simulate_env(robot, net, params, render = False, save_gif= False):
 
     obs = env.reset()
     actuators = env.get_actuator_indices("robot")
+    in_size = math.ceil(math.sqrt(len(obs))) # this is to be used to format the input
+
     finished = False
     imgs = []
     for _ in range(params["steps"]):
@@ -35,6 +38,7 @@ def simulate_env(robot, net, params, render = False, save_gif= False):
         elif save_gif:
             imgs.append(env.render(mode='img'))
         
+        obs.resize(in_size**2, refcheck=False)
         action_by_actuator = net.activate(obs)
         action = np.array([action_by_actuator[i] for i in actuators])
 

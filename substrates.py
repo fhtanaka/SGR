@@ -1,4 +1,5 @@
 import itertools as it
+import math
 import numpy as np
 from evogym_sim import get_obs_size
 from hyperneat.substrate import Substrate
@@ -20,8 +21,9 @@ def morph_substrate_3D_out_shape(params):
     return shape
 
 def control_substrate_3D_out_shape(params, robot):
+    in_size = math.ceil(math.sqrt(get_obs_size(robot, params)))
     shape = [
-        [1, get_obs_size(robot, params), 1, -1],
+        [in_size, in_size, 1, -1],
         [params["robot_size"], params["robot_size"], 1, -2],
         [params["robot_size"], params["robot_size"], 1, -3]    
     ]
@@ -37,8 +39,9 @@ def morph_substrate_CPPN_like_shape(params):
     return shape
 
 def control_substrate_CPPN_like_shape(params, robot):
+    in_size = math.ceil(math.sqrt(get_obs_size(robot, params)))
     shape = [
-        [1, get_obs_size(robot, params), -1],
+        [in_size, in_size, -1],
         [params["robot_size"], params["robot_size"], -2],
         [params["robot_size"], params["robot_size"], -3]
     ]
