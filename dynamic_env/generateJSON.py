@@ -37,7 +37,7 @@ def ij_to_index(i, j, width):
     return j + i*width
 
 
-def env2json(width=90, height=10, barrier_interval=1, barrier_height_prob=[.6,.2,.2]):
+def env2json(width=90, height=10, barrier_interval=1, barrier_height_prob=[.3,.4,.3]):
     ground = {
         "indices": [],
         "types": [],
