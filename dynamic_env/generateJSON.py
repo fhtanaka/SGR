@@ -21,13 +21,16 @@ def base_json(width, height):
 
 def generate_env(width, height, barrier_height, barrier_prob):
     env = np.zeros((height, width))
-    env[0][:] = FIXED_VX # building the ground
-    previous_height = 1
+
+    env[0:height//2][:STARTING_ZONE] = FIXED_VX # building the starting ground
+    previous_height = height//2
     for j in range(STARTING_ZONE, width):
         r = np.random.choice(barrier_height, 1, p=barrier_prob)
         h = np.clip(previous_height + r, 1, height)
-        for i in range(0, int(h)):
-            env[i][j] = FIXED_VX
+        for i in range(0, height):
+            env[i][j] = EMPTY_VX
+            if i < h:
+                env[i][j] = FIXED_VX
         previous_height = h
     return env
 
@@ -47,7 +50,7 @@ def add_neighbors(i, j, env_vals, width, height):
     return neighbors
 
 
-def env2json(width=90, height=10, barrier_height=[-1,0,1], barrier_prob=[.3,.35,.35]):
+def env2json(width=70, height=20, barrier_height=[-2,-1,0,1,2], barrier_prob=[.1, .25,.3,.25, .1]):
     ground = {
         "indices": [],
         "types": [],
