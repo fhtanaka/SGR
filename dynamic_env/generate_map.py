@@ -10,9 +10,9 @@ def generate_NxN_map(w_size):
     world = [[None for _ in range(w_size[1])] for _ in range(w_size[0]) ]
     for i in range(w_size[0]):
         for j in range(w_size[1]):
-            minus_barrier = .1*(i+1)
-            plus_barrier = .1*(j+1)
-            no_barrier = 1-.1*(i+j+2)
+            minus_barrier = (0.5/w_size[0])*(i+1)
+            plus_barrier = (0.5/w_size[1])*(j+1)
+            no_barrier = 1-minus_barrier-plus_barrier
             p = [minus_barrier, no_barrier, plus_barrier]
             w = env2json(barrier_height=barriers, barrier_prob=p)
             print(i, j)
