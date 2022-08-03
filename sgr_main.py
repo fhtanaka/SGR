@@ -14,7 +14,7 @@ from evogym import is_connected, has_actuator
 from hyperneat.new_hyperNEAT import create_phenotype_network
 from custom_reporter import CustomReporter, remove_reporters
 from arg_parser import parse_args
-from body_speciation import new_distance
+from body_speciation import CustomGenome
 from substrates import morph_substrate, control_substrate
 from generate_robot import generate_robot
 from evogym_sim import simulate_env
@@ -107,7 +107,7 @@ def fit_func(genomes, neat_config, params):
         if params["save_to"] is not "":
             dill.dump(POPULATION, open(params["save_to"] + "_pop.pkl", mode='wb'))
         exit()
-    if (POPULATION.generation+1)%params["save_gen_interval"] == 0:
+    if params["save_to"] is not "" and (POPULATION.generation+1)%params["save_gen_interval"] == 0:
         dill.dump(POPULATION, open(f"{params['save_to']}_pop_gen_{POPULATION.generation}.pkl", mode='wb'))
 
 def main():
@@ -116,11 +116,11 @@ def main():
     config_path = os.path.join(local_dir, params["neat_config"])
     morphology_coords = morph_substrate(params)
 
-    defaultGen = neat.DefaultGenome
-    f = lambda self, other, config: new_distance(params, morphology_coords, generate_robot, self, other, config)
-    defaultGen.distance = f
+    CustomGenome.params = params
+    CustomGenome.robot_func = lambda self, net, params: generate_robot(net, params)
+    CustomGenome.substrate = morphology_coords
 
-    neat_config = neat.Config(defaultGen, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+    neat_config = neat.Config(CustomGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
     
     # ovewriting pop_size from the neat config file
     neat_config.pop_size = params["pop_size"]

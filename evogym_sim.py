@@ -4,11 +4,11 @@ import evogym.envs
 import imageio
 import numpy as np
 
-from dynamic_env.traverser import ObstacleTraverser
+from dynamic_env.traverser import DynamicObstacleTraverser
 
 def get_env(robot, connections, env_name):
     if env_name == "dynamic":
-        env = ObstacleTraverser(body=robot, connections=connections)
+        env = DynamicObstacleTraverser(body=robot, connections=connections)
     else:
         env = evogym.envs.gym.make(env_name, body=robot, connections=connections)
     return env
