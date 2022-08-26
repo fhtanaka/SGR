@@ -1,4 +1,3 @@
-from evogym.envs.base import EvoGymBase
 from gym import error, spaces
 
 from evogym import *
@@ -9,11 +8,14 @@ import os
 
 
 class DynamicObstacleTraverser(WalkingBumpy2):
-    def __init__(self, body, connections=None):
+    def __init__(self, body, connections=None, filename ="data.json", world_dict=None):
 
         # make world
-        local_dir = os.path.dirname(__file__)
-        self.world = EvoWorld.from_json(os.path.join(local_dir, 'data.json'))
+        if world_dict is None:
+            self.load_world_from_file(self, filename)
+        else:
+            self.load_world_from_dict(self, world_dict)
+
         starting_height = (self.world.grid_size[1]//2)+5
         self.world.add_from_array('robot', body, 2, starting_height, connections=connections)
 
@@ -27,3 +29,16 @@ class DynamicObstacleTraverser(WalkingBumpy2):
 
         self.action_space = spaces.Box(low= 0.6, high=1.6, shape=(num_actuators,), dtype=np.float)
         self.observation_space = spaces.Box(low=-100.0, high=100.0, shape=(3 + num_robot_points + (2*self.sight_dist +1),), dtype=np.float)
+
+    def load_world_from_file(self, filename):
+        local_dir = os.path.dirname(__file__)
+        self.world = EvoWorld.from_json(os.path.join(local_dir, filename))
+
+    def load_world_from_dict(self, world_dict):
+        self.world = EvoWorld()
+        file_grid_size = Pair(world_dict['grid_width'], world_dict['grid_height'])
+
+        for name, obj_data in world_dict['objects'].items():
+            obj = WorldObject()
+            obj.load_from_parsed_json(name, obj_data, file_grid_size)
+            self.world.add_object(obj) 

@@ -9,17 +9,13 @@ def robot_from_genome(genome, params, substrate, robot_func, config):
     design_net = create_phenotype_network(cppn, substrate)
     robot = robot_func(design_net, params)
     
-    if not eval_genome_constraint(robot):
+    if not (is_connected(robot) and has_actuator(robot)):
         robot = np.zeros((params["robot_size"], params["robot_size"]))
     return robot
 
 class TempConfig:
     def __init__(self, config):
         self.genome_config = config
-
-def eval_genome_constraint(robot):
-    validity = is_connected(robot) and has_actuator(robot)
-    return validity
 
 
 class CustomGenome(neat.DefaultGenome):
