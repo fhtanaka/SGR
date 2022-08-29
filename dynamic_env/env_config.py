@@ -3,12 +3,12 @@ import numpy as np
 import json
 from generateJSON import env2json
 
-def random_distribution(size, rng: np.random.Generator):
+def random_prob_distribution(size, rng: np.random.Generator):
     initial_values = [rng.random() for _ in range(size)]
     distribution = [n/sum(initial_values) for n in initial_values]
     return distribution
 
-def random_mutation(size, rng: np.random.Generator):
+def random_prob_mutation(size, rng: np.random.Generator):
     initial_values = np.array([rng.random() for _ in range(size)])
     distribution = initial_values - initial_values.mean()
     return distribution
@@ -24,13 +24,24 @@ class EnvConfig:
     def randomize_config(self):
         self.obs_h = self.rng.integers(0,5)
         self.heights_list = [n for n in range(-1*self.obs_h, self.obs_h+1)]
-        self.obstacle_prob = random_distribution(len(self.heights_list), self.rng)
+        self.obstacle_prob = random_prob_distribution(len(self.heights_list), self.rng)
 
     def mutate_prob(self, mutation_power):
-        mutation = random_mutation(len(self.heights_list), self.rng)
+        mutation = random_prob_mutation(len(self.heights_list), self.rng)
         self.obstacle_prob += mutation * mutation_power
+    
+    def mutate_obs_h(self, max_mutation):
+        possible_hs = []
+        for i in range(self.obs_h - max_mutation, self.obs_h + max_mutation + 1):
+            if -5 < i < 5 and i != self.obs_h:
+                possible_hs.append(i)
+        self.obs_h = self.rng.choice(possible_hs)
+        self.heights_list = [n for n in range(-1*self.obs_h, self.obs_h+1)]
+        self.obstacle_prob = random_prob_distribution(len(self.heights_list), self.rng)
+        
 
     def generate_json(self, filename="data.json"):
+        self.reset_seed()
         env = env2json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
         local_dir = os.path.dirname(__file__)
         path = os.path.join(local_dir, filename)
@@ -38,6 +49,7 @@ class EnvConfig:
             json.dump(env, f, ensure_ascii=False, indent=4)
 
     def generate_env_dict(self):
+        self.reset_seed()
         return env2json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
 
     def reset_seed(self):
