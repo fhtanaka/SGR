@@ -12,9 +12,9 @@ class DynamicObstacleTraverser(WalkingBumpy2):
 
         # make world
         if world_dict is None:
-            self.load_world_from_file(self, filename)
+            self.load_world_from_file(filename)
         else:
-            self.load_world_from_dict(self, world_dict)
+            self.load_world_from_dict(world_dict)
 
         starting_height = (self.world.grid_size[1]//2)+5
         self.world.add_from_array('robot', body, 2, starting_height, connections=connections)

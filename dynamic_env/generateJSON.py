@@ -71,9 +71,9 @@ def env2json(width=60, height=20, obstacle_height=[-2,-1,0,1,2], obstacle_prob=[
     return env_json
 
 
-def create_ObstacleTraverser_JSON():
+def create_ObstacleTraverser_JSON(file_path='dynamic_env/data.json'):
     env = env2json()
-    with open('dynamic_env/data.json', 'w', encoding='utf-8') as f:
+    with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(env, f, ensure_ascii=False, indent=4)
 
 
