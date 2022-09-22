@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import json
-from generateJSON import env2json
+from generateJSON import generate_env_json
 
 # Creates and array of length [size] with values [0, 1[ where the sum of elements is 1
 def random_prob_distribution(size, rng: np.random.Generator): 
@@ -45,7 +45,7 @@ class EnvConfig:
 
     def generate_json(self, filename="data.json"):
         self.reset_seed()
-        env = env2json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
+        env = generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
         local_dir = os.path.dirname(__file__)
         path = os.path.join(local_dir, filename)
         with open(path, 'w', encoding='utf-8') as f:
@@ -53,7 +53,7 @@ class EnvConfig:
 
     def generate_env_dict(self):
         self.reset_seed()
-        return env2json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
+        return generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
 
     def reset_seed(self):
         self.rng = np.random.default_rng(self.seed)
