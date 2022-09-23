@@ -11,7 +11,7 @@ import pathlib
 from pathos.multiprocessing import ProcessPool
 
 from hyperneat.new_hyperNEAT import create_phenotype_network
-from custom_reporter import CustomReporter, remove_reporters
+from sgr.custom_reporter import CustomReporter, remove_reporters
 from sgr.body_speciation import CustomGenome
 from sgr.substrates import morph_substrate, control_substrate
 from sgr.generate_robot import generate_robot, eval_robot_constraint
@@ -30,8 +30,6 @@ class SGR:
         ):
 
 
-        local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, neat_config_path)
         morphology_coords = morph_substrate(robot_size)
 
         self.input_size = morphology_coords.dimensions*2 + 1 # two coordinates plus the bias
@@ -46,7 +44,7 @@ class SGR:
         CustomGenome.spec_phenotype_weight = spec_phenotype_weight
 
 
-        self.neat_config = self.create_neat_config(config_path, CustomGenome)
+        self.neat_config = self.create_neat_config(neat_config_path, CustomGenome)
         self.pop = neat.Population(self.neat_config)
         self.add_reporters()
         
@@ -55,6 +53,8 @@ class SGR:
         self.best_fit = -10000
         self.stagnation = 0
         self.generation = 0
+        self.max_stagnation = None
+        self.save_gen_interval = None
 
     def create_neat_config(self, config_path, neat_genome=neat.DefaultGenome):
         neat_config = neat.Config(neat_genome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
@@ -70,7 +70,7 @@ class SGR:
 
         return neat_config
 
-    def add_reporters(self, ):
+    def add_reporters(self):
         stats = neat.StatisticsReporter()
         self.pop.add_reporter(stats)
         if self.save_to is not "":
@@ -163,18 +163,20 @@ class SGR:
 
     def check_stagnation_and_save_interval(self):
         print("STAGNATION: ", self.stagnation)
-        if hasattr(self, 'max_stagnation') and self.stagnation > self.max_stagnation:
+        if self.max_stagnation is not None and self.stagnation > self.max_stagnation:
             print("!!!!!!!!!!!!!!!!!!!!! POPULATION STAGNATED !!!!!!!!!!!!!!!!!!!")
             if self.save_to is not "":
                 dill.dump(self.pop, open(self.save_to + "_pop.pkl", mode='wb'))
             exit()
-        if self.save_to is not "" and hasattr(self, 'save_gen_interval') and (self.pop.generation+1)% self.save_gen_interval == 0:
+        if self.save_to is not "" and self.save_gen_interval is not None and (self.pop.generation+1)% self.save_gen_interval == 0:
             dill.dump(self.pop, open(f"{self.save_to}_pop_gen_{self.pop.generation}.pkl", mode='wb'))
 
-    def run(self, env_name, n_steps, n_gens, cpus=1):
+    def run(self, env_name, n_steps, n_gens, cpus=1, max_stagnation=None, save_gen_interval=None):
         self.best_fit = -10000
         self.stagnation = 0
         self.generation = 0
+        self.max_stagnation = max_stagnation
+        self.save_gen_interval = save_gen_interval
 
         neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus)
         winner = self.pop.run(neat_fit_func, n_gens)
@@ -183,3 +185,5 @@ class SGR:
         if self.save_to is not "":
             remove_reporters(self.pop)
             dill.dump(self.pop, open(self.save_to + "_pop.pkl", mode='wb'))
+        
+        return winner

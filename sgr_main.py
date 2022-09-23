@@ -1,155 +1,30 @@
-import neat
 import os
-import numpy as np
-import errno
-import dill
-import neat
-import time
-import neat.nn
-import pathlib
 
-from pathos.multiprocessing import ProcessPool
-from evogym import is_connected, has_actuator
 
-from hyperneat.new_hyperNEAT import create_phenotype_network
-from custom_reporter import CustomReporter, remove_reporters
 from arg_parser import parse_args
-from body_speciation import CustomGenome
-from substrates import morph_substrate, control_substrate
-from generate_robot import generate_robot
-from evogym_sim import simulate_env
-from dynamic_env.generateJSON import create_ObstacleTraverser_JSON
-
-
-N_TYPES = ['empty', 'rigid', 'soft', 'hori', 'vert']
-BEST_FIT = -10000
-STAG = 0
-POPULATION: neat.Population = None
-
-def eval_genome_constraint(robot):
-    validity = is_connected(robot) and has_actuator(robot)
-    return validity
-
-def single_genome_fit(genome, params, neat_config, render=False, save_gif=False):
-    cppn = neat.nn.FeedForwardNetwork.create(genome, neat_config)
-
-    if hasattr(genome, 'robot'):
-        robot = genome.robot
-    else:
-        design_substrate = morph_substrate(params)
-        design_net = create_phenotype_network(cppn, design_substrate)
-        robot = generate_robot(design_net, params)
-
-    if not eval_genome_constraint(robot):
-        return -10000, False
-
-    try:
-        controller_substrate = control_substrate(params, robot)
-    except IndexError: # Sometimes the environment just implodes
-        return -10000, False
-
-    controller_net = create_phenotype_network(cppn, controller_substrate)
-
-    reward, done = simulate_env(robot, controller_net, params, render, save_gif)
-
-    genome.robot = robot
-    return reward, done
-
-def fit_func_thread(genomes, params, neat_config):
-    results_dict = {}
-    for genome_key, genome in genomes:
-        reward, _ = single_genome_fit(genome, params, neat_config)
-        results_dict[genome_key] = reward
-    return results_dict
-
-def fit_func(genomes, neat_config, params):
-    global BEST_FIT, STAG, POPULATION
-    STAG += 1
-    start_t = time.time()
-    if params["env"] == "dynamic":
-        create_ObstacleTraverser_JSON()
-
-    try:
-        pool = ProcessPool(nodes=params["cpu"])
-        results_map = pool.amap(
-            fit_func_thread,
-            np.array_split(genomes, params["cpu"]),
-            [params for _ in range(params["cpu"])],
-            [neat_config for _ in range(params["cpu"])],
-        )
-        
-        results = results_map.get(timeout=60*60)
-
-        fitness_dict = {}
-        for result_dict in results:
-            for k, v in result_dict.items():
-                fitness_dict[k] = v
-
-        surviving_genomes = {}
-        for g_id, genome in genomes:
-            genome.fitness = fitness_dict[g_id]
-            if genome.fitness > BEST_FIT:
-                BEST_FIT = genome.fitness
-                STAG = 0
-            if genome.fitness > -10000:
-                surviving_genomes[g_id] = genome
-
-        POPULATION.population = surviving_genomes
-    except IOError as e:  # Sometimes the environment just implodes
-        if e.errno == errno.EPIPE:
-            print("Problem with broken pipe")
-        else:
-            raise(IOError)
-    print("Simulation took ", time.time()-start_t, "s")
-    print("STAGNATION: ", STAG)
-    if STAG > params["max_stag"]:
-        print("!!!!!!!!!!!!!!!!!!!!! POPULATION STAGNATED !!!!!!!!!!!!!!!!!!!")
-        if params["save_to"] is not "":
-            dill.dump(POPULATION, open(params["save_to"] + "_pop.pkl", mode='wb'))
-        exit()
-    if params["save_to"] is not "" and (POPULATION.generation+1)%params["save_gen_interval"] == 0:
-        dill.dump(POPULATION, open(f"{params['save_to']}_pop_gen_{POPULATION.generation}.pkl", mode='wb'))
+from sgr.sgr import SGR
 
 def main():
     params = parse_args()
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, params["neat_config"])
-    morphology_coords = morph_substrate(params)
+    config_path = os.path.join(local_dir, params.neat_config)
+    pop = SGR(
+        config_path,
+        params.robot_size,
+        params.spec_genotype_weight,
+        params.spec_phenotype_weight,
+        params.pop_size,
+        params.save_to
+    )
 
-    CustomGenome.params = params
-    CustomGenome.robot_func = lambda self, net, params: generate_robot(net, params)
-    CustomGenome.substrate = morphology_coords
-
-    neat_config = neat.Config(CustomGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
-    
-    # ovewriting pop_size from the neat config file
-    neat_config.pop_size = params["pop_size"]
-
-    # overwriting the num_inputs and num_outputs from the neat config file to fit the substrate
-    input_size = morphology_coords.dimensions*2 + 1 # two coordinates plus the bias
-    neat_config.genome_config.num_inputs = input_size
-    neat_config.genome_config.input_keys = [-1*i for i in range(1, input_size+1)]
-    neat_config.genome_config.num_outputs = 1
-    neat_config.genome_config.output_keys = [1]
-
-
-    pop = neat.Population(neat_config)
-    global POPULATION
-    POPULATION = pop
-    stats = neat.StatisticsReporter()
-    pop.add_reporter(stats)
-    if params["save_to"] is not "":
-        pathlib.Path("/".join(params["save_to"].split("/")[:-1])).mkdir(parents=True, exist_ok=True) 
-        pop.add_reporter(CustomReporter(True, params["save_to"] + "_out.txt", params["save_to"] + "_table.csv"))
-    pop.add_reporter(neat.StdOutReporter(True))
-
-    f = lambda genomes, config: fit_func(genomes, config, params)
-    winner = pop.run(f, params["gens"])
-    print('\nBest genome:\n{!s}'.format(winner))
-
-    if params["save_to"] is not "":
-        remove_reporters(pop)
-        dill.dump(pop, open(params["save_to"] + "_pop.pkl", mode='wb'))
+    pop.run(
+        params.env,
+        params.steps,
+        params.gens,
+        params.cpu,
+        params.max_stag,
+        params.save_gen_interval
+    )
 
 
 if __name__ == "__main__":

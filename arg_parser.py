@@ -56,5 +56,21 @@ def parse_args():
         print(f"{k}: {v}")
     print()
 
-    return args_dict
+    return Parameters(args_dict)
+    
+class Parameters:
+    def __init__(self, args_dict):
+        self.gens = args_dict["gens"]
+        self.robot_size = args_dict["robot_size"]
+        self.steps = args_dict["steps"]
+        self.env = args_dict["env"]
+        self.cpu = args_dict["cpu"]
+        self.save_to = args_dict["save_to"]
+        self.goal_fit = args_dict["goal_fit"]
+        self.pop_size = args_dict["pop_size"]
+        self.max_stag = args_dict["max_stag"]
+        self.neat_config = args_dict["neat_config"]
+        self.save_gen_interval = args_dict["save_gen_interval"]
+        self.spec_genotype_weight = args_dict["spec_genotype_weight"]
+        self.spec_phenotype_weight = args_dict["spec_phenotype_weight"]
 
