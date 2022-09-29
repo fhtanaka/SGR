@@ -1,25 +1,30 @@
 import numpy as np
 from copy import deepcopy
 import pickle
-from box2D.bipedal_walker_hardcore_custom import Env_config
-
+from dynamic_env.env_config import EnvConfig
+from sgr.sgr import SGR
+from arg_parser import Parameters
 class Pair:
     """ A POET pair consisting of an environment and an agent. """
     def __init__(self, seed):
         self.environment = None
-        self.agent = None
+        self.agent_pop = None
         self.fitness = None
         self.seed = seed
 
-    def init_first(self, agent_type, agent_parameters):
-        self.environment = Env_config(name=str(1), ground_roughness=0, pit_gap=[], stump_width=[], stump_height=[],
-                                      stump_float=[], stair_height=[], stair_width=[], stair_steps=[], leg_l_w=0,
-                                      leg_l_h=0, leg_r_w=0, leg_r_h=0, lower_l_w=0,
-                                      lower_l_h=0, lower_r_w=0, lower_r_h=0)
-        self.agent = agent_type(*agent_parameters, self.seed)
+    def init_first(self, params: Parameters, config_path):
+        self.environment = EnvConfig(seed = self.seed)
+        self.agent_pop = SGR(
+            config_path,
+            params.robot_size,
+            params.spec_genotype_weight,
+            params.spec_phenotype_weight,
+            params.pop_size,
+            params.save_to
+        )
 
 class POET:
-    def __init__(self, agent_type, agent_parameters, seed):
+    def __init__(self, seed: np.random.SeedSequence, params: Parameters, config_path):
         self.seed = seed
         self.main_seed = self.seed.spawn(1)[0]
         self.rng = np.random.default_rng(self.main_seed)
@@ -36,12 +41,11 @@ class POET:
         self.max_pair_population_size = 20
         self.k = 5
 
-        self.agent_type = agent_type
         
         # The pairs of environments and agents
         self.pairs = []
         first_pair = Pair(self.seed.spawn(1)[0])
-        first_pair.init_first(self.agent_type, agent_parameters)
+        first_pair.init_first(params, config_path)
         self.pairs.append(first_pair)
 
         # The archive with all environments that have ever existed in the pair population
