@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 from copy import deepcopy
 import pickle
@@ -43,7 +44,8 @@ class POET:
 
         
         # The pairs of environments and agents
-        self.pairs = []
+        self.pairs: List[Pair] = []
+        self.run_params = params
         first_pair = Pair(self.seed.spawn(1)[0])
         first_pair.init_first(params, config_path)
         self.pairs.append(first_pair)
@@ -168,7 +170,7 @@ class POET:
                 if new_pit_1 < min_pit_1:
                     new_pit_1 = min_pit_1
                 if new_pit_1 > max_pit_1:
-                    new_pit_1 = max_pit_1
+                    nelotw_pit_1 = max_pit_1
                 pit_gap = [new_pit_0, new_pit_1]
             if pit_gap[0] > pit_gap[1]:
                 st0 = pit_gap[0]
@@ -247,7 +249,7 @@ class POET:
                     new_steps[0] = max_steps
 
         self.total_environments_created += 1
-        new_env = Env_config(name=str(self.total_environments_created), ground_roughness=new_gr, pit_gap=pit_gap, stump_width=stump_width,
+        new_env = EnvCon(name=str(self.total_environments_created), ground_roughness=new_gr, pit_gap=pit_gap, stump_width=stump_width,
                              stump_height=stump_height, stump_float=env.stump_float, stair_height=stair_height,
                              stair_width=stair_width, stair_steps=new_steps, leg_l_w=env.leg_l_w,
                              leg_l_h=env.leg_l_h, leg_r_w=env.leg_r_w, leg_r_h=env.leg_r_h, lower_l_w=env.lower_l_w,
@@ -338,12 +340,20 @@ class POET:
     def train_agents(self, generations):
         for pair in self.pairs:
             # Set environments
-            pair.agent.set_env_config(pair.environment)
-            # Train agents
-            evaluations = pair.agent.run(generations, self.total_evaluations, verbose=True)
-            self.total_evaluations += evaluations
+            pop = pair.agent_pop
+            env = pair.environment
+            env.generate_json("env.json")
+            winner = pop.run(
+                env_name = self.run_params.env,
+                n_steps = self.run_params.steps,
+                n_gens = self.run_params.gens,
+                cpus = self.run_params.cpu,
+                max_stagnation = self.run_params.max_stag,
+                save_gen_interval = self.run_params.save_gen_interval
+            )
+
             # Set fitness
-            pair.fitness = max(pair.agent.precalculated_fitness)
+            pair.fitness = winner.fitness
 
     def transfer(self):
         # Direct transfer

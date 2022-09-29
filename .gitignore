@@ -138,4 +138,5 @@ results_multiple_neat/Thrower-v0/*.pkl
 results_multiple_neat/Walker-v0/*.pkl
 svg.g*
 data.json
+env.json
 dynamic_env/*.json

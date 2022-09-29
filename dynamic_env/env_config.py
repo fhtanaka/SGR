@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import json
-from generateJSON import generate_env_json
+from .generateJSON import generate_env_json
 
 # Creates and array of length [size] with values [0, 1[ where the sum of elements is 1
 def random_prob_distribution(size, rng: np.random.Generator): 
@@ -9,7 +9,7 @@ def random_prob_distribution(size, rng: np.random.Generator):
     distribution = [n/sum(initial_values) for n in initial_values]
     return distribution
 
-# Creates and array of length [size] with values [-1, .1[ where the sum of elements is 0
+# Creates and array of length [size] with values [-1, 1[ where the sum of elements is 0
 # This is used to mutate arrays without altering its sum
 def random_prob_mutation(size, rng: np.random.Generator):
     initial_values = np.array([rng.random() for _ in range(size)])
@@ -43,7 +43,7 @@ class EnvConfig:
         self.obstacle_prob = random_prob_distribution(len(self.heights_list), self.rng)
         
 
-    def generate_json(self, filename="data.json"):
+    def generate_json(self, filename="env.json"):
         self.reset_seed()
         env = generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
         local_dir = os.path.dirname(__file__)

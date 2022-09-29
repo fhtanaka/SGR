@@ -1,6 +1,4 @@
 import os
-
-
 from arg_parser import parse_args
 from sgr.sgr import SGR
 

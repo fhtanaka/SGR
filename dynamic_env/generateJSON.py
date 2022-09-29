@@ -71,11 +71,11 @@ def generate_env_json(width=60, height=20, obstacle_height=[-2,-1,0,1,2], obstac
     return env_json
 
 
-def create_ObstacleTraverser_JSON(file_path='dynamic_env/data.json'):
+def create_ObstacleTraverser_JSON(file_path):
     env = generate_env_json()
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(env, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
-    create_ObstacleTraverser_JSON()
+    create_ObstacleTraverser_JSON('dynamic_env/env.json')

@@ -122,8 +122,10 @@ class SGR:
     def fit_func(self, genomes, neat_config, env_name, n_steps, cpus):
         self.stagnation += 1
         start_t = time.time()
-        # if env_name == "dynamic":
-        #     create_ObstacleTraverser_JSON("../dynamic_env/data.json")
+        local_dir = os.path.dirname(__file__)
+        json_path = os.path.join(local_dir, "../dynamic_env/env.json")
+        if env_name == "dynamic" and not os.path.exists(json_path):
+            create_ObstacleTraverser_JSON(json_path)
 
         try:
             pool = ProcessPool(nodes=cpus)
@@ -179,7 +181,7 @@ class SGR:
         self.save_gen_interval = save_gen_interval
 
         neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus)
-        winner = self.pop.run(neat_fit_func, n_gens)
+        winner: CustomGenome = self.pop.run(neat_fit_func, n_gens)
         print('\nBest genome:\n{!s}'.format(winner))
 
         if self.save_to is not "":

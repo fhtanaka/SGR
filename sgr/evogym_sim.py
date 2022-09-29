@@ -3,12 +3,15 @@ from evogym import get_full_connectivity
 import evogym.envs
 import imageio
 import numpy as np
+import os
 
 from dynamic_env.traverser import DynamicObstacleTraverser
 
 def get_env(robot, connections, env_name):
     if env_name == "dynamic":
-        env = DynamicObstacleTraverser(body=robot, connections=connections, filename="../dynamic_env/data.json")
+        local_dir = os.path.dirname(__file__)
+        json_path = os.path.join(local_dir, "../dynamic_env/env.json")
+        env = DynamicObstacleTraverser(body=robot, connections=connections, filename=json_path)
     else:
         env = evogym.envs.gym.make(env_name, body=robot, connections=connections)
     return env

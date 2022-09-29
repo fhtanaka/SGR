@@ -17,6 +17,24 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "POET",
+            "type": "python",
+            "request": "launch",
+            "program": "poet_test.py",
+            "args": [
+                "--pop",
+                "4",
+                "--cpu",
+                "4",
+                "--gens",
+                "2",
+                "--steps",
+                "200"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }
