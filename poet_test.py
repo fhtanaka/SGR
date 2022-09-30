@@ -16,7 +16,7 @@ def main():
         config_path
     )
 
-    aux.run(10)
+    aux.run(100)
 
 
 if __name__ == "__main__":

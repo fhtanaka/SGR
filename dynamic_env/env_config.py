@@ -29,7 +29,7 @@ class EnvConfig:
         self.heights_list = [n for n in range(-1*self.barrier_h, self.barrier_h+1)]
         self.obstacle_prob = random_prob_distribution(len(self.heights_list), self.rng)
 
-    def mutate_prob(self, mutation_power):
+    def mutate_obs_prob(self, mutation_power):
         mutation = random_prob_mutation(len(self.heights_list), self.rng)
         self.obstacle_prob += mutation * mutation_power
     

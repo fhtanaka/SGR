@@ -31,7 +31,10 @@ class POET:
         self.rng = np.random.default_rng(self.main_seed)
         
         # Parameters
-        self.mutation_chance = 0.2
+        self.height_mutation_chance = 0.2
+        self.max_height_mutation = 2
+        self.obs_prob_mutation_power = 1
+
         self.transfer_frequency = 5
         self.create_frequency = 40
         self.reproduction_criterion = 200
@@ -57,8 +60,6 @@ class POET:
         self.total_environments_created = 1
 
         self.total_generation = 0
-
-        self.total_evaluations = 0
 
     def run(self, generations):
         assert(self.create_frequency%self.transfer_frequency == 0)
@@ -103,14 +104,13 @@ class POET:
             best_agent = None
             best_fitness = None
             for pair in self.pairs:
-                child_pair.agent = deepcopy(pair.agent)
-                child_pair.agent.seed(child_pair.seed)
+                child_pair.agent_pop = deepcopy(pair.agent_pop)
                 fitness = self.evaluate_pair(child_pair)
                 if (best_fitness is None) or (fitness > best_fitness):
-                    best_agent = child_pair.agent
+                    best_agent = child_pair.agent_pop
                     best_fitness = fitness
             if (best_fitness > self.difficulty_criterion_low) and (best_fitness < self.difficulty_criterion_high):
-                child_pair.agent = best_agent
+                child_pair.agent_pop = best_agent
                 eligible_child_pairs.append(child_pair)
         # Select child environments to add to pair population
         sorted_child_pairs = self.sort_child_pairs(eligible_child_pairs)
@@ -124,146 +124,37 @@ class POET:
             added += 1
 
     # FIX mutate
-    def mutate(self, env):
-        mutation_chance = self.mutation_chance
-
-        new_gr = env.ground_roughness
-        pit_gap = env.pit_gap
-        stump_width = env.stump_width
-        stump_height = env.stump_height
-        stair_width = env.stair_width
-        stair_height = env.stair_height
-        new_steps = env.stair_steps
-
-        mut_ground = True
-        mut_gap = True
-        mut_stump = True
-        mut_stair = True
+    def mutate(self, env: EnvConfig):
+        child = deepcopy(env)        
+        mutate_height = np.random.rand()
+        if mutate_height and mutate_height < self.height_mutation_chance:
+            child.mutate_barrier_h(self.max_height_mutation)
+        else:
+            child.mutate_obs_prob(self.obs_prob_mutation_power)
         
-        # Ground
-        mutate_ground = np.random.rand()
-        if mut_ground and mutate_ground < mutation_chance:
-            min_ground_roughness = 0
-            max_ground_roughness = 10
-            new_gr = env.ground_roughness + ((np.random.rand()*1.2)-0.6)
-            if new_gr < min_ground_roughness:
-                new_gr = min_ground_roughness
-            if new_gr > max_ground_roughness:
-                new_gr = max_ground_roughness
-        
-        # Pit Gap
-        mutate_pit = np.random.rand()
-        if mut_gap and mutate_pit < mutation_chance:
-            min_pit_0 = 0.1
-            max_pit_0 = 10.0
-            min_pit_1 = 0.8
-            max_pit_1 = 10.0
-            if len(env.pit_gap) == 0:
-                pit_gap = [0.1, 0.8]
-            else:
-                new_pit_0 = env.pit_gap[0] + (np.random.choice([1,-1])*0.4)
-                new_pit_1 = env.pit_gap[1] + (np.random.choice([1,-1])*0.4)
-                if new_pit_0 < min_pit_0:
-                    new_pit_0 = min_pit_0
-                if new_pit_0 > max_pit_0:
-                    new_pit_0 = max_pit_0
-                if new_pit_1 < min_pit_1:
-                    new_pit_1 = min_pit_1
-                if new_pit_1 > max_pit_1:
-                    nelotw_pit_1 = max_pit_1
-                pit_gap = [new_pit_0, new_pit_1]
-            if pit_gap[0] > pit_gap[1]:
-                st0 = pit_gap[0]
-                pit_gap[0] = pit_gap[1]
-                pit_gap[1] = st0
-            
-        # Stump Height
-        mutate_stump_h = np.random.rand()
-        if mut_stump and mutate_stump_h < mutation_chance:
-            min_stump_h_0 = 0.1
-            max_stump_h_0 = 5.0
-            min_stump_h_1 = 0.4
-            max_stump_h_1 = 5.0
-            if len(env.stump_height) == 0:
-                stump_width = [1, 2]
-                stump_height = [0.1, 0.4]
-            else:
-                new_stump_h_0 = env.stump_height[0] + (np.random.choice([1,-1])*0.2)
-                new_stump_h_1 = env.stump_height[1] + (np.random.choice([1,-1])*0.2)
-                if new_stump_h_0 < min_stump_h_0:
-                    new_stump_h_0 = min_stump_h_0
-                if new_stump_h_0 > max_stump_h_0:
-                    new_stump_h_0 = max_stump_h_0
-                if new_stump_h_1 < min_stump_h_1:
-                    new_stump_h_1 = min_stump_h_1
-                if new_stump_h_1 > max_stump_h_1:
-                    new_stump_h_1 = max_stump_h_1
-                stump_height = [new_stump_h_0, new_stump_h_1]
-            if stump_height[0] > stump_height[1]:
-                st0 = stump_height[0]
-                stump_height[0] = stump_height[1]
-                stump_height[1] = st0
-            
-        # Stair Height
-        mutate_stair_h = np.random.rand()
-        if mut_stair and mutate_stair_h < mutation_chance:
-            min_stair_h_0 = 0.1
-            max_stair_h_0 = 5.0
-            min_stair_h_1 = 0.4
-            max_stair_h_1 = 5.0
-            if len(env.stair_height) == 0:
-                stair_width = [1, 2]
-                stair_height = [0.1, 0.4]
-                new_steps = [2]
-            else:
-                new_stair_h_0 = env.stair_height[0] + (np.random.choice([1,-1])*0.2)
-                new_stair_h_1 = env.stair_height[1] + (np.random.choice([1,-1])*0.2)
-                if new_stair_h_0 < min_stair_h_0:
-                    new_stair_h_0 = min_stair_h_0
-                if new_stair_h_0 > max_stair_h_0:
-                    new_stair_h_0 = max_stair_h_0
-                if new_stair_h_1 < min_stair_h_1:
-                    new_stair_h_1 = min_stair_h_1
-                if new_stair_h_1 > max_stair_h_1:
-                    new_stair_h_1 = max_stair_h_1
-                stair_height = [new_stair_h_0, new_stair_h_1]
-            if stair_height[0] > stair_height[1]:
-                st0 = stair_height[0]
-                stair_height[0] = stair_height[1]
-                stair_height[1] = st0
-
-        # Steps
-        mutate_steps = np.random.rand()
-        if mut_stair and mutate_steps < mutation_chance:
-            min_steps = 2
-            max_steps = 9
-            if len(env.stair_steps) == 0:
-                new_steps = [2]
-                stair_width = [1, 2]
-                stair_height = [0.1, 0.4]
-            else:
-                new_steps = [env.stair_steps[0] + (np.random.choice([1,-1]))]
-                if new_steps[0] < min_steps:
-                    new_steps[0] = min_steps
-                if new_steps[0] > max_steps:
-                    new_steps[0] = max_steps
 
         self.total_environments_created += 1
-        new_env = EnvCon(name=str(self.total_environments_created), ground_roughness=new_gr, pit_gap=pit_gap, stump_width=stump_width,
-                             stump_height=stump_height, stump_float=env.stump_float, stair_height=stair_height,
-                             stair_width=stair_width, stair_steps=new_steps, leg_l_w=env.leg_l_w,
-                             leg_l_h=env.leg_l_h, leg_r_w=env.leg_r_w, leg_r_h=env.leg_r_h, lower_l_w=env.lower_l_w,
-                             lower_l_h=env.lower_l_h, lower_r_w=env.lower_r_w, lower_r_h=env.lower_r_h)
+        return child
+    
+    # The difference from this and training is that this one only runs for 1 generations
+    def evaluate_pair(self, pair: Pair):
+        pop = pair.agent_pop
+        env = pair.environment
+        env.generate_json("env.json")
+        winner = pop.run(
+            env_name = self.run_params.env,
+            n_steps = self.run_params.steps,
+            n_gens = 1,
+            cpus = self.run_params.cpu,
+            max_stagnation = self.run_params.max_stag,
+            save_gen_interval = self.run_params.save_gen_interval
+        )
 
-        return new_env
+        # Set fitness
+        pair.fitness = winner.fitness
+        return pair.fitness
     
-    def evaluate_pair(self, pair):
-        pair.agent.set_env_config(pair.environment)
-        fitness_list, evaluations = pair.agent.evaluate_parallel(pair.agent.population)
-        self.total_evaluations += evaluations
-        return max(fitness_list)
-    
-    def sort_child_pairs(self, pairs):
+    def sort_child_pairs(self, pairs: List[Pair]):
         # Remove already existing environments
         pruned_pairs = []
         for pair in pairs:
@@ -364,10 +255,9 @@ class POET:
                 for transfer_pair in self.pairs:
                     temp_test_pair = Pair(self.seed.spawn(1)[0])
                     temp_test_pair.environment = pair.environment
-                    temp_test_pair.agent = deepcopy(transfer_pair.agent)
-                    temp_test_pair.agent.seed(temp_test_pair.seed)
+                    temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
                     fitness = self.evaluate_pair(temp_test_pair)
                     if (best_fitness is None) or (best_fitness < fitness):
-                        best_agent = temp_test_pair.agent
+                        best_agent = temp_test_pair.agent_pop
                         best_fitness = fitness
-                pair.agent = best_agent
+                pair.agent_pop = best_agent
