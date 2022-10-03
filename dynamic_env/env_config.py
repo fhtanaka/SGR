@@ -35,7 +35,7 @@ class EnvConfig:
 
     def mutate_obs_prob(self, mutation_power):
         mutation = random_prob_mutation(len(self.heights_list), self.rng)
-        self.obstacle_prob += mutation * mutation_power
+        self.obstacle_prob = self.obstacle_prob + (mutation * mutation_power)
     
     def mutate_barrier_h(self, max_mutation):
         possible_hs = []

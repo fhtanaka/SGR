@@ -38,10 +38,10 @@ class POET:
         self.obs_prob_mutation_power = 1
 
         self.transfer_frequency = 5
-        self.create_frequency = 40
-        self.reproduction_criterion = 200
-        self.difficulty_criterion_low = 50
-        self.difficulty_criterion_high = 300
+        self.create_frequency = 20
+        self.reproduction_criterion = 1
+        self.difficulty_criterion_low = .5
+        self.difficulty_criterion_high = 6
         self.num_create_environments = 20
         self.num_children_add = 2
         self.max_pair_population_size = 20
@@ -70,19 +70,19 @@ class POET:
             print("################ Starting gen ", i, "################")
             print(f"Evaluating {len(self.pairs)} pairs\n")
             # Transfer
-            if self.total_generation%self.transfer_frequency == 0 and i != 0:
+            if i%self.transfer_frequency == 0 and i != 0:
                 print("Starting transfer process\n")
                 self.transfer()
             # Create new environments
-            if self.total_generation%self.create_frequency == 0 and i != 0:
+            if i%self.create_frequency == 0 and i != 0:
                 print("Creating new environments\n")
                 self.create_environments()
             # Train
             print("Population training\n")
             self.train_agents(self.transfer_frequency)
             # Create checkpoint
-            if self.total_generation%self.transfer_frequency == 0 and i != 0:
-                self.save_checkpoint(self.total_generation)
+            if i%self.transfer_frequency == 0 and i != 0:
+                self.save_checkpoint(i)
             self.total_generation += self.transfer_frequency
 
     def save_checkpoint(self, gen):
@@ -97,6 +97,7 @@ class POET:
         for pair in self.pairs:
             if (pair.fitness is not None) and (pair.fitness > self.reproduction_criterion):
                 eligible_pairs.append(pair)
+        print(len(eligible_pairs))
         # Create child environments
         child_environments = []
         if len(eligible_pairs) > 0:
@@ -154,7 +155,8 @@ class POET:
             n_gens = 1,
             cpus = self.run_params.cpu,
             max_stagnation = self.run_params.max_stag,
-            save_gen_interval = self.run_params.save_gen_interval
+            save_gen_interval = self.run_params.save_gen_interval,
+            print_results = False
         )
 
         # Set fitness
