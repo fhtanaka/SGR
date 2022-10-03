@@ -4,11 +4,16 @@ import json
 import itertools
 from .generateJSON import generate_env_json
 
+def round_and_normalize_sum(arr):
+    new_arr = np.array([np.clip(round(n, 2), 0, 1) for n in arr])
+    new_arr[len(arr)//2] += 1-sum(new_arr)
+    return new_arr
+
 # Creates and array of length [size] with values [0, 1[ where the sum of elements is 1
 def random_prob_distribution(size, rng: np.random.Generator):
     initial_values = [rng.random() for _ in range(size)]
     distribution = [n/sum(initial_values) for n in initial_values]
-    return distribution
+    return round_and_normalize_sum(distribution)
 
 # Creates and array of length [size] with values [-1, 1[ where the sum of elements is 0
 # This is used to mutate arrays without altering its sum
@@ -35,8 +40,8 @@ class EnvConfig:
 
     def mutate_obs_prob(self, mutation_power):
         mutation = random_prob_mutation(len(self.heights_list), self.rng)
-        self.obstacle_prob = self.obstacle_prob + (mutation * mutation_power)
-        self.obstacle_prob = np.clip(self.obstacle_prob, 0, 1)
+        new_prob = self.obstacle_prob + (mutation * mutation_power)
+        self.obstacle_prob = round_and_normalize_sum(new_prob)
     
     def mutate_barrier_h(self, max_mutation):
         possible_hs = []

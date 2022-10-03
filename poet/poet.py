@@ -38,13 +38,13 @@ class POET:
         self.obs_prob_mutation_power = 1
 
         self.transfer_frequency = 5
-        self.create_frequency = 20
-        self.reproduction_criterion = 1
+        self.create_frequency = 10
+        self.reproduction_criterion = 1.5
         self.difficulty_criterion_low = .5
         self.difficulty_criterion_high = 6
-        self.num_create_environments = 20
+        self.num_create_environments = 10
         self.num_children_add = 2
-        self.max_pair_population_size = 20
+        self.max_pair_population_size = 16
         self.k = 5
 
         
@@ -61,30 +61,26 @@ class POET:
 
         self.total_environments_created = 1
 
-        self.total_generation = 0
-
     def run(self, generations):
         assert(self.create_frequency%self.transfer_frequency == 0)
         assert(generations%self.transfer_frequency == 0)
-        for i in range(int(generations/self.transfer_frequency)):
+        for i in range(1, generations):
             print("################ Starting gen ", i, "################")
             print(f"Evaluating {len(self.pairs)} pairs\n")
             # Transfer
-            if i%self.transfer_frequency == 0 and i != 0:
+            if i%self.transfer_frequency == 0:
                 print("Starting transfer process\n")
                 self.transfer()
             # Create new environments
-            if i%self.create_frequency == 0 and i != 0:
+            if i%self.create_frequency == 0:
                 print("Creating new environments\n")
                 self.create_environments()
             # Train
             print("Population training\n")
             self.train_agents(self.transfer_frequency)
             # Create checkpoint
-            if i%self.transfer_frequency == 0 and i != 0:
+            if i%self.transfer_frequency == 0:
                 self.save_checkpoint(i)
-            self.total_generation += self.transfer_frequency
-
     def save_checkpoint(self, gen):
         path = "checkpoints/cp_gen_{}.pkl".format(gen)
         f = open(path, "wb")
@@ -93,6 +89,7 @@ class POET:
 
     def create_environments(self):
         # Find eligible pairs
+        t = time()
         eligible_pairs = []
         for pair in self.pairs:
             if (pair.fitness is not None) and (pair.fitness > self.reproduction_criterion):
@@ -113,6 +110,7 @@ class POET:
             best_fitness = None
             for pair in self.pairs:
                 child_pair.agent_pop = deepcopy(pair.agent_pop)
+                child_pair.agent_pop.id = child_pair.agent_pop.idCounter()
                 fitness = self.evaluate_pair(child_pair)
                 if (best_fitness is None) or (fitness > best_fitness):
                     best_agent = child_pair.agent_pop
@@ -130,10 +128,12 @@ class POET:
                 if len(self.pairs) > self.max_pair_population_size:
                     self.pairs.pop(0)
             added += 1
+        print(f"env creation took {time()-t}s\n")
 
     # FIX mutate
     def mutate(self, env: EnvConfig):
-        child = deepcopy(env)        
+        child = deepcopy(env)
+        child.id = child.idCounter()      
         mutate_height = np.random.rand()
         if mutate_height and mutate_height < self.height_mutation_chance:
             child.mutate_barrier_h(self.max_height_mutation)
@@ -212,29 +212,6 @@ class POET:
             for i, j in zip(env1.obstacle_prob, env2.obstacle_prob):
                 diff_num += (i-j) ** 2
         return np.sqrt(diff_num)
-
-    def compare_feature_1(self, f1, f2):
-        diff_num = 0
-        if (len(f1) == 1) and (len(f2) == 1):
-            diff_num += (f1[0] - f2[0])**2
-        elif (len(f1) == 2):
-            diff_num += (f1[0])**2
-        elif (len(f2) == 2):
-            diff_num += (f2[0])**2
-        return diff_num
-    
-    def compare_feature_2(self, f1, f2):
-        diff_num = 0
-        if (len(f1) == 2) and (len(f2) == 2):
-            diff_num += (f1[0] - f2[0])**2
-            diff_num += (f1[1] - f2[1])**2
-        elif (len(f1) == 2):
-            diff_num += (f1[0])**2
-            diff_num += (f1[1])**2
-        elif (len(f2) == 2):
-            diff_num += (f2[0])**2
-            diff_num += (f2[1])**2
-        return diff_num
     
     def train_agents(self, generations):
         for pair in self.pairs:
