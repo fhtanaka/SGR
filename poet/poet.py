@@ -204,14 +204,13 @@ class POET:
             novelty += novelty_i/k
         return novelty
 
-    def compare_envs(self, env1, env2):
+    def compare_envs(self, env1: EnvConfig, env2: EnvConfig):
         # Find the difference between two environments
         diff_num = 0
-        diff_num += (env1.ground_roughness - env2.ground_roughness)**2
-        diff_num += self.compare_feature_2(env1.pit_gap, env2.pit_gap)
-        diff_num += self.compare_feature_2(env1.stump_height, env2.stump_height)
-        diff_num += self.compare_feature_2(env1.stair_height, env2.stair_height)
-        diff_num += self.compare_feature_1(env1.stair_steps, env2.stair_steps)
+        diff_num += (env1.barrier_h - env2.barrier_h)**2
+        if diff_num == 0:
+            for i, j in zip(env1.obstacle_prob, env2.obstacle_prob):
+                diff_num += (i-j) ** 2
         return np.sqrt(diff_num)
 
     def compare_feature_1(self, f1, f2):
