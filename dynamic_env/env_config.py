@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import json
+import itertools
 from .generateJSON import generate_env_json
 
 # Creates and array of length [size] with values [0, 1[ where the sum of elements is 1
@@ -17,7 +18,10 @@ def random_prob_mutation(size, rng: np.random.Generator):
     return distribution
 
 class EnvConfig:
+    idCounter = itertools.count().__next__
+
     def __init__(self, seed, obstacle_height=0, obstacle_prob=np.array([1])):
+        self.id = self.idCounter()
         self.seed = seed
         self.rng = np.random.default_rng(seed)
         self.barrier_h = obstacle_height

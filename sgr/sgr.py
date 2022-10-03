@@ -7,6 +7,7 @@ import neat
 import time
 import neat.nn
 import pathlib
+import itertools
 
 from pathos.multiprocessing import ProcessPool
 
@@ -19,6 +20,8 @@ from sgr.evogym_sim import simulate_env
 from dynamic_env.generateJSON import create_ObstacleTraverser_JSON
 
 class SGR:
+    idCounter = itertools.count().__next__
+
     def __init__(
             self,
             neat_config_path,
@@ -27,9 +30,10 @@ class SGR:
             spec_phenotype_weight,
             pop_size,
             save_to="",
+            reporters=True
         ):
 
-
+        self.id = self.idCounter()
         morphology_coords = morph_substrate(robot_size)
 
         self.input_size = morphology_coords.dimensions*2 + 1 # two coordinates plus the bias
@@ -46,7 +50,8 @@ class SGR:
 
         self.neat_config = self.create_neat_config(neat_config_path, CustomGenome)
         self.pop = neat.Population(self.neat_config)
-        self.add_reporters()
+        if reporters:
+            self.add_reporters()
         
         self.voxel_types = ['empty', 'rigid', 'soft', 'hori', 'vert']
 
@@ -160,11 +165,11 @@ class SGR:
             else:
                 raise(IOError)
 
-        print("Simulation took ", time.time()-start_t, "s")
+        # print("Simulation took ", time.time()-start_t, "s")
         self.check_stagnation_and_save_interval()
 
     def check_stagnation_and_save_interval(self):
-        print("STAGNATION: ", self.stagnation)
+        # print("STAGNATION: ", self.stagnation)
         if self.max_stagnation is not None and self.stagnation > self.max_stagnation:
             print("!!!!!!!!!!!!!!!!!!!!! POPULATION STAGNATED !!!!!!!!!!!!!!!!!!!")
             if self.save_to is not "":
@@ -173,7 +178,7 @@ class SGR:
         if self.save_to is not "" and self.save_gen_interval is not None and (self.pop.generation+1)% self.save_gen_interval == 0:
             dill.dump(self.pop, open(f"{self.save_to}_pop_gen_{self.pop.generation}.pkl", mode='wb'))
 
-    def run(self, env_name, n_steps, n_gens, cpus=1, max_stagnation=None, save_gen_interval=None):
+    def run(self, env_name, n_steps, n_gens, cpus=1, max_stagnation=None, save_gen_interval=None, print_results=True):
         self.best_fit = -10000
         self.stagnation = 0
         self.generation = 0
@@ -182,7 +187,9 @@ class SGR:
 
         neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus)
         winner: CustomGenome = self.pop.run(neat_fit_func, n_gens)
-        print('\nBest genome:\n{!s}'.format(winner))
+        
+        if print_results:
+            print('\nBest genome:\n{!s}'.format(winner))
 
         if self.save_to is not "":
             remove_reporters(self.pop)

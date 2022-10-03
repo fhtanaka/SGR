@@ -1,3 +1,4 @@
+from time import time
 from typing import List
 import numpy as np
 from copy import deepcopy
@@ -21,7 +22,8 @@ class Pair:
             params.spec_genotype_weight,
             params.spec_phenotype_weight,
             params.pop_size,
-            params.save_to
+            params.save_to,
+            reporters=False
         )
 
 class POET:
@@ -65,16 +67,21 @@ class POET:
         assert(self.create_frequency%self.transfer_frequency == 0)
         assert(generations%self.transfer_frequency == 0)
         for i in range(int(generations/self.transfer_frequency)):
+            print("################ Starting gen ", i, "################")
+            print(f"Evaluating {len(self.pairs)} pairs\n")
             # Transfer
-            if self.total_generation%self.transfer_frequency == 0:
+            if self.total_generation%self.transfer_frequency == 0 and i != 0:
+                print("Starting transfer process\n")
                 self.transfer()
             # Create new environments
-            if self.total_generation%self.create_frequency == 0:
+            if self.total_generation%self.create_frequency == 0 and i != 0:
+                print("Creating new environments\n")
                 self.create_environments()
             # Train
+            print("Population training\n")
             self.train_agents(self.transfer_frequency)
             # Create checkpoint
-            if self.total_generation%self.transfer_frequency == 0:
+            if self.total_generation%self.transfer_frequency == 0 and i != 0:
                 self.save_checkpoint(self.total_generation)
             self.total_generation += self.transfer_frequency
 
@@ -230,6 +237,9 @@ class POET:
     
     def train_agents(self, generations):
         for pair in self.pairs:
+            t = time()
+            print("Evaluating pop ", pair.agent_pop.id)
+            print("Environment ", pair.environment.id)
             # Set environments
             pop = pair.agent_pop
             env = pair.environment
@@ -240,11 +250,14 @@ class POET:
                 n_gens = self.run_params.gens,
                 cpus = self.run_params.cpu,
                 max_stagnation = self.run_params.max_stag,
-                save_gen_interval = self.run_params.save_gen_interval
+                save_gen_interval = self.run_params.save_gen_interval,
+                print_results=False
             )
 
             # Set fitness
             pair.fitness = winner.fitness
+            print("Final fitness: ", pair.fitness)
+            print(f"evaluation took {time()-t}s\n")
 
     def transfer(self):
         # Direct transfer
