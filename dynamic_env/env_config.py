@@ -5,7 +5,7 @@ import itertools
 from .generateJSON import generate_env_json
 
 # Creates and array of length [size] with values [0, 1[ where the sum of elements is 1
-def random_prob_distribution(size, rng: np.random.Generator): 
+def random_prob_distribution(size, rng: np.random.Generator):
     initial_values = [rng.random() for _ in range(size)]
     distribution = [n/sum(initial_values) for n in initial_values]
     return distribution
@@ -36,11 +36,12 @@ class EnvConfig:
     def mutate_obs_prob(self, mutation_power):
         mutation = random_prob_mutation(len(self.heights_list), self.rng)
         self.obstacle_prob = self.obstacle_prob + (mutation * mutation_power)
+        self.obstacle_prob = np.clip(self.obstacle_prob, 0, 1)
     
     def mutate_barrier_h(self, max_mutation):
         possible_hs = []
         for i in range(self.barrier_h - max_mutation, self.barrier_h + max_mutation + 1):
-            if -5 < i < 5 and i != self.barrier_h:
+            if 0 <= i < 5 and i != self.barrier_h:
                 possible_hs.append(i)
         self.barrier_h = self.rng.choice(possible_hs)
         self.heights_list = [n for n in range(-1*self.barrier_h, self.barrier_h+1)]
