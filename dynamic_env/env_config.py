@@ -7,7 +7,7 @@ from .generateJSON import generate_env_json
 def round_and_normalize_sum(arr):
     new_arr = np.array([np.clip(round(n, 2), 0, 1) for n in arr])
     new_arr[len(arr)//2] += 1-sum(new_arr)
-    return new_arr
+    return np.clip(new_arr, 0, 1) 
 
 # Creates and array of length [size] with values [0, 1[ where the sum of elements is 1
 def random_prob_distribution(size, rng: np.random.Generator):
@@ -55,6 +55,7 @@ class EnvConfig:
 
     def generate_json(self, filename="env.json"):
         self.reset_seed()
+        self.obstacle_prob = round_and_normalize_sum(self.obstacle_prob)
         env = generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
         local_dir = os.path.dirname(__file__)
         path = os.path.join(local_dir, filename)

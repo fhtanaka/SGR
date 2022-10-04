@@ -33,18 +33,18 @@ class POET:
         self.rng = np.random.default_rng(self.main_seed)
         
         # Parameters
-        self.height_mutation_chance = 0.2
+        self.height_mutation_chance = 0.3
         self.max_height_mutation = 2
-        self.obs_prob_mutation_power = 1
+        self.obs_prob_mutation_power = 2
 
         self.transfer_frequency = 5
         self.create_frequency = 10
         self.reproduction_criterion = 1.5
-        self.difficulty_criterion_low = .5
-        self.difficulty_criterion_high = 6
+        self.difficulty_criterion_low = .2
+        self.difficulty_criterion_high = 8
         self.num_create_environments = 10
         self.num_children_add = 2
-        self.max_pair_population_size = 16
+        self.max_pair_population_size = 20
         self.k = 5
 
         

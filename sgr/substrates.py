@@ -5,11 +5,11 @@ from sgr.evogym_sim import get_obs_size
 from hyperneat.substrate import Substrate
 
 def morph_substrate(robot_size):
-    shape = morph_substrate_CPPN_like_shape(robot_size)
+    shape = morph_substrate_3D_out_shape(robot_size)
     return Substrate(shape)
 
 def control_substrate(robot_size, env_name, robot):
-    shape = control_substrate_CPPN_like_shape(robot_size, env_name, robot)
+    shape = control_substrate_3D_out_shape(robot_size, env_name, robot)
     return Substrate(shape)
 
 def morph_substrate_3D_out_shape(robot_size):

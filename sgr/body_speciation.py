@@ -1,6 +1,6 @@
 import neat
 import numpy as np
-from hyperneat.hyperNEAT import create_phenotype_network
+from hyperneat.new_hyperNEAT import create_phenotype_network
 from evogym import is_connected, has_actuator
 
 def robot_from_genome(genome, robot_size, substrate, robot_func, config):

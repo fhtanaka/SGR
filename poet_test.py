@@ -9,10 +9,10 @@ def main():
 
     params.gens = 5
     params.robot_size = 5
-    params.steps = 300
+    params.steps = 400
     params.env = "dynamic"
-    params.cpu = 8
-    params.pop_size = 16
+    params.cpu = 12
+    params.pop_size = params.cpu*4
     params.neat_config="configs/POET.cfg"
     # params.save_to = "results_poet/test"
     
