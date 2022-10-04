@@ -33,8 +33,8 @@ class POET:
         self.rng = np.random.default_rng(self.main_seed)
         
         # Parameters
-        self.height_mutation_chance = 0.3
-        self.max_height_mutation = 2
+        self.height_mutation_chance = 0.35
+        self.max_height_mutation = 1
         self.obs_prob_mutation_power = 2
 
         self.transfer_frequency = 5
@@ -234,8 +234,9 @@ class POET:
 
             # Set fitness
             pair.fitness = winner.fitness
-            print("Final fitness: ", pair.fitness)
-            print(f"evaluation took {time()-t}s\n")
+            print("Final fitness: ", np.round(pair.fitness, 4))
+            print("Estagnation: ", pop.stagnation)
+            print(f"Evaluation took {int(time()-t)}s\n")
 
     def transfer(self):
         # Direct transfer
