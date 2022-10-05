@@ -250,10 +250,13 @@ class POET:
                     if transfer_pair.agent_pop.id != pair.agent_pop.id:
                         temp_test_pair = Pair(self.seed.spawn(1)[0])
                         temp_test_pair.environment = pair.environment
+                        # if we remove the deepcopy in the line below, we will be doing the proposal transfer as well
+                        # is this a good idea?
                         temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
                         fitness = self.evaluate_pair(temp_test_pair)
                         if (best_fitness is None) or (best_fitness < fitness):
                             best_agent = temp_test_pair.agent_pop
                             best_fitness = fitness
-                if best_agent is not None and best_fitness > pair.agent_pop.best_fit:
+                if best_agent is not None and best_fitness > pair.fitness:
                     pair.agent_pop = best_agent
+                    pair.fitness = best_fitness

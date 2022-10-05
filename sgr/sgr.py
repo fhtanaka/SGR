@@ -179,9 +179,6 @@ class SGR:
             dill.dump(self.pop, open(f"{self.save_to}_pop_gen_{self.pop.generation}.pkl", mode='wb'))
 
     def run(self, env_name, n_steps, n_gens, cpus=1, max_stagnation=None, save_gen_interval=None, print_results=True):
-        self.best_fit = -10000
-        self.stagnation = 0
-        self.generation = 0
         self.max_stagnation = max_stagnation
         self.save_gen_interval = save_gen_interval
 
