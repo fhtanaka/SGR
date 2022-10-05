@@ -2,7 +2,7 @@ import os
 import numpy as np
 import json
 import itertools
-from generateJSON import generate_env_json
+from .generateJSON import generate_env_json
 
 def round_and_normalize_sum(arr):
     new_arr = np.array([np.clip(round(n, 2), 0, 1) for n in arr])

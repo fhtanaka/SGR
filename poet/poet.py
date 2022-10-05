@@ -40,7 +40,7 @@ class POET:
         self.transfer_frequency = 5
         self.create_frequency = 10
         self.reproduction_criterion = 1.5
-        self.difficulty_criterion_low = .2
+        self.difficulty_criterion_low = .1
         self.difficulty_criterion_high = 8
         self.num_create_environments = 10
         self.num_children_add = 2
@@ -247,7 +247,7 @@ class POET:
                 best_agent = None
                 best_fitness = None
                 for transfer_pair in self.pairs:
-                    if temp_test_pair.agent_pop.id != pair.agent_pop.id:
+                    if transfer_pair.agent_pop.id != pair.agent_pop.id:
                         temp_test_pair = Pair(self.seed.spawn(1)[0])
                         temp_test_pair.environment = pair.environment
                         temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
@@ -255,4 +255,5 @@ class POET:
                         if (best_fitness is None) or (best_fitness < fitness):
                             best_agent = temp_test_pair.agent_pop
                             best_fitness = fitness
-                pair.agent_pop = best_agent
+                if best_agent is not None and best_fitness > pair.agent_pop.best_fit:
+                    pair.agent_pop = best_agent
