@@ -2,12 +2,13 @@ import os
 import numpy as np
 import json
 import itertools
-from .generateJSON import generate_env_json
+from generateJSON import generate_env_json
 
 def round_and_normalize_sum(arr):
     new_arr = np.array([np.clip(round(n, 2), 0, 1) for n in arr])
-    new_arr[len(arr)//2] += 1-sum(new_arr)
-    return np.clip(new_arr, 0, 1) 
+    if sum(new_arr) != 1:
+        new_arr[np.argmax(new_arr)] += 1-sum(new_arr)
+    return  new_arr
 
 # Creates and array of length [size] with values [0, 1[ where the sum of elements is 1
 def random_prob_distribution(size, rng: np.random.Generator):
@@ -54,40 +55,24 @@ class EnvConfig:
         
 
     def generate_json(self, filename="env.json"):
-        self.reset_seed()
+        temp_rng=np.random.default_rng(self.seed)
         self.obstacle_prob = round_and_normalize_sum(self.obstacle_prob)
-        env = generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
+        env = generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=temp_rng)
         local_dir = os.path.dirname(__file__)
         path = os.path.join(local_dir, filename)
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(env, f, ensure_ascii=False, indent=4)
 
     def generate_env_dict(self):
-        self.reset_seed()
-        return generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=self.rng)
-
-    def reset_seed(self):
-        self.rng = np.random.default_rng(self.seed)
+        temp_rng=np.random.default_rng(self.seed)
+        return generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=temp_rng)
 
 
 if __name__ == "__main__":
-    rng = np.random.default_rng(2)
-    distribution = random_prob_distribution(5, rng)
-    mut = random_prob_mutation(5, rng)
-    print(distribution, sum(distribution))
-    print(mut, sum(mut))
-
-    flat_env = EnvConfig(2)
-    flat_env.generate_json("flat.json")
-
-    env1 = EnvConfig(2)
-    env1.randomize_config()
-    env2 = EnvConfig(2, env1.barrier_h, env1.obstacle_prob)
-    
-    env1.reset_seed()
-    env1.generate_json("env1.json")
-    env2.generate_json("env2.json")
-
+    env1 = EnvConfig(2, 1, [.3, .4, .3])
+    for i in range(1000):
+        env1.mutate_obs_prob(1)
+        d = env1.generate_env_dict()
 
 
 

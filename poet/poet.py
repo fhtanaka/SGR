@@ -77,7 +77,7 @@ class POET:
                 self.create_environments()
             # Train
             print("Population training\n")
-            self.train_agents(self.transfer_frequency)
+            self.train_agents()
             # Create checkpoint
             if i%self.transfer_frequency == 0:
                 self.save_checkpoint(i)
@@ -207,13 +207,15 @@ class POET:
     def compare_envs(self, env1: EnvConfig, env2: EnvConfig):
         # Find the difference between two environments
         diff_num = 0
-        diff_num += (env1.barrier_h - env2.barrier_h)**2
+        d = env1.barrier_h - env2.barrier_h
+        diff_num += d if d>0 else -1*d
         if diff_num == 0:
             for i, j in zip(env1.obstacle_prob, env2.obstacle_prob):
-                diff_num += (i-j) ** 2
-        return np.sqrt(diff_num)
+                d = i-j
+                diff_num += d if d>0 else -1*d
+        return diff_num
     
-    def train_agents(self, generations):
+    def train_agents(self):
         for pair in self.pairs:
             t = time()
             print("Evaluating pop ", pair.agent_pop.id)
@@ -245,11 +247,12 @@ class POET:
                 best_agent = None
                 best_fitness = None
                 for transfer_pair in self.pairs:
-                    temp_test_pair = Pair(self.seed.spawn(1)[0])
-                    temp_test_pair.environment = pair.environment
-                    temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
-                    fitness = self.evaluate_pair(temp_test_pair)
-                    if (best_fitness is None) or (best_fitness < fitness):
-                        best_agent = temp_test_pair.agent_pop
-                        best_fitness = fitness
+                    if temp_test_pair.agent_pop.id != pair.agent_pop.id:
+                        temp_test_pair = Pair(self.seed.spawn(1)[0])
+                        temp_test_pair.environment = pair.environment
+                        temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
+                        fitness = self.evaluate_pair(temp_test_pair)
+                        if (best_fitness is None) or (best_fitness < fitness):
+                            best_agent = temp_test_pair.agent_pop
+                            best_fitness = fitness
                 pair.agent_pop = best_agent
