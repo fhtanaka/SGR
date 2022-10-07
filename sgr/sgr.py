@@ -154,6 +154,7 @@ class SGR:
                 if genome.fitness > self.best_fit:
                     self.best_fit = genome.fitness
                     self.stagnation = 0
+                    self.best_genome = genome
                 if genome.fitness > -10000:
                     surviving_genomes[g_id] = genome
 
