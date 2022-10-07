@@ -23,7 +23,7 @@ class Pair:
             params.spec_phenotype_weight,
             params.pop_size,
             params.save_to,
-            reporters=False
+            reporters=True
         )
 
 class POET:
@@ -37,9 +37,9 @@ class POET:
         self.max_height_mutation = 1
         self.obs_prob_mutation_power = 2
 
-        self.transfer_frequency = 5
-        self.create_frequency = 10
-        self.reproduction_criterion = 1.5
+        self.transfer_frequency = 25
+        self.create_frequency = 50
+        self.reproduction_criterion = 1
         self.difficulty_criterion_low = .1
         self.difficulty_criterion_high = 8
         self.num_create_environments = 10
@@ -62,10 +62,8 @@ class POET:
         self.total_environments_created = 1
 
     def run(self, generations):
-        assert(self.create_frequency%self.transfer_frequency == 0)
-        assert(generations%self.transfer_frequency == 0)
         for i in range(1, generations):
-            print("################ Starting gen ", i, "################")
+            print("##################### Starting POET gen ", i, "#####################")
             print(f"Evaluating {len(self.pairs)} pairs\n")
             # Transfer
             if i%self.transfer_frequency == 0:
@@ -217,9 +215,7 @@ class POET:
     
     def train_agents(self):
         for pair in self.pairs:
-            t = time()
-            print("Evaluating pop ", pair.agent_pop.id)
-            print("Environment ", pair.environment.id)
+            print(f"----------------- Env {pair.environment.id}, Pop {pair.agent_pop.id} -----------------")
             # Set environments
             pop = pair.agent_pop
             env = pair.environment
@@ -236,10 +232,8 @@ class POET:
 
             # Set fitness
             pair.fitness = winner.fitness
-            print("Final fitness: ", np.round(pair.fitness, 4))
-            print("Estagnation: ", pop.stagnation)
-            print(f"Evaluation took {int(time()-t)}s\n")
-
+            print("Pair fitness: ", np.round(pair.fitness, 4), "\n")
+            
     def transfer(self):
         # Direct transfer
         if len(self.pairs) > 1:

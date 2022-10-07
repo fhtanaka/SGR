@@ -7,12 +7,12 @@ import numpy as np
 def main():
     params = parse_args()
 
-    params.gens = 5
-    params.robot_size = 5
-    params.steps = 400
+    params.gens = 1
+    params.robot_size = 7
+    params.steps = 500
     params.env = "dynamic"
     params.cpu = 12
-    params.pop_size = params.cpu*4
+    params.pop_size = params.cpu*3
     params.neat_config="configs/POET.cfg"
     # params.save_to = "results_poet/test"
     
@@ -26,7 +26,7 @@ def main():
         config_path
     )
 
-    aux.run(505)
+    aux.run(501)
 
 
 if __name__ == "__main__":
