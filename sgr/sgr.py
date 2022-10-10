@@ -1,3 +1,5 @@
+from multiprocessing import TimeoutError
+import multiprocess
 import neat
 import os
 import numpy as np
@@ -165,6 +167,10 @@ class SGR:
                 print("Problem with broken pipe")
             else:
                 raise(IOError)
+        except multiprocess.context.TimeoutError as e:
+            for g_id, genome in genomes:
+                if genome.fitness is None:
+                    genome.fitness = 0
 
         # print("Simulation took ", time.time()-start_t, "s")
         self.check_stagnation_and_save_interval()

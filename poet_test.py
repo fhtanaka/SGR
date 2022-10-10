@@ -9,7 +9,7 @@ def main():
 
     params.gens = 1
     params.robot_size = 5
-    params.steps = 400
+    params.steps = 500
     params.env = "dynamic"
     params.cpu = 12
     params.pop_size = params.cpu*4
@@ -26,7 +26,7 @@ def main():
         config_path
     )
 
-    aux.run(501)
+    aux.run(1001)
 
 
 if __name__ == "__main__":
