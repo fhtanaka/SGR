@@ -40,7 +40,7 @@ class POET:
         self.transfer_frequency = 25
         self.create_frequency = 50
         self.reproduction_criterion = 1
-        self.difficulty_criterion_low = .1
+        self.difficulty_criterion_low = .5
         self.difficulty_criterion_high = 8
         self.num_create_environments = 10
         self.num_children_add = 2
@@ -80,7 +80,7 @@ class POET:
             if i%self.transfer_frequency == 0:
                 self.save_checkpoint(i)
     def save_checkpoint(self, gen):
-        path = "checkpoints/cp_gen_{}.pkl".format(gen)
+        path = "checkpoints/cp5_gen_{}.pkl".format(gen)
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()

@@ -8,11 +8,11 @@ def main():
     params = parse_args()
 
     params.gens = 1
-    params.robot_size = 7
-    params.steps = 500
+    params.robot_size = 5
+    params.steps = 400
     params.env = "dynamic"
     params.cpu = 12
-    params.pop_size = params.cpu*3
+    params.pop_size = params.cpu*4
     params.neat_config="configs/POET.cfg"
     # params.save_to = "results_poet/test"
     
