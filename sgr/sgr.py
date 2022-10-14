@@ -1,3 +1,4 @@
+from copy import deepcopy
 from multiprocessing import TimeoutError
 import multiprocess
 import neat
@@ -85,6 +86,18 @@ class SGR:
             self.pop.add_reporter(CustomReporter(True, self.save_to + "_out.txt", self.save_to + "_table.csv"))
         self.pop.add_reporter(neat.StdOutReporter(True))
 
+    def create_child(self):
+        new_pop = deepcopy(self)
+        new_pop.id = self.idCounter()
+        new_pop.best_fit = -10000
+        new_pop.stagnation = 0
+        new_pop.generation = 0
+        new_pop.max_stagnation = None
+        new_pop.save_gen_interval = None
+        new_pop.pop.reporters.reporters = []
+        new_pop.pop.generation = 0
+
+        return new_pop
 
     def single_genome_fit(
             self, 

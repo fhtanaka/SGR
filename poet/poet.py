@@ -1,3 +1,4 @@
+from distutils.command.config import config
 from time import time
 from typing import List
 import numpy as np
@@ -27,18 +28,17 @@ class Pair:
         )
 
 class POET:
-    def __init__(self, seed: np.random.SeedSequence, params: Parameters, config_path):
+    def __init__(self, seed: int, params: Parameters, config_path):
         self.seed = seed
-        self.main_seed = self.seed.spawn(1)[0]
-        self.rng = np.random.default_rng(self.main_seed)
+        self.rng = np.random.default_rng(seed)
         
         # Parameters
         self.height_mutation_chance = 0.35
         self.max_height_mutation = 1
         self.obs_prob_mutation_power = 2
 
-        self.transfer_frequency = 25
-        self.create_frequency = 50
+        self.transfer_frequency = 50
+        self.create_frequency = 100
         self.reproduction_criterion = 1
         self.difficulty_criterion_low = .5
         self.difficulty_criterion_high = 8
@@ -51,7 +51,8 @@ class POET:
         # The pairs of environments and agents
         self.pairs: List[Pair] = []
         self.run_params = params
-        first_pair = Pair(self.seed.spawn(1)[0])
+        self.config_path = config_path
+        first_pair = Pair(self.rng.integers(100))
         first_pair.init_first(params, config_path)
         self.pairs.append(first_pair)
 
@@ -92,7 +93,7 @@ class POET:
         for pair in self.pairs:
             if (pair.fitness is not None) and (pair.fitness > self.reproduction_criterion):
                 eligible_pairs.append(pair)
-        print(len(eligible_pairs))
+        print("Eligible pairs to reproduce: ", len(eligible_pairs))
         # Create child environments
         child_environments = []
         if len(eligible_pairs) > 0:
@@ -102,12 +103,12 @@ class POET:
         # Find agents for the children and test them against the minimal criteria
         eligible_child_pairs = []
         for environment in child_environments:
-            child_pair = Pair(self.seed.spawn(1)[0])
+            child_pair = Pair(self.rng.integers(100))
             child_pair.environment = environment
             best_agent = None
             best_fitness = None
             for pair in self.pairs:
-                child_pair.agent_pop = deepcopy(pair.agent_pop)
+                child_pair.agent_pop = pair.agent_pop.create_child()
                 child_pair.agent_pop.id = child_pair.agent_pop.idCounter()
                 fitness = self.evaluate_pair(child_pair)
                 if (best_fitness is None) or (fitness > best_fitness):
@@ -121,6 +122,7 @@ class POET:
         added = 0
         for child in sorted_child_pairs:
             if added < self.num_children_add:
+                child.agent_pop.add_reporters()
                 self.pairs.append(child)
                 self.environment_archive.append(child.environment)
                 if len(self.pairs) > self.max_pair_population_size:
@@ -128,25 +130,25 @@ class POET:
             added += 1
         print(f"env creation took {time()-t}s\n")
 
-    # FIX mutate
     def mutate(self, env: EnvConfig):
-        child = deepcopy(env)
-        child.id = child.idCounter()      
+        child = env.create_child()
+
         mutate_height = np.random.rand()
         if mutate_height and mutate_height < self.height_mutation_chance:
             child.mutate_barrier_h(self.max_height_mutation)
         else:
-            child.mutate_obs_prob(self.obs_prob_mutation_power)
-        
+            child.mutate_obs_prob(self.obs_prob_mutation_power)    
 
         self.total_environments_created += 1
         return child
     
     # The difference from this and training is that this one only runs for 1 generations
-    def evaluate_pair(self, pair: Pair):
+    def evaluate_pair(self, pair: Pair, print_par_name = False):
         pop = pair.agent_pop
         env = pair.environment
         env.generate_json("env.json")
+        if print_par_name:
+            print(f"----- Env {pair.environment.id}, Pop {pair.agent_pop.id} -----")
         winner = pop.run(
             env_name = self.run_params.env,
             n_steps = self.run_params.steps,
@@ -238,19 +240,20 @@ class POET:
         # Direct transfer
         if len(self.pairs) > 1:
             for pair in self.pairs:
-                best_agent = None
-                best_fitness = None
+                best_agent_pop = None
+                best_fitness = -1000000
                 for transfer_pair in self.pairs:
                     if transfer_pair.agent_pop.id != pair.agent_pop.id:
-                        temp_test_pair = Pair(self.seed.spawn(1)[0])
+                        temp_test_pair = Pair(self.rng.integers(100))
                         temp_test_pair.environment = pair.environment
                         # if we remove the deepcopy in the line below, we will be doing the proposal transfer as well
                         # is this a good idea?
-                        temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
-                        fitness = self.evaluate_pair(temp_test_pair)
-                        if (best_fitness is None) or (best_fitness < fitness):
-                            best_agent = temp_test_pair.agent_pop
+                        # temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
+                        temp_test_pair.agent_pop = transfer_pair.agent_pop
+                        fitness = self.evaluate_pair(temp_test_pair, True)
+                        if best_fitness < fitness:
+                            best_agent_pop = temp_test_pair.agent_pop
                             best_fitness = fitness
-                if best_agent is not None and best_fitness > pair.fitness:
-                    pair.agent_pop = best_agent
+                if best_fitness > pair.fitness:
+                    pair.agent_pop = deepcopy(best_agent_pop)
                     pair.fitness = best_fitness

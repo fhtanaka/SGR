@@ -1,3 +1,4 @@
+from copy import deepcopy
 import os
 import numpy as np
 import json
@@ -67,6 +68,12 @@ class EnvConfig:
         temp_rng=np.random.default_rng(self.seed)
         return generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=temp_rng)
 
+    def create_child(self):
+        child = deepcopy(self)
+        child.id = self.idCounter()
+        child.seed = self.rng.integers(100)
+
+        return child
 
 if __name__ == "__main__":
     env1 = EnvConfig(2, 1, [.3, .4, .3])
