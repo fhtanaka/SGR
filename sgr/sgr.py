@@ -143,7 +143,7 @@ class SGR:
                 [env_name for _ in range(cpus)],
             )
             
-            results = results_map.get(timeout=60*60)
+            results = results_map.get(timeout=60*60*1.5)
 
             fitness_dict = {}
             for result_dict in results:
@@ -168,6 +168,7 @@ class SGR:
             else:
                 raise(IOError)
         except multiprocess.context.TimeoutError as e:
+            print("Deu timeout!!!!!!")
             for g_id, genome in genomes:
                 if genome.fitness is None:
                     genome.fitness = 0

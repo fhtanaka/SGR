@@ -9,7 +9,7 @@ def main():
 
     params.gens = 1
     params.robot_size = 5
-    params.steps = 500
+    params.steps = 600
     params.env = "dynamic"
     params.cpu = 12
     params.pop_size = params.cpu*4
