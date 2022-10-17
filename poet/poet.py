@@ -33,19 +33,18 @@ class POET:
         self.rng = np.random.default_rng(seed)
         
         # Parameters
-        self.height_mutation_chance = 0.35
-        self.max_height_mutation = 1
-        self.obs_prob_mutation_power = 2
-
-        self.transfer_frequency = 10
-        self.create_frequency = 50
-        self.reproduction_criterion = 1
-        self.difficulty_criterion_low = .5
-        self.difficulty_criterion_high = 8
-        self.num_create_environments = 10
-        self.num_children_add = 2
-        self.max_pair_population_size = 20
-        self.k = 5
+        self.height_mutation_chance = params.height_mutation_chance 
+        self.max_height_mutation = params.max_height_mutation 
+        self.obs_prob_mutation_power = params.obs_prob_mutation_power 
+        self.transfer_frequency = params.transfer_frequency 
+        self.create_frequency = params.create_frequency 
+        self.reproduction_criterion = params.reproduction_criterion 
+        self.difficulty_criterion_low = params.difficulty_criterion_low
+        self.difficulty_criterion_high = params.difficulty_criterion_high 
+        self.num_create_environments = params.num_create_environments 
+        self.num_children_add = params.num_children_add 
+        self.max_pair_population_size = params.max_pair_population_size 
+        self.n_nearest_neighbors = params.n_nearest_neighbors 
 
         
         # The pairs of environments and agents
@@ -78,7 +77,7 @@ class POET:
             print("Population training\n")
             self.train_agents()
             # Create checkpoint
-            if i%self.transfer_frequency == 0:
+            if i%self.run_params.save_gen_interval == 0:
                 self.save_checkpoint(i)
     def save_checkpoint(self, gen):
         path = "checkpoints/cp_real_transfer_gen_{}.pkl".format(gen)
@@ -195,7 +194,7 @@ class POET:
         for environment in self.environment_archive:
             differences.append(self.compare_envs(environment, env))
         novelty = 0
-        k = self.k
+        k = self.n_nearest_neighbors
         if len(differences) < k:
             k = len(differences)
         for i in range(k):
