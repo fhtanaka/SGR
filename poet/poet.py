@@ -37,8 +37,8 @@ class POET:
         self.max_height_mutation = 1
         self.obs_prob_mutation_power = 2
 
-        self.transfer_frequency = 50
-        self.create_frequency = 100
+        self.transfer_frequency = 10
+        self.create_frequency = 50
         self.reproduction_criterion = 1
         self.difficulty_criterion_low = .5
         self.difficulty_criterion_high = 8
@@ -81,7 +81,7 @@ class POET:
             if i%self.transfer_frequency == 0:
                 self.save_checkpoint(i)
     def save_checkpoint(self, gen):
-        path = "checkpoints/cp5_gen_{}.pkl".format(gen)
+        path = "checkpoints/cp_real_transfer_gen_{}.pkl".format(gen)
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
@@ -238,8 +238,9 @@ class POET:
             
     def transfer(self):
         # Direct transfer
-        if len(self.pairs) > 1:
-            for pair in self.pairs:
+        if len(self.pairs) >= 1:
+            base_pairs = self.rng.choice(self.pairs, 3, replace=True)
+            for pair in base_pairs:
                 best_agent_pop = None
                 best_fitness = -1000000
                 for transfer_pair in self.pairs:
