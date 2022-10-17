@@ -13,7 +13,7 @@ def main():
     params.env = "dynamic"
     params.cpu = 12
     params.pop_size = params.cpu*4
-    params.neat_config="configs/POET.cfg"
+    params.neat_config="neat_configs/POET.cfg"
     # params.save_to = "results_poet/test"
     
     local_dir = os.path.dirname(__file__)

@@ -13,7 +13,7 @@ def parse_args():
     goal_fit = 10
     pop_size = 32
     max_stag = 10000
-    neat_config = "configs/hyperNEAT.cfg"
+    neat_config = "neat_configs/hyperNEAT.cfg"
     save_gen_interval = 20
     spec_genotype_weight = .8
     spec_phenotype_weight = 5
