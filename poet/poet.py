@@ -80,7 +80,7 @@ class POET:
             if i%self.run_params.save_gen_interval == 0:
                 self.save_checkpoint(i)
     def save_checkpoint(self, gen):
-        path = "checkpoints/cp_cppn_gen_{}.pkl".format(gen)
+        path = "checkpoints/cp_3D_gen_{}.pkl".format(gen)
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
@@ -142,7 +142,7 @@ class POET:
         return child
     
     # The difference from this and training is that this one only runs for 1 generations
-    def evaluate_pair(self, pair: Pair, print_par_name = False):
+    def evaluate_pair(self, pair: Pair, print_par_name = False, gens = 1):
         pop = pair.agent_pop
         env = pair.environment
         env.generate_json("env.json")
@@ -151,7 +151,7 @@ class POET:
         winner = pop.run(
             env_name = self.run_params.env,
             n_steps = self.run_params.steps,
-            n_gens = 1,
+            n_gens = gens,
             cpus = self.run_params.cpu,
             max_stagnation = self.run_params.max_stag,
             save_gen_interval = self.run_params.save_gen_interval,
@@ -238,7 +238,7 @@ class POET:
     def transfer(self):
         # Direct transfer
         if len(self.pairs) >= 1:
-            base_pairs = self.rng.choice(self.pairs, 3, replace=True)
+            base_pairs = self.rng.choice(self.pairs, 1, replace=True)
             for pair in base_pairs:
                 best_agent_pop = None
                 best_fitness = -1000000
@@ -250,7 +250,7 @@ class POET:
                         # is this a good idea?
                         # temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
                         temp_test_pair.agent_pop = transfer_pair.agent_pop
-                        fitness = self.evaluate_pair(temp_test_pair, True)
+                        fitness = self.evaluate_pair(temp_test_pair, True, gens = 3)
                         if best_fitness < fitness:
                             best_agent_pop = temp_test_pair.agent_pop
                             best_fitness = fitness

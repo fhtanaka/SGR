@@ -156,24 +156,19 @@ class SGR:
                 [env_name for _ in range(cpus)],
             )
             
-            results = results_map.get(timeout=60*60*1.5)
+            results = results_map.get(timeout=60*10)
 
             fitness_dict = {}
             for result_dict in results:
                 for k, v in result_dict.items():
                     fitness_dict[k] = v
 
-            surviving_genomes = {}
             for g_id, genome in genomes:
                 genome.fitness = fitness_dict[g_id]
                 if genome.fitness > self.best_fit:
                     self.best_fit = genome.fitness
                     self.stagnation = 0
                     self.best_genome = genome
-                if genome.fitness > -10000:
-                    surviving_genomes[g_id] = genome
-
-            self.pop.population = surviving_genomes
 
         except IOError as e:  # Sometimes the environment just implodes
             if e.errno == errno.EPIPE:
@@ -182,10 +177,9 @@ class SGR:
                 raise(IOError)
         except multiprocess.context.TimeoutError as e:
             print("Deu timeout!!!!!!")
-            for g_id, genome in genomes:
-                if genome.fitness is None:
-                    genome.fitness = 0
 
+        surviving_genomes = {g_id: genome for g_id, genome in genomes if genome.fitness is not None and genome.fitness > -1000}
+        self.pop.population = surviving_genomes
         # print("Simulation took ", time.time()-start_t, "s")
         self.check_stagnation_and_save_interval()
 
