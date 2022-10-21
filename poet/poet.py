@@ -80,7 +80,7 @@ class POET:
             if i%self.run_params.save_gen_interval == 0:
                 self.save_checkpoint(i)
     def save_checkpoint(self, gen):
-        path = "checkpoints/cp_real_transfer_gen_{}.pkl".format(gen)
+        path = "checkpoints/cp_cppn_gen_{}.pkl".format(gen)
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
