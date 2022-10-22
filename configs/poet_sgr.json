@@ -17,7 +17,7 @@
 
     "height_mutation_chance": 0.2,
     "max_height_mutation": 1,
-    "obs_prob_mutation_power": 1,
+    "obs_prob_mutation_power": 0.25,
     "transfer_frequency": 20,
     "create_frequency": 50,
     "reproduction_criterion": 2,
