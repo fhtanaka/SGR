@@ -68,10 +68,11 @@ class EnvConfig:
         temp_rng=np.random.default_rng(self.seed)
         return generate_env_json(obstacle_height=self.heights_list, obstacle_prob=self.obstacle_prob, rng=temp_rng)
 
-    def create_child(self):
+    def create_child(self, seed = None):
         child = deepcopy(self)
         child.id = self.idCounter()
-        child.seed = self.rng.integers(100)
+        child.seed = self.rng.integers(100) if seed == None else seed
+        self.rng = np.random.default_rng(child.seed)
 
         return child
 

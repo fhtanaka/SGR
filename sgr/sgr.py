@@ -141,7 +141,6 @@ class SGR:
     
     def fit_func(self, genomes, neat_config, env_name, n_steps, cpus):
         self.stagnation += 1
-        start_t = time.time()
         local_dir = os.path.dirname(__file__)
         json_path = os.path.join(local_dir, "../dynamic_env/env.json")
         if env_name == "dynamic" and not os.path.exists(json_path):
@@ -177,10 +176,15 @@ class SGR:
                 raise(IOError)
         except multiprocess.context.TimeoutError as e:
             print("Deu timeout!!!!!!")
+            for g_id, genome in genomes:
+                if genome.fitness is None:
+                    genome.fitness = -1000
 
+        pool.terminate()
+        pool.clear()
         surviving_genomes = {g_id: genome for g_id, genome in genomes if genome.fitness is not None and genome.fitness > -1000}
         self.pop.population = surviving_genomes
-        # print("Simulation took ", time.time()-start_t, "s")
+
         self.check_stagnation_and_save_interval()
 
     def check_stagnation_and_save_interval(self):

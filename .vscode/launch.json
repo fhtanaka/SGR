@@ -24,14 +24,22 @@
             "request": "launch",
             "program": "poet_test.py",
             "args": [
-                "--pop",
-                "4",
+                "-c", 
+                "configs/poet_sgr.json"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "debug POET",
+            "type": "python",
+            "request": "launch",
+            "program": "debug.py",
+            "args": [
+                "-c", 
+                "configs/poet_sgr.json",
                 "--cpu",
-                "4",
-                "--gens",
-                "2",
-                "--steps",
-                "200"
+                "1"
             ],
             "console": "integratedTerminal",
             "justMyCode": false

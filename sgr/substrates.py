@@ -40,6 +40,8 @@ def morph_substrate_CPPN_like_shape(robot_size):
 
 def control_substrate_CPPN_like_shape(robot_size, env_name, robot):
     in_size = math.ceil(math.sqrt(get_obs_size(robot, env_name)))
+    # intermediate_layer = (in_size+robot_size)//2
+    # [intermediate_layer, intermediate_layer, -2],
     shape = [
         [in_size, in_size, -1],
         [robot_size, robot_size, -2],

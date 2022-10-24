@@ -65,29 +65,33 @@ class POET:
         for i in range(1, generations):
             print("##################### Starting POET gen ", i, "#####################")
             print(f"Evaluating {len(self.pairs)} pairs\n")
+            gen_start_time = time()
             # Transfer
             if i%self.transfer_frequency == 0:
-                print("Starting transfer process\n")
+                print("Starting transfer process")
                 self.transfer()
+                print(f"Transfer took {time()-gen_start_time}s\n")
             # Create new environments
             if i%self.create_frequency == 0:
-                print("Creating new environments\n")
+                env_creation_t = time()
+                print("Creating new environments")
                 self.create_environments()
+                print(f"Env creation took {time()-env_creation_t}s\n")
             # Train
             print("Population training\n")
             self.train_agents()
             # Create checkpoint
             if i%self.run_params.save_gen_interval == 0:
                 self.save_checkpoint(i)
+            print(f"\nPOET generation took {time()-gen_start_time}s\n")
     def save_checkpoint(self, gen):
-        path = "checkpoints/cp_3D_gen_{}.pkl".format(gen)
+        path = "checkpoints/cp_5_3D_gen_{}.pkl".format(gen)
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
 
     def create_environments(self):
         # Find eligible pairs
-        t = time()
         eligible_pairs = []
         for pair in self.pairs:
             if (pair.fitness is not None) and (pair.fitness > self.reproduction_criterion):
@@ -113,6 +117,7 @@ class POET:
                 if (best_fitness is None) or (fitness > best_fitness):
                     best_agent = child_pair.agent_pop
                     best_fitness = fitness
+            print("Env created with fitness of: ", best_fitness)
             if (best_fitness > self.difficulty_criterion_low) and (best_fitness < self.difficulty_criterion_high):
                 child_pair.agent_pop = best_agent
                 eligible_child_pairs.append(child_pair)
@@ -127,10 +132,10 @@ class POET:
                 if len(self.pairs) > self.max_pair_population_size:
                     self.pairs.pop(0)
             added += 1
-        print(f"env creation took {time()-t}s\n")
 
     def mutate(self, env: EnvConfig):
-        child = env.create_child()
+        seed = self.rng.integers(100)
+        child = env.create_child(seed)
 
         mutate_height = np.random.rand()
         if mutate_height and mutate_height < self.height_mutation_chance:
