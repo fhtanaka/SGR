@@ -39,7 +39,7 @@
                 "-c", 
                 "configs/poet_sgr.json",
                 "--cpu",
-                "1"
+                "12"
             ],
             "console": "integratedTerminal",
             "justMyCode": false

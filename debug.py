@@ -8,7 +8,7 @@ from sgr.generate_robot import generate_robot
 
 import numpy as np
 
-checkpoint = "/home/mma-lab/fabio/SGR/poet/cp_7CPPN_gen_750.pkl"
+checkpoint = "/home/mma-lab/fabio/SGR/checkpoints/cp_5_3D_gen_1000.pkl"
 
 def main():
     params = parse_args()
@@ -22,8 +22,7 @@ def main():
     CustomGenome.spec_genotype_weight = poet.run_params.spec_genotype_weight
     CustomGenome.spec_phenotype_weight = poet.run_params.spec_phenotype_weight
 
-    poet.run(3)
-
+    poet.create_environments()
 
 if __name__ == "__main__":
     main()

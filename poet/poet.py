@@ -112,7 +112,6 @@ class POET:
             best_fitness = None
             for pair in self.pairs:
                 child_pair.agent_pop = pair.agent_pop.create_child()
-                child_pair.agent_pop.id = child_pair.agent_pop.idCounter()
                 fitness = self.evaluate_pair(child_pair)
                 if (best_fitness is None) or (fitness > best_fitness):
                     best_agent = child_pair.agent_pop
@@ -249,6 +248,7 @@ class POET:
                 best_fitness = -1000000
                 for transfer_pair in self.pairs:
                     if transfer_pair.agent_pop.id != pair.agent_pop.id:
+                        transfer_pair.agent_pop.pop.best_genome = None
                         temp_test_pair = Pair(self.rng.integers(100))
                         temp_test_pair.environment = pair.environment
                         # if we remove the deepcopy in the line below, we will be doing the proposal transfer as well

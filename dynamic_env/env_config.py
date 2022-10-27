@@ -27,7 +27,7 @@ def random_prob_mutation(size, rng: np.random.Generator):
 class EnvConfig:
     idCounter = itertools.count().__next__
 
-    def __init__(self, seed, obstacle_height=0, obstacle_prob=np.array([1])):
+    def __init__(self, seed, obstacle_height=1, obstacle_prob=np.array([0, 1, 0])):
         self.id = self.idCounter()
         self.seed = seed
         self.rng = np.random.default_rng(seed)

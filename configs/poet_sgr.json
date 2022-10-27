@@ -17,14 +17,14 @@
 
     "height_mutation_chance": 0.2,
     "max_height_mutation": 1,
-    "obs_prob_mutation_power": 0.2,
+    "obs_prob_mutation_power": 0.3,
     "transfer_frequency": 10,
     "create_frequency": 50,
     "reproduction_criterion": 2,
-    "difficulty_criterion_low": 0.6,
+    "difficulty_criterion_low": 0.5,
     "difficulty_criterion_high": 3,
-    "num_create_environments": 15,
-    "num_children_add": 6,
+    "num_create_environments": 20,
+    "num_children_add": 4,
     "max_pair_population_size": 20,
     "n_nearest_neighbors": 5
 }
