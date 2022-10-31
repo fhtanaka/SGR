@@ -6,7 +6,7 @@
     "n_threads": 12,
     "save_to": "",
     "goal_fit": 10,
-    "pop_size": 48,
+    "pop_size": 36,
     "max_stag": 10000,
     "neat_config": "neat_configs/POET.cfg",
     "save_gen_interval": 25,
@@ -15,11 +15,12 @@
     "substrate_type": "cppn",
 
 
+    "transfer_gens": 1,
     "height_mutation_chance": 0.2,
     "max_height_mutation": 1,
-    "obs_prob_mutation_power": 0.3,
+    "obs_prob_mutation_power": 0.25,
     "transfer_frequency": 10,
-    "create_frequency": 50,
+    "create_frequency": 41,
     "reproduction_criterion": 2,
     "difficulty_criterion_low": 0.5,
     "difficulty_criterion_high": 3,

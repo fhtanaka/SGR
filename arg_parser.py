@@ -34,6 +34,7 @@ def default_values():
         "num_children_add": 2,
         "max_pair_population_size": 20,
         "n_nearest_neighbors": 5,
+        "transfer_gens": 1,
     }
 
     return default
@@ -67,6 +68,7 @@ def create_parser(default_args):
     parser.add_argument("--num_children_add", nargs="?", default=default_args["num_children_add"], help="", type=int)
     parser.add_argument("--max_pair_population_size", nargs="?", default=default_args["max_pair_population_size"], help="", type=int)
     parser.add_argument("--n_nearest_neighbors", nargs="?", default=default_args["n_nearest_neighbors"], help="", type=int)
+    parser.add_argument("--transfer_gens", nargs="?", default=default_args["transfer_gens"], help="", type=int)
     return parser
 
 
@@ -115,6 +117,7 @@ def parse_args():
     args_dict["num_children_add"] = command_line_args.num_children_add
     args_dict["max_pair_population_size"] = command_line_args.max_pair_population_size
     args_dict["n_nearest_neighbors"] = command_line_args.n_nearest_neighbors    
+    args_dict["transfer_gens"] = command_line_args.transfer_gens
 
     return Parameters(args_dict)
     
@@ -143,6 +146,7 @@ class Parameters:
             self.morph_substrate = morph_substrate_3D_out_shape
             self.control_substrate = control_substrate_3D_out_shape
 
+        self.transfer_gens = args_dict["transfer_gens"]
         self.height_mutation_chance = args_dict["height_mutation_chance"]
         self.max_height_mutation = args_dict["max_height_mutation"]
         self.obs_prob_mutation_power = args_dict["obs_prob_mutation_power"]

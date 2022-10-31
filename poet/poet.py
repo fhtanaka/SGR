@@ -85,7 +85,7 @@ class POET:
                 self.save_checkpoint(i)
             print(f"\nPOET generation took {time()-gen_start_time}s\n")
     def save_checkpoint(self, gen):
-        path = "checkpoints/cp_5_3D_gen_{}.pkl".format(gen)
+        path = "checkpoints/cp_5_CPPN_gen_{}.pkl".format(gen)
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
@@ -255,7 +255,7 @@ class POET:
                         # is this a good idea?
                         # temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
                         temp_test_pair.agent_pop = transfer_pair.agent_pop
-                        fitness = self.evaluate_pair(temp_test_pair, True, gens = 3)
+                        fitness = self.evaluate_pair(temp_test_pair, True, gens = self.run_params.transfer_gens)
                         if best_fitness < fitness:
                             best_agent_pop = temp_test_pair.agent_pop
                             best_fitness = fitness
