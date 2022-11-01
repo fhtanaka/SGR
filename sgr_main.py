@@ -12,6 +12,7 @@ def main():
         params.spec_genotype_weight,
         params.spec_phenotype_weight,
         params.pop_size,
+        params.substrate_type,
         params.save_to
     )
 

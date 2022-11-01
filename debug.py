@@ -16,7 +16,7 @@ def main():
     poet: POET = pickle.load(file)
     poet.run_params.cpu = params.cpu
     
-    CustomGenome.robot_func = lambda self, net, config: generate_robot(net, poet.run_params.robot_size)
+    CustomGenome.robot_func = lambda self, net, config: generate_robot(net, poet.run_params.robot_size, params.substrate_type)
     CustomGenome.substrate = morph_substrate(poet.run_params.robot_size)
     CustomGenome.robot_size = poet.run_params.robot_size
     CustomGenome.spec_genotype_weight = poet.run_params.spec_genotype_weight

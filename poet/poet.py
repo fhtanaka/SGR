@@ -23,7 +23,7 @@ class Pair:
             params.spec_genotype_weight,
             params.spec_phenotype_weight,
             params.pop_size,
-            params.save_to,
+            params.substrate_type,
             reporters=True
         )
 
@@ -81,11 +81,13 @@ class POET:
             print("Population training\n")
             self.train_agents()
             # Create checkpoint
-            if i%self.run_params.save_gen_interval == 0:
+            if i%self.run_params.save_gen_interval == 0 and self.run_params.save_to != "":
                 self.save_checkpoint(i)
+
             print(f"\nPOET generation took {time()-gen_start_time}s\n")
+
     def save_checkpoint(self, gen):
-        path = "checkpoints/cp_5_CPPN_gen_{}.pkl".format(gen)
+        path = f"checkpoints/cp_{self.run_params.save_to}_{gen}.pkl"
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
@@ -122,6 +124,7 @@ class POET:
                 eligible_child_pairs.append(child_pair)
         # Select child environments to add to pair population
         sorted_child_pairs = self.sort_child_pairs(eligible_child_pairs)
+        print("# Eligible envs: ", len(sorted_child_pairs))
         added = 0
         for child in sorted_child_pairs:
             if added < self.num_children_add:
@@ -228,7 +231,7 @@ class POET:
             winner = pop.run(
                 env_name = self.run_params.env,
                 n_steps = self.run_params.steps,
-                n_gens = self.run_params.gens,
+                n_gens = 1,
                 cpus = self.run_params.cpu,
                 max_stagnation = self.run_params.max_stag,
                 save_gen_interval = self.run_params.save_gen_interval,

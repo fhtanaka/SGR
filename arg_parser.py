@@ -1,8 +1,6 @@
 import argparse
 import json
 import os
-from sgr.generate_robot import generate_robot_CPPN_like, generate_robot_3D_out
-from sgr.substrates import morph_substrate_3D_out_shape, morph_substrate_CPPN_like_shape, control_substrate_3D_out_shape, control_substrate_CPPN_like_shape
 
 def default_values():
     default = {
@@ -77,7 +75,7 @@ def parse_args():
 
     default_args = default_values()
 
-    # Parsing just to check if there is a config file
+    # Parsing just to change the default values in the case of a config file exists
     parser = create_parser(default_args)
     command_line_args = parser.parse_args()
     if command_line_args.config != "":
@@ -86,7 +84,8 @@ def parse_args():
         with open(path, 'r', encoding='utf-8') as f:
             default_args = json.load(f)
 
-    # "real" parser to get the values, the default values may change
+    # "real" parser to get the values from the command line that have priority over the
+    # config file
     parser = create_parser(default_args)
     command_line_args = parser.parse_args()
 
@@ -136,15 +135,7 @@ class Parameters:
         self.save_gen_interval = args_dict["save_gen_interval"]
         self.spec_genotype_weight = args_dict["spec_genotype_weight"]
         self.spec_phenotype_weight = args_dict["spec_phenotype_weight"]
-
-        if args_dict["substrate_type"] == "cppn":
-            self.robot_func = generate_robot_CPPN_like
-            self.morph_substrate = morph_substrate_CPPN_like_shape
-            self.control_substrate = control_substrate_CPPN_like_shape
-        elif args_dict["substrate_type"] == "3d":
-            self.robot_func = generate_robot_3D_out
-            self.morph_substrate = morph_substrate_3D_out_shape
-            self.control_substrate = control_substrate_3D_out_shape
+        self.substrate_type = args_dict["substrate_type"]
 
         self.transfer_gens = args_dict["transfer_gens"]
         self.height_mutation_chance = args_dict["height_mutation_chance"]

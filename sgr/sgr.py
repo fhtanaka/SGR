@@ -32,19 +32,21 @@ class SGR:
             spec_genotype_weight,
             spec_phenotype_weight,
             pop_size,
+            substrate_type,
             save_to="",
             reporters=True
         ):
 
         self.id = self.idCounter()
-        morphology_coords = morph_substrate(robot_size)
+        morphology_coords = morph_substrate(robot_size, substrate_type)
 
         self.input_size = morphology_coords.dimensions*2 + 1 # two coordinates plus the bias
         self.pop_size = pop_size
         self.robot_size = robot_size
+        self.substrate_type = substrate_type
         self.save_to = save_to
 
-        CustomGenome.robot_func = lambda self, net, params: generate_robot(net, robot_size)
+        CustomGenome.robot_func = lambda self, net, params: generate_robot(net, robot_size, substrate_type)
         CustomGenome.substrate = morphology_coords
         CustomGenome.robot_size = robot_size
         CustomGenome.spec_genotype_weight = spec_genotype_weight
@@ -117,16 +119,16 @@ class SGR:
         if hasattr(genome, 'robot'):
             robot = genome.robot
         else:
-            design_substrate = morph_substrate(self.robot_size)
+            design_substrate = morph_substrate(self.robot_size, self.substrate_type)
             design_net = create_phenotype_network(cppn, design_substrate)
-            robot = generate_robot(design_net, self.robot_size)
+            robot = generate_robot(design_net, self.robot_size, self.substrate_type)
             genome.robot = robot
 
         if not eval_robot_constraint(robot):
             return -10000, False
 
         try:
-            controller_substrate = control_substrate(self.robot_size, env_name, robot)
+            controller_substrate = control_substrate(self.robot_size, env_name, robot, self.substrate_type)
         except IndexError: # Sometimes the environment just implodes
             return -10000, False
 

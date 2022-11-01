@@ -1,5 +1,5 @@
 {
-    "gens": 1,
+    "gens": 501,
     "robot_size": 5,
     "steps": 400,
     "env": "dynamic",     

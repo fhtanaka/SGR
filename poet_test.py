@@ -11,13 +11,13 @@ def main():
     config_path = os.path.join(local_dir, params.neat_config)
     seed =  np.random.SeedSequence()
     
-    aux = POET(
+    poet_alg = POET(
         seed,
         params,
         config_path
     )
 
-    aux.run(1001)
+    poet_alg.run(params.gens)
 
 
 if __name__ == "__main__":
