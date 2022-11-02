@@ -9,24 +9,26 @@
     "pop_size": 36,
     "max_stag": 10000,
     "neat_config": "neat_configs/POET.cfg",
-    "save_gen_interval": 25,
+    "save_gen_interval": 20,
     "spec_genotype_weight": 1,
     "spec_phenotype_weight": 5,
     "substrate_type": "cppn",
 
 
-    "transfer_gens": 1,
     "height_mutation_chance": 0.2,
     "max_height_mutation": 1,
     "obs_prob_mutation_power": 0.25,
-    "transfer_frequency": 10,
-    "create_frequency": 41,
     "reproduction_criterion": 2,
-    "difficulty_criterion_low": 0.5,
-    "difficulty_criterion_high": 3,
-    "num_create_environments": 20,
-    "num_children_add": 4,
+    "difficulty_criterion_low": 1,
+    "difficulty_criterion_high": 3.3,
+    "num_create_environments": 10,
+    "num_children_add": 2,
     "max_pair_population_size": 20,
-    "n_nearest_neighbors": 5
+    "n_nearest_neighbors": 5,
+
+    "create_frequency": 41,
+    "p_transfer_frequency": 10,
+    "p_transfer_gens": 1,
+    "d_transfer_frequency": 52
 }
     

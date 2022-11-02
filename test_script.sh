@@ -1,0 +1,2 @@
+python poet_test.py -c configs/poet_sgr.json -g 3 --save_to cp_5_cppn --substrate cppn | tee saida_cppn.txt
+python poet_test.py -c configs/poet_sgr.json -g 3 --save_to cp_5_3d --substrate 3d | tee saida_3d.txt

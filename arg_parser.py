@@ -23,8 +23,6 @@ def default_values():
         "height_mutation_chance": 0.35,
         "max_height_mutation": 1,
         "obs_prob_mutation_power": 2,
-        "transfer_frequency": 10,
-        "create_frequency": 50,
         "reproduction_criterion": 1,
         "difficulty_criterion_low": .5,
         "difficulty_criterion_high": 8,
@@ -32,7 +30,11 @@ def default_values():
         "num_children_add": 2,
         "max_pair_population_size": 20,
         "n_nearest_neighbors": 5,
-        "transfer_gens": 1,
+        "p_transfer_gens": 1,
+
+        "create_frequency": 49,
+        "p_transfer_frequency": 10,
+        "d_transfer_frequency": 27,
     }
 
     return default
@@ -57,7 +59,6 @@ def create_parser(default_args):
     parser.add_argument("--height_mutation_chance", nargs="?", default=default_args["height_mutation_chance"], help="", type=float)
     parser.add_argument("--max_height_mutation", nargs="?", default=default_args["max_height_mutation"], help="", type=int)
     parser.add_argument("--obs_prob_mutation_power", nargs="?", default=default_args["obs_prob_mutation_power"], help="", type=float)
-    parser.add_argument("--transfer_frequency", nargs="?", default=default_args["transfer_frequency"], help="", type=int)
     parser.add_argument("--create_frequency", nargs="?", default=default_args["create_frequency"], help="", type=int)
     parser.add_argument("--reproduction_criterion", nargs="?", default=default_args["reproduction_criterion"], help="", type=float)
     parser.add_argument("--difficulty_criterion_low", nargs="?", default=default_args["difficulty_criterion_low"], help="", type=float)
@@ -66,7 +67,11 @@ def create_parser(default_args):
     parser.add_argument("--num_children_add", nargs="?", default=default_args["num_children_add"], help="", type=int)
     parser.add_argument("--max_pair_population_size", nargs="?", default=default_args["max_pair_population_size"], help="", type=int)
     parser.add_argument("--n_nearest_neighbors", nargs="?", default=default_args["n_nearest_neighbors"], help="", type=int)
-    parser.add_argument("--transfer_gens", nargs="?", default=default_args["transfer_gens"], help="", type=int)
+    parser.add_argument("--p_transfer_gens", nargs="?", default=default_args["p_transfer_gens"], help="", type=int)
+
+    parser.add_argument("--p_transfer_frequency", nargs="?", default=default_args["p_transfer_frequency"], help="", type=int)
+    parser.add_argument("--d_transfer_frequency", nargs="?", default=default_args["d_transfer_frequency"], help="", type=int)
+
     return parser
 
 
@@ -107,7 +112,6 @@ def parse_args():
     args_dict["height_mutation_chance"] = command_line_args.height_mutation_chance
     args_dict["max_height_mutation"] = command_line_args.max_height_mutation
     args_dict["obs_prob_mutation_power"] = command_line_args.obs_prob_mutation_power
-    args_dict["transfer_frequency"] = command_line_args.transfer_frequency
     args_dict["create_frequency"] = command_line_args.create_frequency
     args_dict["reproduction_criterion"] = command_line_args.reproduction_criterion
     args_dict["difficulty_criterion_low"] = command_line_args.difficulty_criterion_low
@@ -116,7 +120,9 @@ def parse_args():
     args_dict["num_children_add"] = command_line_args.num_children_add
     args_dict["max_pair_population_size"] = command_line_args.max_pair_population_size
     args_dict["n_nearest_neighbors"] = command_line_args.n_nearest_neighbors    
-    args_dict["transfer_gens"] = command_line_args.transfer_gens
+    args_dict["p_transfer_gens"] = command_line_args.p_transfer_gens
+    args_dict["p_transfer_frequency"] = command_line_args.p_transfer_frequency
+    args_dict["d_transfer_frequency"] = command_line_args.d_transfer_frequency
 
     return Parameters(args_dict)
     
@@ -137,11 +143,10 @@ class Parameters:
         self.spec_phenotype_weight = args_dict["spec_phenotype_weight"]
         self.substrate_type = args_dict["substrate_type"]
 
-        self.transfer_gens = args_dict["transfer_gens"]
+        self.p_transfer_gens = args_dict["p_transfer_gens"]
         self.height_mutation_chance = args_dict["height_mutation_chance"]
         self.max_height_mutation = args_dict["max_height_mutation"]
         self.obs_prob_mutation_power = args_dict["obs_prob_mutation_power"]
-        self.transfer_frequency = args_dict["transfer_frequency"]
         self.create_frequency = args_dict["create_frequency"]
         self.reproduction_criterion = args_dict["reproduction_criterion"]
         self.difficulty_criterion_low = args_dict["difficulty_criterion_low"]
@@ -150,7 +155,9 @@ class Parameters:
         self.num_children_add = args_dict["num_children_add"]
         self.max_pair_population_size = args_dict["max_pair_population_size"]
         self.n_nearest_neighbors = args_dict["n_nearest_neighbors"]
-        
+
+        self.p_transfer_frequency = args_dict["p_transfer_frequency"]
+        self.d_transfer_frequency = args_dict["d_transfer_frequency"] 
         # if report is not None:
         for k, v in args_dict.items():
             print(f"{k}: {v}")

@@ -36,7 +36,6 @@ class POET:
         self.height_mutation_chance = params.height_mutation_chance 
         self.max_height_mutation = params.max_height_mutation 
         self.obs_prob_mutation_power = params.obs_prob_mutation_power 
-        self.transfer_frequency = params.transfer_frequency 
         self.create_frequency = params.create_frequency 
         self.reproduction_criterion = params.reproduction_criterion 
         self.difficulty_criterion_low = params.difficulty_criterion_low
@@ -46,6 +45,8 @@ class POET:
         self.max_pair_population_size = params.max_pair_population_size 
         self.n_nearest_neighbors = params.n_nearest_neighbors 
 
+        self.p_transfer_frequency = params.p_transfer_frequency
+        self.d_transfer_frequency = params.d_transfer_frequency 
         
         # The pairs of environments and agents
         self.pairs: List[Pair] = []
@@ -66,17 +67,25 @@ class POET:
             print("##################### Starting POET gen ", i, "#####################")
             print(f"Evaluating {len(self.pairs)} pairs\n")
             gen_start_time = time()
-            # Transfer
-            if i%self.transfer_frequency == 0:
-                print("Starting transfer process")
-                self.transfer()
+            # Transfers
+            if i%self.p_transfer_frequency == 0:
+                print("Starting proposal transfer process")
+                self.proposal_transfer()
                 print(f"Transfer took {time()-gen_start_time}s\n")
+            if i % self.d_transfer_frequency == 0:
+                d_transfer_time = time()
+                print("Starting direct transfer process")
+                self.proposal_transfer()
+                print(f"Transfer took {time()-d_transfer_time}s\n")
+
+
             # Create new environments
             if i%self.create_frequency == 0:
                 env_creation_t = time()
                 print("Creating new environments")
                 self.create_environments()
                 print(f"Env creation took {time()-env_creation_t}s\n")
+
             # Train
             print("Population training\n")
             self.train_agents()
@@ -242,26 +251,34 @@ class POET:
             pair.fitness = winner.fitness
             print("Pair fitness: ", np.round(pair.fitness, 4), "\n")
             
-    def transfer(self):
-        # Direct transfer
+    def proposal_transfer(self):
         if len(self.pairs) >= 1:
             base_pairs = self.rng.choice(self.pairs, 1, replace=True)
             for pair in base_pairs:
-                best_agent_pop = None
-                best_fitness = -1000000
                 for transfer_pair in self.pairs:
                     if transfer_pair.agent_pop.id != pair.agent_pop.id:
                         transfer_pair.agent_pop.pop.best_genome = None
                         temp_test_pair = Pair(self.rng.integers(100))
                         temp_test_pair.environment = pair.environment
-                        # if we remove the deepcopy in the line below, we will be doing the proposal transfer as well
-                        # is this a good idea?
-                        # temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
                         temp_test_pair.agent_pop = transfer_pair.agent_pop
-                        fitness = self.evaluate_pair(temp_test_pair, True, gens = self.run_params.transfer_gens)
+                        _ = self.evaluate_pair(temp_test_pair, True, gens = self.run_params.p_transfer_gens)
+                       
+
+    def direct_transfer(self):
+        # Direct transfer
+        if len(self.pairs) >= 1:
+            for pair in self.pairs:
+                best_agent_pop = None
+                best_fitness = -1000000
+                for transfer_pair in self.pairs:
+                    if transfer_pair.agent_pop.id != pair.agent_pop.id:
+                        temp_test_pair = Pair(self.rng.integers(100))
+                        temp_test_pair.environment = pair.environment
+                        temp_test_pair.agent_pop = deepcopy(transfer_pair.agent_pop)
+                        fitness = self.evaluate_pair(temp_test_pair, True, gens = 1)
                         if best_fitness < fitness:
                             best_agent_pop = temp_test_pair.agent_pop
                             best_fitness = fitness
                 if best_fitness > pair.fitness:
-                    pair.agent_pop = deepcopy(best_agent_pop)
+                    pair.agent_pop = best_agent_pop
                     pair.fitness = best_fitness
