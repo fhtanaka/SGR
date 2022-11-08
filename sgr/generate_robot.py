@@ -1,4 +1,6 @@
 import numpy as np
+from .substrates import raise_substrate_error
+from evogym import is_connected, has_actuator
 
 N_TYPES = ['empty', 'rigid', 'soft', 'hori', 'vert']
 
@@ -21,8 +23,15 @@ def generate_robot_CPPN_like(net, robot_size=5):
             robot[i][j] = node
     return robot
 
-def generate_robot(net, params):
-    return generate_robot_CPPN_like(net, params["robot_size"])
+def generate_robot(net, robot_size, substrate_name):
+    if substrate_name == "cppn" or substrate_name == "CPPN":
+        robot = generate_robot_CPPN_like(net, robot_size)
+    elif substrate_name == "3D" or substrate_name == "3d":
+        robot = generate_robot_3D_out(net, robot_size)
+    else:
+        raise_substrate_error()
+        
+    return robot
     # return premade_robot()
 
 def premade_robot():
@@ -35,3 +44,7 @@ def premade_robot():
     ]
     r = np.asarray(a)
     return r
+
+def eval_robot_constraint(robot):
+    validity = is_connected(robot) and has_actuator(robot)
+    return validity

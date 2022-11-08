@@ -13,10 +13,10 @@ from pathos.multiprocessing import ProcessPool
 from evogym import hashable
 
 sys.path.append('../')
-from custom_reporter import CustomReporter, remove_reporters
+from sgr.custom_reporter import CustomReporter, remove_reporters
 from alt_arg_parser import parse_args
-from generate_robot import generate_robot_CPPN_like
-from evogym_sim import simulate_env, get_obs_size
+from sgr.generate_robot import generate_robot_CPPN_like
+from sgr.evogym_sim import simulate_env, get_obs_size
 from sgr_main import eval_genome_constraint
 
 BEST_FIT = -10000

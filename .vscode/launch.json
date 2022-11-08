@@ -17,6 +17,32 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "POET",
+            "type": "python",
+            "request": "launch",
+            "program": "poet_test.py",
+            "args": [
+                "-c", 
+                "configs/poet_sgr.json"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "debug POET",
+            "type": "python",
+            "request": "launch",
+            "program": "debug.py",
+            "args": [
+                "-c", 
+                "configs/poet_sgr.json",
+                "--cpu",
+                "12"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

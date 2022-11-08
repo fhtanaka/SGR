@@ -50,7 +50,7 @@ def add_neighbors(i, j, env_vals, width, height):
     return neighbors
 
 
-def env2json(width=60, height=20, obstacle_height=[-2,-1,0,1,2], obstacle_prob=[.1, .25,.3,.25, .1], rng=np.random.default_rng()):
+def generate_env_json(width=90, height=20, obstacle_height=[-2,-1,0,1,2], obstacle_prob=[.1, .25,.3,.25, .1], rng=np.random.default_rng()):
     ground = {
         "indices": [],
         "types": [],
@@ -71,11 +71,11 @@ def env2json(width=60, height=20, obstacle_height=[-2,-1,0,1,2], obstacle_prob=[
     return env_json
 
 
-def create_ObstacleTraverser_JSON():
-    env = env2json()
-    with open('dynamic_env/data.json', 'w', encoding='utf-8') as f:
+def create_ObstacleTraverser_JSON(file_path):
+    env = generate_env_json()
+    with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(env, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
-    create_ObstacleTraverser_JSON()
+    create_ObstacleTraverser_JSON('dynamic_env/env.json')
