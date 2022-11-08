@@ -6,7 +6,7 @@ from evogym import is_connected, has_actuator
 def robot_from_genome(genome, robot_size, substrate, robot_func, config):
     cppn = neat.nn.FeedForwardNetwork.create(genome, TempConfig(config))
 
-    design_net = create_phenotype_network(cppn, substrate)
+    design_net = create_phenotype_network(cppn, substrate, output_node_idx=0)
     robot = robot_func(design_net, robot_size)
     
     if not (is_connected(robot) and has_actuator(robot)):

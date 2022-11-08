@@ -34,7 +34,7 @@ def control_substrate(robot_size, env_name, robot, substrate_name):
 def morph_substrate_3D_out_shape(robot_size):
     shape = [
         [1,1,1,1],
-        [robot_size//2, robot_size//2, 3, 2],
+        [robot_size, robot_size, 3, 2],
         [robot_size, robot_size, 5, 3],
     ]
     return shape

@@ -75,8 +75,8 @@ class SGR:
         # overwriting the num_inputs and num_outputs from the neat config file to fit the substrate
         neat_config.genome_config.num_inputs = self.input_size
         neat_config.genome_config.input_keys = [-1*i for i in range(1, self.input_size+1)]
-        neat_config.genome_config.num_outputs = 1
-        neat_config.genome_config.output_keys = [1]
+        neat_config.genome_config.num_outputs = 2
+        neat_config.genome_config.output_keys = [1, 2]
 
         return neat_config
 
@@ -123,7 +123,7 @@ class SGR:
             robot = genome.robot
         else:
             design_substrate = morph_substrate(self.robot_size, self.substrate_type)
-            design_net = create_phenotype_network(cppn, design_substrate)
+            design_net = create_phenotype_network(cppn, design_substrate, output_node_idx=0)
             robot = generate_robot(design_net, self.robot_size, self.substrate_type)
             genome.robot = robot
 
@@ -135,7 +135,7 @@ class SGR:
         except IndexError: # Sometimes the environment just implodes
             return -10000, False
 
-        controller_net = create_phenotype_network(cppn, controller_substrate)
+        controller_net = create_phenotype_network(cppn, controller_substrate, output_node_idx=1)
 
         reward, done = simulate_env(robot, controller_net, env_name, n_steps, render, save_gif)
 
