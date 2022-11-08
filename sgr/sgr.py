@@ -91,17 +91,20 @@ class SGR:
     def create_child(self):
         new_pop = deepcopy(self)
         new_pop.id = self.idCounter()
-        for _, ag in new_pop.pop.population.items():
-            ag.fitness = None
         new_pop.stagnation = 0
         new_pop.generation = 0
         new_pop.best_fit = -10000
         new_pop.best_genome = None
-        new_pop.pop.best_genome = None
         new_pop.max_stagnation = None
         new_pop.save_gen_interval = None
+
+        for _, ag in new_pop.pop.population.items():
+            ag.fitness = None
+        new_pop.pop.best_genome = None
         new_pop.pop.reporters.reporters = []
         new_pop.pop.generation = 0
+        new_pop.pop.species = self.neat_config.species_set_type(self.neat_config.species_set_config, self.pop.reporters)
+        new_pop.pop.species.speciate(self.neat_config, new_pop.pop.population, 0)
 
         return new_pop
 
