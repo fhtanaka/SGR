@@ -217,14 +217,11 @@ class POET:
 
     def compare_envs(self, env1: EnvConfig, env2: EnvConfig):
         # Find the difference between two environments
-        diff_num = 0
-        d = env1.barrier_h - env2.barrier_h
-        diff_num += d if d>0 else -1*d
-        if diff_num == 0:
-            for i, j in zip(env1.obstacle_prob, env2.obstacle_prob):
-                d = i-j
-                diff_num += d if d>0 else -1*d
-        return diff_num
+        d_list = env1.heights_list - env2.heights_list
+        acc = 0
+        for d in d_list:
+            acc += d if d>0 else -1*d 
+        return acc
     
     def train_agents(self):
         for pair in self.pairs:
