@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 from copy import deepcopy
 import pickle
-from dynamic_env.env_config import EnvConfig
+from dynamic_env_v2.env_config import EnvConfig
 from sgr.sgr import SGR
 from arg_parser import Parameters
 class Pair:
@@ -148,11 +148,7 @@ class POET:
         seed = self.rng.integers(100)
         child = env.create_child(seed)
 
-        mutate_height = np.random.rand()
-        if mutate_height and mutate_height < self.height_mutation_chance:
-            child.mutate_barrier_h(self.max_height_mutation)
-        else:
-            child.mutate_obs_prob(self.obs_prob_mutation_power)    
+        child.mutate_barrier_h(self.height_mutation_chance)    
 
         self.total_environments_created += 1
         return child

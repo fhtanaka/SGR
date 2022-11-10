@@ -11,6 +11,7 @@ import time
 import neat.nn
 import pathlib
 import itertools
+from neat.reporting import ReporterSet
 
 from pathos.multiprocessing import ProcessPool
 
@@ -20,7 +21,7 @@ from sgr.body_speciation import CustomGenome
 from sgr.substrates import morph_substrate, control_substrate
 from sgr.generate_robot import generate_robot, eval_robot_constraint
 from sgr.evogym_sim import simulate_env
-from dynamic_env.generateJSON import create_ObstacleTraverser_JSON
+from dynamic_env_v2.generateJSON import create_ObstacleTraverser_JSON
 
 class SGR:
     idCounter = itertools.count().__next__
@@ -101,7 +102,7 @@ class SGR:
         for _, ag in new_pop.pop.population.items():
             ag.fitness = None
         new_pop.pop.best_genome = None
-        new_pop.pop.reporters.reporters = []
+        new_pop.pop.reporters = ReporterSet()
         new_pop.pop.generation = 0
         new_pop.pop.species = self.neat_config.species_set_type(self.neat_config.species_set_config, self.pop.reporters)
         new_pop.pop.species.speciate(self.neat_config, new_pop.pop.population, 0)
