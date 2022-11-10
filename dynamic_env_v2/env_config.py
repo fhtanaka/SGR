@@ -15,8 +15,7 @@ class EnvConfig:
         self.h = height
         self.w = width
         self.flat_start = flat_start
-        self.heights_list =  [height//2 for _ in range(width)]
-    
+        self.heights_list = np.full((width), height//2)
    
     def mutate_barrier_h(self, mutation_prob):
         for idx, h in enumerate(self.heights_list):
