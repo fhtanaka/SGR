@@ -10,15 +10,15 @@
     "max_stag": 10000,
     "neat_config": "neat_configs/POET.cfg",
     "save_gen_interval": 20,
-    "spec_genotype_weight": 1.25,
-    "spec_phenotype_weight": 4,
+    "spec_genotype_weight": 1,
+    "spec_phenotype_weight": 3,
     "substrate_type": "3d",
 
 
     "height_mutation_chance": 0.25,
     "max_height_mutation": 1,
     "obs_prob_mutation_power": 0.4,
-    "reproduction_criterion": 4,
+    "reproduction_criterion": 3,
     "difficulty_criterion_low": 1,
     "difficulty_criterion_high": 3.5,
     "num_create_environments": 30,
