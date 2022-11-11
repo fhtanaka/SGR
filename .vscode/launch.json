@@ -33,10 +33,10 @@
             "justMyCode": false
         },
         {
-            "name": "debug multithread POET",
+            "name": "multithread POET",
             "type": "python",
             "request": "launch",
-            "program": "debug.py",
+            "program": "poet_test.py",
             "args": [
                 "-c", 
                 "configs/poet_sgr.json",
