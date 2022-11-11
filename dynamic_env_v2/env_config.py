@@ -21,12 +21,16 @@ class EnvConfig:
         for idx, h in enumerate(self.heights_list):
             if idx < self.flat_start:
                 pass 
-            r = self.rng.random()
-            if r < mutation_prob: 
-                if r < mutation_prob/2:
+            if self.rng.random() < mutation_prob: 
+                r = self.rng.random()
+                if r < .1:
+                    h -= 2
+                elif r < .5:
                     h -= 1
-                else:
+                elif r < .9:
                     h += 1
+                else:
+                    h += 2
                 self.heights_list[idx] = h      
 
     def generate_json(self, filename="env.json"):

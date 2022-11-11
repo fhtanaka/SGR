@@ -114,6 +114,7 @@ class SGR:
             genome,
             n_steps,
             env_name,
+            dynamic_env_config=None,
             render=False, 
             save_gif=None,
         ):
@@ -138,23 +139,28 @@ class SGR:
 
         controller_net = create_phenotype_network(cppn, controller_substrate, output_node_idx=1)
 
-        reward, done = simulate_env(robot, controller_net, env_name, n_steps, render, save_gif)
+        reward, done = simulate_env(robot, controller_net, env_name, n_steps, dynamic_env_config, render, save_gif)
 
         return reward, done
 
-    def fit_func_thread(self, genomes, n_steps, env_name):
+    def fit_func_thread(self, genomes, n_steps, env_name, dynamic_env_config=None):
         results_dict = {}
         for genome_key, genome in genomes:
-            reward, _ = self.single_genome_fit(genome, n_steps, env_name)
+            reward, _ = self.single_genome_fit(genome, n_steps, env_name, dynamic_env_config)
             results_dict[genome_key] = reward
         return results_dict
     
-    def fit_func(self, genomes, neat_config, env_name, n_steps, cpus):
+    def fit_func(
+            self, 
+            genomes, 
+            neat_config, 
+            env_name, 
+            n_steps, 
+            cpus, 
+            dynamic_env_config = None,
+        ):
+
         self.stagnation += 1
-        local_dir = os.path.dirname(__file__)
-        json_path = os.path.join(local_dir, "../dynamic_env/env.json")
-        if env_name == "dynamic" and not os.path.exists(json_path):
-            create_ObstacleTraverser_JSON(json_path)
 
         try:
             pool = ProcessPool(nodes=cpus)
@@ -163,6 +169,7 @@ class SGR:
                 np.array_split(genomes, cpus),
                 [n_steps for _ in range(cpus)],
                 [env_name for _ in range(cpus)],
+                [dynamic_env_config for _ in range(cpus)],
             )
             
             results = results_map.get(timeout=60*10)
@@ -207,11 +214,22 @@ class SGR:
         if self.save_to is not "" and self.save_gen_interval is not None and (self.pop.generation+1)% self.save_gen_interval == 0:
             dill.dump(self.pop, open(f"{self.save_to}_pop_gen_{self.pop.generation}.pkl", mode='wb'))
 
-    def run(self, env_name, n_steps, n_gens, cpus=1, max_stagnation=None, save_gen_interval=None, print_results=True):
+    def run(
+            self, 
+            env_name, 
+            n_steps, 
+            n_gens, 
+            cpus=1, 
+            max_stagnation=None, 
+            save_gen_interval=None, 
+            print_results=True, 
+            dynamic_env_config=None
+        ):
+
         self.max_stagnation = max_stagnation
         self.save_gen_interval = save_gen_interval
 
-        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus)
+        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus, dynamic_env_config)
         winner: CustomGenome = self.pop.run(neat_fit_func, n_gens)
         
         if print_results:

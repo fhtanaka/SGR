@@ -63,7 +63,7 @@ def generate_env_json(width=60, height=10, h_list=None):
             if vx_type != EMPTY_VX:
                 ground["indices"].append(idx)
                 ground["types"].append(vx_type)
-                ground["neighbors"][idx] = add_neighbors(i, j, env_vals, width, height)
+                ground["neighbors"][str(idx)] = add_neighbors(i, j, env_vals, width, height)
 
     env_json = base_json(width, height)
     env_json["objects"]["ground"] = ground

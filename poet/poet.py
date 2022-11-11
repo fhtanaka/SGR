@@ -157,7 +157,6 @@ class POET:
     def evaluate_pair(self, pair: Pair, print_par_name = False, gens = 1):
         pop = pair.agent_pop
         env = pair.environment
-        env.generate_json("env.json")
         if print_par_name:
             print(f"----- Env {pair.environment.id}, Pop {pair.agent_pop.id} -----")
         winner = pop.run(
@@ -167,7 +166,8 @@ class POET:
             cpus = self.run_params.cpu,
             max_stagnation = self.run_params.max_stag,
             save_gen_interval = self.run_params.save_gen_interval,
-            print_results = False
+            print_results = False,
+            dynamic_env_config=env,
         )
 
         # Set fitness
@@ -229,7 +229,6 @@ class POET:
             # Set environments
             pop = pair.agent_pop
             env = pair.environment
-            env.generate_json("env.json")
             winner = pop.run(
                 env_name = self.run_params.env,
                 n_steps = self.run_params.steps,
@@ -237,7 +236,8 @@ class POET:
                 cpus = self.run_params.cpu,
                 max_stagnation = self.run_params.max_stag,
                 save_gen_interval = self.run_params.save_gen_interval,
-                print_results=False
+                print_results=False,
+                dynamic_env_config=env,
             )
 
             # Set fitness

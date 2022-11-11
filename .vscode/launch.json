@@ -25,13 +25,15 @@
             "program": "poet_test.py",
             "args": [
                 "-c", 
-                "configs/poet_sgr.json"
+                "configs/poet_sgr.json",
+                "--cpu",
+                "1",
             ],
             "console": "integratedTerminal",
             "justMyCode": false
         },
         {
-            "name": "debug POET",
+            "name": "debug multithread POET",
             "type": "python",
             "request": "launch",
             "program": "debug.py",
