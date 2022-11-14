@@ -99,13 +99,16 @@ class SGR:
         new_pop.max_stagnation = None
         new_pop.save_gen_interval = None
 
-        new_pop.pop = neat.Population(self.neat_config)
+        # new_pop.pop = neat.Population(self.neat_config)
+        new_pop.pop.reporters = ReporterSet()
+        new_pop.pop.generation = 0
+        new_pop.pop.best_genome = None
         new_pop.pop.population = self.pop.population
         for _, ag in new_pop.pop.population.items():
             ag.fitness = None
         new_pop.pop.species = self.neat_config.species_set_type(self.neat_config.species_set_config, new_pop.pop.reporters)
         new_pop.pop.species.speciate(self.neat_config, new_pop.pop.population, 0)
-
+        new_pop.pop.reproduction.reporters = new_pop.pop.reporters
         return new_pop
 
     def single_genome_fit(

@@ -8,7 +8,7 @@ from .generateJSON import generate_env_json
 class EnvConfig:
     idCounter = itertools.count().__next__
 
-    def __init__(self, seed, width = 60, height = 10, flat_start = 8):
+    def __init__(self, seed, width = 90, height = 18, flat_start = 10):
         self.id = self.idCounter()
         self.seed = seed
         self.rng = np.random.default_rng(seed)
@@ -18,10 +18,11 @@ class EnvConfig:
         self.heights_list = np.full((width), height//2)
    
     def mutate_barrier_h(self, mutation_prob):
+        previous_h = self.h//2
         for idx, h in enumerate(self.heights_list):
             if idx < self.flat_start:
                 pass 
-            if self.rng.random() < mutation_prob: 
+            elif self.rng.random() < mutation_prob: 
                 r = self.rng.random()
                 if r < .1:
                     h -= 2
@@ -31,7 +32,10 @@ class EnvConfig:
                     h += 1
                 else:
                     h += 2
-                self.heights_list[idx] = h      
+                h = np.clip(h, previous_h-3, previous_h+3)
+                h = np.clip(h, 0, self.h)
+                previous_h = h
+                self.heights_list[idx] = h
 
     def generate_json(self, filename="env.json"):
         env = generate_env_json(self.w, self.h, self.heights_list)

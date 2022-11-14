@@ -69,12 +69,12 @@ class POET:
             gen_start_time = time()
             # Transfers
             if i%self.p_transfer_frequency == 0:
-                print("Starting proposal transfer process")
+                print("\n=== Starting proposal transfer process ===\n")
                 self.proposal_transfer()
                 print(f"Transfer took {time()-gen_start_time}s\n")
             if i % self.d_transfer_frequency == 0:
                 d_transfer_time = time()
-                print("Starting direct transfer process")
+                print("\n=== Starting direct transfer process ===\n")
                 self.proposal_transfer()
                 print(f"Transfer took {time()-d_transfer_time}s\n")
 
@@ -82,13 +82,15 @@ class POET:
             # Create new environments
             if i%self.create_frequency == 0:
                 env_creation_t = time()
-                print("Creating new environments")
+                print("\n=== Creating new environments ===\n")
                 self.create_environments()
                 print(f"Env creation took {time()-env_creation_t}s\n")
 
             # Train
-            print("Population training\n")
-            self.train_agents()
+            print("\n=== Population training ===")
+            n_steps = int(self.run_params.steps * (self.rng.integers(8, 12)/10))
+            print("Steps: ", n_steps, "\n")
+            self.train_agents(n_steps)
             # Create checkpoint
             if i%self.run_params.save_gen_interval == 0 and self.run_params.save_to != "":
                 self.save_checkpoint(i)
@@ -133,7 +135,7 @@ class POET:
                 eligible_child_pairs.append(child_pair)
         # Select child environments to add to pair population
         sorted_child_pairs = self.sort_child_pairs(eligible_child_pairs)
-        print("# Eligible envs: ", len(sorted_child_pairs))
+        print("Eligible envs: ", len(sorted_child_pairs))
         added = 0
         for child in sorted_child_pairs:
             if added < self.num_children_add:
@@ -223,7 +225,7 @@ class POET:
             acc += d if d>0 else -1*d 
         return acc
     
-    def train_agents(self):
+    def train_agents(self, n_steps):
         for pair in self.pairs:
             print(f"----------------- Env {pair.environment.id}, Pop {pair.agent_pop.id} -----------------")
             # Set environments
