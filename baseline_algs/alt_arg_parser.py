@@ -18,7 +18,7 @@ def parse_args():
     controller_in_between_gens = 1
     pop_size = 64
     pad = 0
-    neat_config = "../neat_configs/hyperNEAT.cfg"
+    neat_config = "../neat_configs/single_genome_neat.cfg"
 
 
 
