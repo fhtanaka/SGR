@@ -6,12 +6,12 @@
     "n_threads": 8,
     "save_to": "",
     "goal_fit": 10,
-    "pop_size": 36,
+    "pop_size": 48,
     "max_stag": 10000,
     "neat_config": "neat_configs/POET.cfg",
     "save_gen_interval": 20,
     "spec_genotype_weight": 1,
-    "spec_phenotype_weight": 3,
+    "spec_phenotype_weight": 5,
     "substrate_type": "3d",
 
 
@@ -28,7 +28,7 @@
 
     "create_frequency": 41,
     "p_transfer_frequency": 8,
-    "p_transfer_gens": 2,
-    "d_transfer_frequency": 52
+    "p_transfer_gens": 1,
+    "d_transfer_frequency": 67
 }
     

@@ -106,9 +106,15 @@ class SGR:
         new_pop.pop.population = self.pop.population
         for _, ag in new_pop.pop.population.items():
             ag.fitness = None
-        new_pop.pop.species = self.neat_config.species_set_type(self.neat_config.species_set_config, new_pop.pop.reporters)
-        new_pop.pop.species.speciate(self.neat_config, new_pop.pop.population, 0)
-        new_pop.pop.reproduction.reporters = new_pop.pop.reporters
+
+        config = new_pop.pop.config
+        
+        new_pop.pop.species = self.neat_config.species_set_type(config.species_set_config, new_pop.pop.reporters)
+        new_pop.pop.species.speciate(config, new_pop.pop.population, 0)
+        
+        stagnation = config.stagnation_type(config.stagnation_config,new_pop.pop.reporters)
+        new_pop.pop.reproduction = config.reproduction_type(config.reproduction_config, new_pop.pop.reporters, stagnation)
+
         return new_pop
 
     def single_genome_fit(
