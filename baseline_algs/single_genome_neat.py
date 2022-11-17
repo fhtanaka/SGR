@@ -14,10 +14,10 @@ from evogym import get_full_connectivity
 import evogym.envs
 
 sys.path.append('../')
-from custom_reporter import CustomReporter, remove_reporters
+from sgr.custom_reporter import CustomReporter, remove_reporters
 from alt_arg_parser import parse_args
-from evogym_sim import get_obs_size
-from sgr_main import eval_genome_constraint, N_TYPES
+from sgr.evogym_sim import get_obs_size
+from sgr.generate_robot import eval_robot_constraint, N_TYPES
 
 BEST_FIT = -10000
 STAG = 0
@@ -73,7 +73,7 @@ def fit_func_thread(genomes, params, neat_config, render=False, save_gif=False )
     for g_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, neat_config)
         robot = generate_robot(net, params["robot_size"], params["pad"])
-        if not eval_genome_constraint(robot):
+        if not eval_robot_constraint(robot):
             results_dict[g_id] = -10000
             continue
 

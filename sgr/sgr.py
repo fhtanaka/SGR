@@ -15,13 +15,13 @@ from neat.reporting import ReporterSet
 
 from pathos.multiprocessing import ProcessPool
 
-from hyperneat.new_hyperNEAT import create_phenotype_network
+from hyperneat.hyperNEAT import create_phenotype_network
 from sgr.custom_reporter import CustomReporter, remove_reporters
 from sgr.body_speciation import CustomGenome
 from sgr.substrates import morph_substrate, control_substrate
 from sgr.generate_robot import generate_robot, eval_robot_constraint
 from sgr.evogym_sim import simulate_env
-from dynamic_env_v2.generateJSON import create_ObstacleTraverser_JSON
+from dynamic_env.generateJSON import create_ObstacleTraverser_JSON
 
 class SGR:
     idCounter = itertools.count().__next__

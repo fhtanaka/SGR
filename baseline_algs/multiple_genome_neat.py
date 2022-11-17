@@ -4,7 +4,7 @@ import numpy as np
 import errno
 import dill
 import neat
-import time
+import math
 import neat.nn
 import pathlib
 import sys
@@ -13,11 +13,11 @@ from pathos.multiprocessing import ProcessPool
 from evogym import hashable
 
 sys.path.append('../')
-from sgr.custom_reporter import CustomReporter, remove_reporters
 from alt_arg_parser import parse_args
+from sgr.custom_reporter import CustomReporter, remove_reporters
 from sgr.generate_robot import generate_robot_CPPN_like
 from sgr.evogym_sim import simulate_env, get_obs_size
-from sgr_main import eval_genome_constraint
+from sgr.generate_robot import eval_robot_constraint
 
 BEST_FIT = -10000
 STAG = 0
@@ -35,11 +35,11 @@ def get_controller_config(robot, params):
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
     
-    in_size =  get_obs_size(robot, params)
+    in_size =  math.ceil(math.sqrt(get_obs_size(robot,  params["env"])))
     out_size = params["robot_size"]**2
     
-    config.genome_config.num_inputs = in_size
-    config.genome_config.input_keys = [-1*i for i in range(1, in_size+1)]
+    config.genome_config.num_inputs = in_size**2
+    config.genome_config.input_keys = [-1*i for i in range(1, (in_size**2)+1)]
 
     config.genome_config.num_outputs = out_size
     config.genome_config.output_keys = [i for i in range(1, out_size+1)]
@@ -61,7 +61,7 @@ def update_pop_fitness_thread(genomes, robot, control_neat_config, params):
     results_dict = {}
     for g_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, control_neat_config)
-        fit, _ = simulate_env(robot, net, params)
+        fit, _ = simulate_env(robot, net, params["env"], params["steps"])
         results_dict[g_id] = fit
     return results_dict
 
@@ -106,7 +106,7 @@ def structure_fit_func(genomes, config, params, robot_dict: Dict[str, RobotContr
         net = neat.nn.FeedForwardNetwork.create(genome, config)
 
         robot = generate_robot_CPPN_like(net, params["robot_size"])
-        if not eval_genome_constraint(robot):
+        if not eval_robot_constraint(robot):
             genome.fitness = -10000
             continue
 

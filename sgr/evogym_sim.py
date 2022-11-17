@@ -5,8 +5,8 @@ import imageio
 import numpy as np
 import os
 
-from dynamic_env_v2.traverser import DynamicObstacleTraverser
-from dynamic_env_v2.env_config import EnvConfig
+from dynamic_env.traverser import DynamicObstacleTraverser
+from dynamic_env.env_config import EnvConfig
 
 def get_env(robot, connections, env_name, dynamic_env_config=None):
     if env_name == "dynamic":

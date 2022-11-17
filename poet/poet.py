@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 from copy import deepcopy
 import pickle
-from dynamic_env_v2.env_config import EnvConfig
+from dynamic_env.env_config import EnvConfig
 from sgr.sgr import SGR
 from arg_parser import Parameters
 class Pair:

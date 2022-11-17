@@ -7,13 +7,15 @@ import numpy as np
 import os
 
 from dynamic_env.generateJSON import generate_env_json
+from dynamic_env.env_config import EnvConfig
 
 
 class DynamicObstacleTraverser(WalkingBumpy2):
-    def __init__(self, body, connections=None, filename ="", world_dict=None):
+    def __init__(self, body, connections=None, filename ="", env_config: EnvConfig=None):
 
         # make world
-        if world_dict is not None:
+        if env_config is not None:
+            world_dict = env_config.generate_env_dict()
             self.load_env_from_json_dict(world_dict)
         elif filename != "":
             self.load_world_from_file(filename)
