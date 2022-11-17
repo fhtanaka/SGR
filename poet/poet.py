@@ -88,7 +88,8 @@ class POET:
 
             # Train
             print("\n=== Population training ===")
-            n_steps = int(self.run_params.steps * (self.rng.integers(8, 12)/10))
+            # n_steps = int(self.run_params.steps * (self.rng.integers(8, 12)/10))
+            n_steps = self.run_params.steps
             print("Steps: ", n_steps, "\n")
             self.train_agents(n_steps)
             # Create checkpoint

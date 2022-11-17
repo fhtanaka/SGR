@@ -1,7 +1,7 @@
 {
     "gens": 301,
     "robot_size": 5,
-    "steps": 500,
+    "steps": 400,
     "env": "dynamic",     
     "n_threads": 12,
     "save_to": "",
