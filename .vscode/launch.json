@@ -13,7 +13,11 @@
                 "--pop",
                 "16",
                 "--cpu",
-                "1"
+                "1",
+                "--substrate_type",
+                "cppn",
+                "--save_interval",
+                "2"
             ],
             "console": "integratedTerminal",
             "justMyCode": false
@@ -28,6 +32,10 @@
                 "configs/poet_sgr.json",
                 "--cpu",
                 "1",
+                "--substrate",
+                "cppn",
+                "--save_gen_interval",
+                "2"
             ],
             "console": "integratedTerminal",
             "justMyCode": false
