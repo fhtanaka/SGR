@@ -133,13 +133,13 @@ def main():
 
     params = parse_args()
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, params["neat_config"])
+    config_path = os.path.join(local_dir, params["controller_config"])
    
     neat_config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
     neat_config.pop_size = params["pop_size"]
 
     robot = np.full((params["robot_size"], params["robot_size"]), 4)
-    OBS_SIZE = get_obs_size(robot, params)
+    OBS_SIZE = get_obs_size(robot, params["env"])
     in_size =  2 + OBS_SIZE
     out_size = len(N_TYPES) + params["robot_size"]**2
     
