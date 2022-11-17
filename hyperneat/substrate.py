@@ -26,4 +26,4 @@ class Substrate(object):
 
         self.input_coordinates = layers[0]
         self.output_coordinates  = layers[-1]
-        self.hidden_coordinates = [[l] for l in layers[1*-1]]
+        self.hidden_coordinates = [[*l] for l in layers[1:-1]]
