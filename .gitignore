@@ -140,4 +140,4 @@ svg.g*
 data.json
 env.json
 dynamic_env/*.json
-checkpoints/*.pkl
+checkpoints/*

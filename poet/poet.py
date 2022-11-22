@@ -7,6 +7,10 @@ import pickle
 from dynamic_env.env_config import EnvConfig
 from sgr.sgr import SGR
 from arg_parser import Parameters
+import pathlib
+
+RESULTS_DIR = "checkpoints"
+
 class Pair:
     """ A POET pair consisting of an environment and an agent. """
     def __init__(self, seed):
@@ -14,8 +18,10 @@ class Pair:
         self.agent_pop = None
         self.fitness = None
         self.seed = seed
+        self.dir_path = None
+        self.csv = None
 
-    def init_first(self, params: Parameters, config_path):
+    def init_first(self, params: Parameters, config_path, save_to=None):
         self.environment = EnvConfig(seed = self.seed)
         self.agent_pop = SGR(
             config_path,
@@ -26,6 +32,14 @@ class Pair:
             params.substrate_type,
             reporters=True
         )
+
+    def add_reporter (self, save_to):
+        dir_path = f"{RESULTS_DIR}/{save_to}/"
+        pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
+
+        csv_file = f"{dir_path}/env_{self.environment.id}_results.csv"
+        self.csv = open(csv_file, "w+")
+        self.csv.write("gen;pop_id;best_fit;num_species\n")
 
 class POET:
     def __init__(self, seed: int, params: Parameters, config_path):
@@ -54,6 +68,8 @@ class POET:
         self.config_path = config_path
         first_pair = Pair(self.rng.integers(100))
         first_pair.init_first(params, config_path)
+        if self.run_params.save_to != "":
+            first_pair.add_reporter(self.run_params.save_to)
         self.pairs.append(first_pair)
 
         # The archive with all environments that have ever existed in the pair population
@@ -98,11 +114,23 @@ class POET:
 
             print(f"\nPOET generation took {time()-gen_start_time}s\n")
 
+        for p in self.pairs:
+            if p.csv is not None:
+                p.csv.close()
+
     def save_checkpoint(self, gen):
-        path = f"checkpoints/cp_{self.run_params.save_to}_{gen}.pkl"
+        temp_csvs = {}
+        for p in self.pairs:
+            temp_csvs[p.environment.id] = p.csv
+            p.csv = None
+        
+        path = f"{RESULTS_DIR}/{self.run_params.save_to}/cp_{gen}.pkl"
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
+
+        for p in self.pairs:
+            p.csv = temp_csvs[p.environment.id]
 
     def create_environments(self):
         # Find eligible pairs
@@ -141,6 +169,8 @@ class POET:
         for child in sorted_child_pairs:
             if added < self.num_children_add:
                 child.agent_pop.add_reporters()
+                if self.run_params.save_to != "":
+                    child.add_reporter(self.run_params.save_to)
                 self.pairs.append(child)
                 self.environment_archive.append(child.environment)
                 if len(self.pairs) > self.max_pair_population_size:
@@ -246,6 +276,10 @@ class POET:
             # Set fitness
             pair.fitness = winner.fitness
             print("Pair fitness: ", np.round(pair.fitness, 4), "\n")
+
+            if pair.csv is not None:
+                text = f"{pop.generation};{pop.id};{winner.fitness};{len(pop.pop.species.species)}\n"
+                pair.csv.write(text)
             
     def proposal_transfer(self):
         if len(self.pairs) >= 1:
