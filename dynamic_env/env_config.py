@@ -3,7 +3,7 @@ import os
 import numpy as np
 import json
 import itertools
-from generateJSON import generate_env_json
+from .generateJSON import generate_env_json
 
 class EnvConfig:
     idCounter = itertools.count().__next__
