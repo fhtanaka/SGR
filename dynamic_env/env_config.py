@@ -3,12 +3,12 @@ import os
 import numpy as np
 import json
 import itertools
-from .generateJSON import generate_env_json
+from generateJSON import generate_env_json
 
 class EnvConfig:
     idCounter = itertools.count().__next__
 
-    def __init__(self, seed, width = 90, height = 18, flat_start = 10):
+    def __init__(self, seed, width = 120, height = 18, flat_start = 6):
         self.id = self.idCounter()
         self.seed = seed
         self.rng = np.random.default_rng(seed)
@@ -24,18 +24,22 @@ class EnvConfig:
                 pass 
             elif self.rng.random() < mutation_prob: 
                 r = self.rng.random()
-                if r < .1:
+                if r < .05:
+                    h -= 3
+                if r < .15:
                     h -= 2
                 elif r < .5:
                     h -= 1
-                elif r < .9:
+                elif r < .85:
                     h += 1
-                else:
+                elif r < .95:
                     h += 2
-                h = np.clip(h, previous_h-3, previous_h+3)
-                h = np.clip(h, 0, self.h)
-                previous_h = h
-                self.heights_list[idx] = h
+                else:
+                    h += 3
+
+            h = np.clip(h, max(0, previous_h-2), min(self.h, previous_h + 2))
+            self.heights_list[idx] = h
+            previous_h = h
 
     def generate_json(self, filename="env.json"):
         env = generate_env_json(self.w, self.h, self.heights_list)
@@ -62,8 +66,15 @@ if __name__ == "__main__":
     for i in range(10):
         new_env = env.create_child()
         new_env.mutate_barrier_h(.25)
-        new_env.generate_json(f"env{i+2}.json")
         env = new_env
+        print(env.heights_list)
+        for idx, h in enumerate(env.heights_list):
+            if idx == 0:
+                pass
+            if h-env.heights_list[idx-1] < -2 or h-env.heights_list[idx-1] > 2:
+                print(idx, h, env.heights_list[idx-1])
+
+        print()
 
 
 
