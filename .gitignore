@@ -141,3 +141,4 @@ data.json
 env.json
 dynamic_env/*.json
 checkpoints/*
+*.txt

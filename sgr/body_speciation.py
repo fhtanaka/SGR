@@ -45,7 +45,7 @@ class CustomGenome(neat.DefaultGenome):
                 if (self.robot[i][j] == 0 and other.robot[i][j] != 0) or (self.robot[i][j] != 0 and other.robot[i][j] == 0):
                     diff += 1
                 elif self.robot[i][j] != other.robot[i][j]:
-                    diff += .5
+                    diff += .75
                 
         
         phenotype_dist = diff/(self.robot_size**2) # Normalizing between 0 and 1
