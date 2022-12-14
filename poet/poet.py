@@ -153,11 +153,7 @@ class POET:
         # Find agents for the children and test them against the minimal criteria
         eligible_child_pairs = []
         for child_pair in child_pairs:
-            try:
-                self.evaluate_pair(child_pair)
-            except:
-                print(child_pair.environment.heights_list)
-                exit()
+            self.evaluate_pair(child_pair)
             print("Env created with fitness of: ", child_pair.fitness)
             if self.difficulty_criterion_low <= child_pair.fitness <= self.difficulty_criterion_high:
                 eligible_child_pairs.append(child_pair)
