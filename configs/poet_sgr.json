@@ -1,12 +1,12 @@
 {
-    "gens": 501,
+    "gens": 201,
     "robot_size": 5,
     "steps": 800,
     "env": "dynamic",     
     "n_threads": 12,
     "save_to": "",
     "goal_fit": 10,
-    "pop_size": 96,
+    "pop_size": 60,
     "max_stag": 10000,
     "neat_config": "neat_configs/POET.cfg",
     "save_gen_interval": 10,
@@ -23,12 +23,12 @@
     "difficulty_criterion_high": 8,
     "num_create_environments": 30,
     "num_children_add": 3,
-    "max_pair_population_size": 20,
+    "max_pair_population_size": 10,
     "n_nearest_neighbors": 5,
 
     "create_frequency": 45,
     "p_transfer_frequency": 10,
-    "p_transfer_gens": 2,
+    "p_transfer_gens": 1,
     "d_transfer_frequency": 100
 }
     

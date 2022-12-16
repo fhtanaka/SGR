@@ -14,10 +14,10 @@ RESULTS_DIR = "checkpoints"
 class Pair:
     """ A POET pair consisting of an environment and an agent. """
     def __init__(self, seed):
-        self.environment = None
-        self.agent_pop = None
-        self.fitness = None
-        self.seed = seed
+        self.environment: EnvConfig = None
+        self.agent_pop: SGR = None
+        self.fitness: float = None
+        self.seed: int = seed
         self.dir_path = None
         self.csv = None
 
@@ -91,7 +91,7 @@ class POET:
             if i % self.d_transfer_frequency == 0:
                 d_transfer_time = time()
                 print("\n=== Starting direct transfer process ===\n")
-                self.proposal_transfer()
+                self.direct_transfer()
                 print(f"Transfer took {time()-d_transfer_time}s\n")
 
 
@@ -278,7 +278,7 @@ class POET:
                 pair.csv.write(text)
             
     def proposal_transfer(self):
-        if len(self.pairs) >= 1:
+        if len(self.pairs) > 1:
             base_pairs = self.rng.choice(self.pairs, 1, replace=True)
             for pair in base_pairs:
                 for transfer_pair in self.pairs:
@@ -308,3 +308,22 @@ class POET:
                 if best_fitness > pair.fitness:
                     pair.agent_pop = best_agent_pop
                     pair.fitness = best_fitness
+
+
+    def proposal_transfer_strictly_better(self):
+        if len(self.pairs) > 1:
+            base_pairs = self.rng.choice(self.pairs, 1, replace=True)
+            for pair in base_pairs:
+                for transfer_pair in self.pairs:
+                    if transfer_pair.agent_pop.id != pair.agent_pop.id:
+                        test_pair = Pair(self.rng.integers(100))
+                        test_pair.environment = pair.environment
+                        test_pair.agent_pop = transfer_pair.agent_pop.create_child()
+                        _ = self.evaluate_pair(test_pair, True, gens = self.run_params.p_transfer_gens)
+
+                        test_pair.environment = transfer_pair.environment
+                        fit = self.evaluate_pair(test_pair, True, gens = 1)
+                        if fit >= transfer_pair.fitness:
+                            print(f"Successfull strictly better transfer: {transfer_pair.agent_pop.id} became {test_pair.agent_pop.id} by training on env {test_pair.environment.id}")
+                            test_pair.agent_pop.add_reporters()
+                            transfer_pair.agent_pop = test_pair.agent_pop

@@ -8,7 +8,7 @@ from .generateJSON import generate_env_json
 class EnvConfig:
     idCounter = itertools.count().__next__
 
-    def __init__(self, seed, width = 120, height = 18, flat_start = 6):
+    def __init__(self, seed, width = 120, height = 18, flat_start = 9):
         self.id = self.idCounter()
         self.seed = seed
         self.rng = np.random.default_rng(seed)
