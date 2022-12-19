@@ -51,17 +51,17 @@ def control_substrate_3D_out_shape(robot_size, in_size):
 def morph_substrate_CPPN_like_shape(robot_size):
     shape = [
         [1, 2, 1],
-        [1, 4, 2],
+        [1, 3, 2],
         [1, 5, 3]
     ]
     return shape
 
 def control_substrate_CPPN_like_shape(robot_size, in_size):
-    # intermediate_layer = (in_size+robot_size)//2
+    intermediate_layer = (in_size+robot_size)//2
     # [intermediate_layer, intermediate_layer, -2],
     shape = [
         [in_size, in_size, -1],
-        [robot_size, robot_size, -2],
+        [intermediate_layer, intermediate_layer, -2],
         [robot_size, robot_size, -3]
     ]
     return shape

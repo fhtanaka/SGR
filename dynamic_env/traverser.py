@@ -32,7 +32,7 @@ class DynamicObstacleTraverser(WalkingBumpy2):
         # set action space and observation space
         num_actuators = self.get_actuator_indices('robot').size
         num_robot_points = self.object_pos_at_time(self.get_time(), "robot").size
-        self.sight_dist = 5
+        self.sight_dist = 4
         self.step_count = 0
 
         self.action_space = spaces.Box(low= 0.6, high=1.6, shape=(num_actuators,), dtype=np.float)
@@ -51,7 +51,22 @@ class DynamicObstacleTraverser(WalkingBumpy2):
             obj.load_from_parsed_json(name, obj_data, file_grid_size)
             self.world.add_object(obj) 
 
+    def get_obs(self):
+        obs = np.array ([
+            *self.get_vel_com_obs("robot"),
+            *self.get_ort_obs("robot"),
+            *self.get_pos_com_obs("robot"),
+            *self.get_floor_obs("robot", ["ground"], self.sight_dist),
+            self.step_count%30,
+        ])
+        return obs
+
     def step(self, action):
-        obs, reward, done, _ =  super().step(action)
-        np.concatenate([obs, [self.step_count%30]])
+        _, reward, done, _ =  super().step(action)
+        obs = self.get_obs()
         return obs, reward, done, {}
+
+    def reset(self):
+        
+        _ = super().reset()
+        return self.get_obs()
