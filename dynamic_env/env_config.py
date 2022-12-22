@@ -37,7 +37,7 @@ class EnvConfig:
                 else:
                     h += 3
 
-            h = np.clip(h, max(0, previous_h-2), min(self.h, previous_h + 2))
+            h = np.clip(h, max(0, previous_h-2), min(self.h, previous_h + 1))
             self.heights_list[idx] = h
             previous_h = h
 

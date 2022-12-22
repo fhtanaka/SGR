@@ -40,9 +40,10 @@ def morph_substrate_3D_out_shape(robot_size):
     return shape
 
 def control_substrate_3D_out_shape(robot_size, in_size):
+    intermediate_layer = (in_size+robot_size)//2
     shape = [
         [in_size, in_size, 1, -1],
-        [(robot_size+in_size)//2, (robot_size+in_size)//2, 1, -2],
+        [intermediate_layer, intermediate_layer, 1, -2],
         [robot_size, robot_size, 1, -3]    
     ]
     return shape
@@ -52,7 +53,8 @@ def morph_substrate_CPPN_like_shape(robot_size):
     shape = [
         [1, 2, 1],
         [1, 3, 2],
-        [1, 5, 3]
+        [1, 4, 3],
+        [1, 5, 4]
     ]
     return shape
 
