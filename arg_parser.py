@@ -87,7 +87,10 @@ def parse_args():
         local_dir = os.path.dirname(__file__)
         path = os.path.join(local_dir, command_line_args.config)
         with open(path, 'r', encoding='utf-8') as f:
-            default_args = json.load(f)
+            file_args = json.load(f)
+            for k, v in file_args.items():
+                print(k, v)
+                default_args[k] = v
 
     # "real" parser to get the values from the command line that have priority over the
     # config file

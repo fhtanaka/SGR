@@ -8,7 +8,7 @@ import os
 from dynamic_env.traverser import DynamicObstacleTraverser
 from dynamic_env.env_config import EnvConfig
 
-def get_env(robot, connections, env_name, dynamic_env_config=None):
+def get_env(robot, connections, env_name, dynamic_env_config:EnvConfig =None):
     if env_name == "dynamic":
         if dynamic_env_config is None:
             print("Using JSON file")
@@ -33,7 +33,7 @@ def get_obs_size(robot, env_name):
     del env
     return len(obs)
 
-def simulate_env(robot, net, env_name, n_steps, dynamic_env_config=None, render = False, save_gif=None):
+def simulate_env(robot, net, env_name, n_steps, dynamic_env_config:EnvConfig=None, render = False, save_gif=None):
     connections = get_full_connectivity(robot)
     env = get_env(robot, connections, env_name, dynamic_env_config)
     reward = 0
