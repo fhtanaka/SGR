@@ -82,12 +82,11 @@ class SGR:
         return neat_config
 
     def add_reporters(self):
-        stats = neat.StatisticsReporter()
-        self.pop.add_reporter(stats)
+        self.pop.add_reporter(neat.StdOutReporter(True))
+        self.pop.add_reporter(neat.StatisticsReporter())
         if self.save_to is not "":
             pathlib.Path("/".join(self.save_to.split("/")[:-1])).mkdir(parents=True, exist_ok=True) 
             self.pop.add_reporter(CustomReporter(True, self.save_to + "_out.txt", self.save_to + "_table.csv"))
-        self.pop.add_reporter(neat.StdOutReporter(True))
 
     def create_child(self):
         new_pop = deepcopy(self)
@@ -244,7 +243,7 @@ class SGR:
             print('\nBest genome:\n{!s}'.format(winner))
 
         if self.save_to is not "":
-            remove_reporters(self.pop)
+            # remove_reporters(self.pop)
             dill.dump(self.pop, open(self.save_to + "_pop.pkl", mode='wb'))
         
         return winner
