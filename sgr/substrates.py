@@ -32,9 +32,12 @@ def control_substrate(robot_size, env_name, robot, substrate_name):
     return Substrate(shape)
 
 def morph_substrate_3D_out_shape(robot_size):
+    intermediate_layer = (1+robot_size)//2
+
     shape = [
         [1,1,1,1],
-        [robot_size, robot_size, 3, 2],
+        [intermediate_layer, intermediate_layer, 3, 2],
+        [intermediate_layer, intermediate_layer, 4, 3],
         [robot_size, robot_size, 5, 3],
     ]
     return shape
