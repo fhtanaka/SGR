@@ -75,8 +75,8 @@ def main():
                 print_results=False,
                 dynamic_env_config=env,
             )
-            if pop.generation % params.save_gen_interval == 0:
-                dill.dump(pop, open(f"{params.save_to}_pop_gen_{pop.generation}.pkl", mode='wb'))
+        if gen % params.save_gen_interval == 0:
+            dill.dump(pop, open(f"{params.save_to}_pop_gen_{gen}.pkl", mode='wb'))
 
 
 if __name__ == "__main__":
