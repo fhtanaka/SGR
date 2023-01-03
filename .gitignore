@@ -143,3 +143,4 @@ dynamic_env/*.json
 checkpoints/*
 .vscode
 *.txt
+multiple_env_results/
