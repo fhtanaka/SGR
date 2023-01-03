@@ -6,7 +6,7 @@ import numpy as np
 import pickle as pkl
 import sys
 sys.path.append('../')
-
+from typing import List
 
 from sgr.substrates import morph_substrate
 from sgr.generate_robot import generate_robot
@@ -14,6 +14,8 @@ from sgr.sgr import SGR
 from sgr.body_speciation import CustomGenome
 from poet.poet import POET
 from dynamic_env.env_config import EnvConfig
+from pathos.multiprocessing import ProcessPool
+import numpy as np
 
 POET_DIRS = [
     "new_cppn_1",
@@ -34,16 +36,39 @@ MULT_ENV_FILES = [
 ]
 
 RESULTS_DIR = os.getcwd() + "/poet_results"
-CPUS = 8
 STEPS = 600
 
 
+def fit_func_thread(pop, n_steps, env_name, dynamic_env_config=None):
+    results_dict = {}
+    reward, _ = pop.single_genome_fit(pop.pop.best_genome, n_steps, env_name, dynamic_env_config)
+    results_dict[dynamic_env_config.id] = np.round(reward, 4)
+    return results_dict
+
+def multithread_eval(pop: SGR, envs: List[EnvConfig]):
+    cpus = len(envs)
+    pool = ProcessPool(nodes=5)
+    # winner = pop.pop.best_genome
+    results_map = pool.amap(
+        fit_func_thread,
+        [pop for _ in range(cpus)],
+        [STEPS for _ in range(cpus)],
+        ["dynamic" for _ in range(cpus)],
+        envs,
+    )
+    results = results_map.get(timeout=60*10)
+
+    fit_dict = {}
+    for result_dict in results:
+        for k, v in result_dict.items():
+            fit_dict[k] = v
+    return fit_dict
 class POET_TEST:
     def __init__(self, test_name, envs) -> None:
         self.test_name = test_name
         self.csvs_dict = {}
 
-        self.envs: list[EnvConfig] = envs
+        self.envs: List[EnvConfig] = envs
         self.dir_path = f"{os.getcwd()}/../checkpoints/{test_name}"
         self.create_csv("global")
 
@@ -58,18 +83,11 @@ class POET_TEST:
 
         for p in poet_pop.pairs:
             pop = p.agent_pop
-            original_env_id = p.environment.id
-            winner = p.agent_pop.pop.best_genome
-            for env in self.envs: 
-                reward, _ = pop.single_genome_fit(
-                    genome = winner,
-                    n_steps = STEPS,
-                    env_name = "dynamic",
-                    dynamic_env_config = env
-                )
-                print("   ", original_env_id, env.id, reward)
-                results = f"{gen}; {original_env_id}; {env.id};{reward}\n"
-                self.csvs_dict["global"].write(results)
+            results = multithread_eval(pop, envs)
+            for i in range(0, 5):
+                print_results = f"{gen}; {p.environment.id}; {i}; {results[i]}\n"
+                self.csvs_dict["global"].write(print_results)
+            print(f"   {p.environment.id}; {results}")
 
     def create_csv(self, original_env_id):
         csv_file = f"{RESULTS_DIR}/POET_{self.test_name}_{original_env_id}.csv"
@@ -82,7 +100,7 @@ class MULT_ENV_TEST:
         self.test_name = test_name
         self.csvs_dict = {}
 
-        self.envs: list[EnvConfig] = envs
+        self.envs: List[EnvConfig] = envs
         self.dir_path = f"{os.getcwd()}/../multiple_env_results/{test_name}"
         self.create_csv("global")
 
@@ -96,16 +114,12 @@ class MULT_ENV_TEST:
         CustomGenome.spec_phenotype_weight = 2
 
         winner = pop.pop.best_genome
-        for env in self.envs: 
-            reward, _ = pop.single_genome_fit(
-                genome = winner,
-                n_steps = STEPS,
-                env_name = "dynamic",
-                dynamic_env_config = env
-            )
-            print("   ", 0, env.id, reward)
-            results = f"{gen}; {0}; {env.id};{reward}\n"
-            self.csvs_dict["global"].write(results)
+
+        results = multithread_eval(pop, envs)
+        for i in range(0, 5):
+            print_results = f"{gen}; 0; {i}; {results[i]}\n"
+            self.csvs_dict["global"].write(print_results)
+        print(f"   0; {results}")
 
     def create_csv(self, original_env_id):
         csv_file = f"{RESULTS_DIR}/MULT_ENV_{self.test_name}_{original_env_id}.csv"
