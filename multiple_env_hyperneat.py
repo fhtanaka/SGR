@@ -14,6 +14,7 @@ from sgr.generate_robot import eval_robot_constraint, N_TYPES
 import os
 from sgr.sgr import SGR
 from dynamic_env.env_config import EnvConfig
+import dill
 
 N_ENVIRONMENTS = 6
 
@@ -35,7 +36,7 @@ def main():
         params.spec_phenotype_weight,
         params.pop_size,
         params.substrate_type,
-        params.save_to,
+        # params.save_to,
         reporters=True
     )
     seed =  np.random.SeedSequence()
@@ -58,11 +59,12 @@ def main():
     #     child.mutate_barrier_h(params.height_mutation_chance)
     #     print(parent_env.id, child.id, child.heights_list)
     #     env_bag.append(child)
-    
-    for _ in range(params.gens//params.p_transfer_gens):
-        env_order: list[EnvConfig] = rng.choice(env_bag, 1, replace=False)
+    for gen in range(1, params.gens//params.p_transfer_gens):
+        env_order: list[EnvConfig] = rng.choice(env_bag, len(env_bag), replace=False)
+        print("##################### Starting gen ", gen, "#####################")
+        print("Curriculum: ", [env.id for env in env_order])
         for env in env_order:
-            print("Training on env: ", env.id)
+            print("\nTraining on env: ", env.id)
             pop.run(
                 env_name="dynamic",
                 n_steps=params.steps,
@@ -73,6 +75,9 @@ def main():
                 print_results=False,
                 dynamic_env_config=env,
             )
+        if gen % params.save_gen_interval == 0:
+            dill.dump(pop, open(f"{params.save_to}_pop_gen_{gen}.pkl", mode='wb'))
+
 
 if __name__ == "__main__":
     main()
