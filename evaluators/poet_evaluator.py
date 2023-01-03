@@ -84,15 +84,19 @@ class POET_TEST:
         for p in poet_pop.pairs:
             pop = p.agent_pop
             results = multithread_eval(pop, envs)
+            print_results = f"{gen}; {p.environment.id}; {pop.best_genome.key}"
             for i in range(0, 5):
-                print_results = f"{gen}; {p.environment.id}; {i}; {results[i]}\n"
-                self.csvs_dict["global"].write(print_results)
-            print(f"   {p.environment.id}; {results}")
+                print_results += f"; {results[i]}"
+            self.csvs_dict["global"].write(print_results + "\n")
+            print(f"   {p.environment.id}; {pop.best_genome.key}; {results}")
 
     def create_csv(self, original_env_id):
         csv_file = f"{RESULTS_DIR}/POET_{self.test_name}_{original_env_id}.csv"
         csv = open(csv_file, "w+")
-        csv.write("gen;original_env_id;test_env_id;fitness\n")
+        header = "gen;original_env_id;genome_id"
+        for e in self.envs:
+            header +=";env" + str(e.id) + "_fit"
+        csv.write(header + "\n")
         self.csvs_dict[original_env_id] = csv
 
 class MULT_ENV_TEST:
@@ -116,15 +120,19 @@ class MULT_ENV_TEST:
         winner = pop.pop.best_genome
 
         results = multithread_eval(pop, envs)
+        print_results = f"{gen}; 0; {winner.key}"
         for i in range(0, 5):
-            print_results = f"{gen}; 0; {i}; {results[i]}\n"
-            self.csvs_dict["global"].write(print_results)
-        print(f"   0; {results}")
+            print_results += f"; {results[i]}"
+        self.csvs_dict["global"].write(print_results + "\n")
+        print(f"   0; {winner.key}; {results}")
 
     def create_csv(self, original_env_id):
         csv_file = f"{RESULTS_DIR}/MULT_ENV_{self.test_name}_{original_env_id}.csv"
         csv = open(csv_file, "w+")
-        csv.write("gen;original_env_id;test_env_id;fitness\n")
+        header = "gen;original_env_id;genome_id"
+        for e in self.envs:
+            header += ";env" + str(e.id) + "_fit"
+        csv.write(header + "\n")
         self.csvs_dict[original_env_id] = csv
 
 
@@ -145,7 +153,7 @@ if __name__ == "__main__":
     for dir in POET_DIRS:
         print("initiating test on: ", dir)
         p = POET_TEST(dir, envs)
-        for i in range(5, 202, 5):
+        for i in range(5, 201, 5):
             print(i)
             p.evaluate_gen(i)
         print()
@@ -155,7 +163,7 @@ if __name__ == "__main__":
     for f in MULT_ENV_FILES:
         print("initiating test on: ", f)
         p = MULT_ENV_TEST(f, envs)
-        for i in range(5, 202, 5):
+        for i in range(5, 201, 5):
             print(i)
             p.evaluate_gen(i)
         print()
