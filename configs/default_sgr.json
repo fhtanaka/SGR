@@ -6,12 +6,12 @@
     "n_threads": 4,
     "save_to": "",
     "goal_fit": 10,
-    "pop_size": 32,
-    "max_stag": 10000,
+    "pop_size": 120,
+    "max_stag": 100,
     "neat_config": "neat_configs/hyperNEAT.cfg",
-    "save_gen_interval": 20,
-    "spec_genotype_weight": 0.8,
-    "spec_phenotype_weight": 5,
-    "substrate_type": "cppn"
+    "save_gen_interval": 5,
+    "spec_genotype_weight": 1,
+    "spec_phenotype_weight": 2,
+    "substrate_type": "3d"
 }
     

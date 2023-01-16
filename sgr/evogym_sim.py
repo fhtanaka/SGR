@@ -46,7 +46,7 @@ def simulate_env(robot, net, env_name, n_steps, dynamic_env_config:EnvConfig=Non
     imgs = []
     for _ in range(n_steps):
         if render:
-            env.render('screen')
+            env.render('human')
         elif save_gif is not None:
             imgs.append(env.render(mode='img'))
         
