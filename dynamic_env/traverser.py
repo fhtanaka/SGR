@@ -7,13 +7,15 @@ import numpy as np
 import os
 
 from dynamic_env.generateJSON import generate_env_json
+from dynamic_env.env_config import EnvConfig
 
 
 class DynamicObstacleTraverser(WalkingBumpy2):
-    def __init__(self, body, connections=None, filename ="", world_dict=None):
+    def __init__(self, body, connections=None, filename ="", env_config: EnvConfig=None):
 
         # make world
-        if world_dict is not None:
+        if env_config is not None:
+            world_dict = env_config.generate_env_dict()
             self.load_env_from_json_dict(world_dict)
         elif filename != "":
             self.load_world_from_file(filename)
@@ -30,7 +32,7 @@ class DynamicObstacleTraverser(WalkingBumpy2):
         # set action space and observation space
         num_actuators = self.get_actuator_indices('robot').size
         num_robot_points = self.object_pos_at_time(self.get_time(), "robot").size
-        self.sight_dist = 5
+        self.sight_dist = 4
         self.step_count = 0
 
         self.action_space = spaces.Box(low= 0.6, high=1.6, shape=(num_actuators,), dtype=np.float)
@@ -49,7 +51,22 @@ class DynamicObstacleTraverser(WalkingBumpy2):
             obj.load_from_parsed_json(name, obj_data, file_grid_size)
             self.world.add_object(obj) 
 
+    def get_obs(self):
+        obs = np.array ([
+            *self.get_vel_com_obs("robot"),
+            *self.get_ort_obs("robot"),
+            *self.get_pos_com_obs("robot"),
+            *self.get_floor_obs("robot", ["ground"], self.sight_dist),
+            self.step_count%30,
+        ])
+        return obs
+
     def step(self, action):
-        obs, reward, done, _ =  super().step(action)
-        np.concatenate([obs, [self.step_count%30]])
+        _, reward, done, _ =  super().step(action)
+        obs = self.get_obs()
         return obs, reward, done, {}
+
+    def reset(self):
+        
+        _ = super().reset()
+        return self.get_obs()

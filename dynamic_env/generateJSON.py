@@ -19,19 +19,15 @@ def base_json(width, height):
     }
     return env_json
 
-def generate_env(width, height, obstacle_height, obstacle_prob, rng):
+def generate_env(width, height, h_list):
     env = np.zeros((height, width))
 
-    env[0:height//2][:STARTING_ZONE] = FIXED_VX # building the starting ground
-    previous_height = height//2
-    for j in range(STARTING_ZONE, width):
-        r = rng.choice(obstacle_height, 1, p=obstacle_prob)
-        h = np.clip(previous_height + r, 1, height)
-        for i in range(0, height):
+    for j in range(width):
+        h = h_list[j]
+        for i in range(height):
             env[i][j] = EMPTY_VX
             if i < h:
                 env[i][j] = FIXED_VX
-        previous_height = h
     return env
 
 def ij_to_index(i, j, width):
@@ -50,13 +46,16 @@ def add_neighbors(i, j, env_vals, width, height):
     return neighbors
 
 
-def generate_env_json(width=90, height=20, obstacle_height=[-2,-1,0,1,2], obstacle_prob=[.1, .25,.3,.25, .1], rng=np.random.default_rng()):
+def generate_env_json(width=60, height=10, h_list=None):
+    if h_list is None:
+        h_list = [height//2 for _ in range(width)]
+         
     ground = {
         "indices": [],
         "types": [],
         "neighbors": {}
     }
-    env_vals = generate_env(width, height, obstacle_height, obstacle_prob, rng)
+    env_vals = generate_env(width, height, h_list)
     for i in range(height):
         for j in range(width):
             idx = ij_to_index(i, j, width)
@@ -64,7 +63,7 @@ def generate_env_json(width=90, height=20, obstacle_height=[-2,-1,0,1,2], obstac
             if vx_type != EMPTY_VX:
                 ground["indices"].append(idx)
                 ground["types"].append(vx_type)
-                ground["neighbors"][idx] = add_neighbors(i, j, env_vals, width, height)
+                ground["neighbors"][str(idx)] = add_neighbors(i, j, env_vals, width, height)
 
     env_json = base_json(width, height)
     env_json["objects"]["ground"] = ground
@@ -78,4 +77,4 @@ def create_ObstacleTraverser_JSON(file_path):
 
 
 if __name__ == "__main__":
-    create_ObstacleTraverser_JSON('dynamic_env/env.json')
+    create_ObstacleTraverser_JSON('dynamic_env_v2/env.json')

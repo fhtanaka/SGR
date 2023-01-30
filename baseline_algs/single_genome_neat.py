@@ -14,10 +14,10 @@ from evogym import get_full_connectivity
 import evogym.envs
 
 sys.path.append('../')
-from custom_reporter import CustomReporter, remove_reporters
+from sgr.custom_reporter import CustomReporter, remove_reporters
 from alt_arg_parser import parse_args
-from evogym_sim import get_obs_size
-from sgr_main import eval_genome_constraint, N_TYPES
+from sgr.evogym_sim import get_obs_size
+from sgr.generate_robot import eval_robot_constraint, N_TYPES
 
 BEST_FIT = -10000
 STAG = 0
@@ -73,7 +73,7 @@ def fit_func_thread(genomes, params, neat_config, render=False, save_gif=False )
     for g_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, neat_config)
         robot = generate_robot(net, params["robot_size"], params["pad"])
-        if not eval_genome_constraint(robot):
+        if not eval_robot_constraint(robot):
             results_dict[g_id] = -10000
             continue
 
@@ -133,13 +133,13 @@ def main():
 
     params = parse_args()
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, params["neat_config"])
+    config_path = os.path.join(local_dir, params["controller_config"])
    
     neat_config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
     neat_config.pop_size = params["pop_size"]
 
     robot = np.full((params["robot_size"], params["robot_size"]), 4)
-    OBS_SIZE = get_obs_size(robot, params)
+    OBS_SIZE = get_obs_size(robot, params["env"])
     in_size =  2 + OBS_SIZE
     out_size = len(N_TYPES) + params["robot_size"]**2
     

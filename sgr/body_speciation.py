@@ -1,12 +1,12 @@
 import neat
 import numpy as np
-from hyperneat.new_hyperNEAT import create_phenotype_network
+from hyperneat.hyperNEAT import create_phenotype_network
 from evogym import is_connected, has_actuator
 
 def robot_from_genome(genome, robot_size, substrate, robot_func, config):
     cppn = neat.nn.FeedForwardNetwork.create(genome, TempConfig(config))
 
-    design_net = create_phenotype_network(cppn, substrate)
+    design_net = create_phenotype_network(cppn, substrate, output_node_idx=0)
     robot = robot_func(design_net, robot_size)
     
     if not (is_connected(robot) and has_actuator(robot)):
@@ -45,7 +45,7 @@ class CustomGenome(neat.DefaultGenome):
                 if (self.robot[i][j] == 0 and other.robot[i][j] != 0) or (self.robot[i][j] != 0 and other.robot[i][j] == 0):
                     diff += 1
                 elif self.robot[i][j] != other.robot[i][j]:
-                    diff += .5
+                    diff += .75
                 
         
         phenotype_dist = diff/(self.robot_size**2) # Normalizing between 0 and 1

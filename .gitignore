@@ -140,4 +140,7 @@ svg.g*
 data.json
 env.json
 dynamic_env/*.json
-checkpoints/*.pkl
+checkpoints/*
+.vscode
+*.txt
+multiple_env_results/

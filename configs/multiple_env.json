@@ -1,0 +1,21 @@
+{
+    "gens": 201,
+    "robot_size": 5,
+    "steps": 600,
+    "env": "dynamic",     
+    "n_threads": 10,
+    "save_to": "",
+    "goal_fit": 14,
+    "pop_size": 60,
+    "max_stag": 10000,
+    "neat_config": "neat_configs/POET.cfg",
+    "save_gen_interval": 5,
+    "spec_genotype_weight": 1,
+    "spec_phenotype_weight": 2,
+    "substrate_type": "cppn",
+
+    "height_mutation_chance": 0.25,
+    "obs_prob_mutation_power": 0.25,
+    "p_transfer_gens": 1
+}
+    

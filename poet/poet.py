@@ -7,15 +7,21 @@ import pickle
 from dynamic_env.env_config import EnvConfig
 from sgr.sgr import SGR
 from arg_parser import Parameters
+import pathlib
+
+RESULTS_DIR = "checkpoints"
+
 class Pair:
     """ A POET pair consisting of an environment and an agent. """
     def __init__(self, seed):
-        self.environment = None
-        self.agent_pop = None
-        self.fitness = None
-        self.seed = seed
+        self.environment: EnvConfig = None
+        self.agent_pop: SGR = None
+        self.fitness: float = None
+        self.seed: int = seed
+        self.dir_path = None
+        self.csv = None
 
-    def init_first(self, params: Parameters, config_path):
+    def init_first(self, params: Parameters, config_path, save_to=None):
         self.environment = EnvConfig(seed = self.seed)
         self.agent_pop = SGR(
             config_path,
@@ -26,6 +32,14 @@ class Pair:
             params.substrate_type,
             reporters=True
         )
+
+    def add_reporter (self, save_to):
+        dir_path = f"{RESULTS_DIR}/{save_to}/"
+        pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
+
+        csv_file = f"{dir_path}/env_{self.environment.id}_results.csv"
+        self.csv = open(csv_file, "w+")
+        self.csv.write("global_gen;pop_gen;pop_id;best_fit;num_species\n")
 
 class POET:
     def __init__(self, seed: int, params: Parameters, config_path):
@@ -54,6 +68,8 @@ class POET:
         self.config_path = config_path
         first_pair = Pair(self.rng.integers(100))
         first_pair.init_first(params, config_path)
+        if self.run_params.save_to != "":
+            first_pair.add_reporter(self.run_params.save_to)
         self.pairs.append(first_pair)
 
         # The archive with all environments that have ever existed in the pair population
@@ -69,37 +85,52 @@ class POET:
             gen_start_time = time()
             # Transfers
             if i%self.p_transfer_frequency == 0:
-                print("Starting proposal transfer process")
+                print("\n=== Starting proposal transfer process ===\n")
                 self.proposal_transfer()
                 print(f"Transfer took {time()-gen_start_time}s\n")
             if i % self.d_transfer_frequency == 0:
                 d_transfer_time = time()
-                print("Starting direct transfer process")
-                self.proposal_transfer()
+                print("\n=== Starting direct transfer process ===\n")
+                self.direct_transfer()
                 print(f"Transfer took {time()-d_transfer_time}s\n")
 
 
             # Create new environments
             if i%self.create_frequency == 0:
                 env_creation_t = time()
-                print("Creating new environments")
+                print("\n=== Creating new environments ===\n")
                 self.create_environments()
                 print(f"Env creation took {time()-env_creation_t}s\n")
 
             # Train
-            print("Population training\n")
-            self.train_agents()
+            print("\n=== Population training ===")
+            # n_steps = int(self.run_params.steps * (self.rng.integers(8, 12)/10))
+            n_steps = self.run_params.steps
+            print("Steps: ", n_steps, "\n")
+            self.train_agents(n_steps, i)
             # Create checkpoint
             if i%self.run_params.save_gen_interval == 0 and self.run_params.save_to != "":
                 self.save_checkpoint(i)
 
             print(f"\nPOET generation took {time()-gen_start_time}s\n")
 
+        for p in self.pairs:
+            if p.csv is not None:
+                p.csv.close()
+
     def save_checkpoint(self, gen):
-        path = f"checkpoints/cp_{self.run_params.save_to}_{gen}.pkl"
+        temp_csvs = {}
+        for p in self.pairs:
+            temp_csvs[p.environment.id] = p.csv
+            p.csv = None
+        
+        path = f"{RESULTS_DIR}/{self.run_params.save_to}/cp_{gen}.pkl"
         f = open(path, "wb")
         pickle.dump(self, f)
         f.close()
+
+        for p in self.pairs:
+            p.csv = temp_csvs[p.environment.id]
 
     def create_environments(self):
         # Find eligible pairs
@@ -108,36 +139,34 @@ class POET:
             if (pair.fitness is not None) and (pair.fitness > self.reproduction_criterion):
                 eligible_pairs.append(pair)
         print("Eligible pairs to reproduce: ", len(eligible_pairs))
+
         # Create child environments
-        child_environments = []
+        child_pairs: List[Pair]= []
         if len(eligible_pairs) > 0:
             selected_pairs = np.random.choice(eligible_pairs, self.num_create_environments, replace=True)
             for pair in selected_pairs:
-                child_environments.append(self.mutate(pair.environment))
+                new_pair = Pair(self.rng.integers(100))
+                new_pair.environment = self.mutate(pair.environment)
+                new_pair.agent_pop =  pair.agent_pop.create_child()
+                child_pairs.append(new_pair)
+
         # Find agents for the children and test them against the minimal criteria
         eligible_child_pairs = []
-        for environment in child_environments:
-            child_pair = Pair(self.rng.integers(100))
-            child_pair.environment = environment
-            best_agent = None
-            best_fitness = None
-            for pair in self.pairs:
-                child_pair.agent_pop = pair.agent_pop.create_child()
-                fitness = self.evaluate_pair(child_pair)
-                if (best_fitness is None) or (fitness > best_fitness):
-                    best_agent = child_pair.agent_pop
-                    best_fitness = fitness
-            print("Env created with fitness of: ", best_fitness)
-            if (best_fitness > self.difficulty_criterion_low) and (best_fitness < self.difficulty_criterion_high):
-                child_pair.agent_pop = best_agent
+        for child_pair in child_pairs:
+            self.evaluate_pair(child_pair)
+            print("Env created with fitness of: ", child_pair.fitness)
+            if self.difficulty_criterion_low <= child_pair.fitness <= self.difficulty_criterion_high:
                 eligible_child_pairs.append(child_pair)
+    
         # Select child environments to add to pair population
         sorted_child_pairs = self.sort_child_pairs(eligible_child_pairs)
-        print("# Eligible envs: ", len(sorted_child_pairs))
+        print("Eligible envs: ", len(sorted_child_pairs))
         added = 0
         for child in sorted_child_pairs:
             if added < self.num_children_add:
                 child.agent_pop.add_reporters()
+                if self.run_params.save_to != "":
+                    child.add_reporter(self.run_params.save_to)
                 self.pairs.append(child)
                 self.environment_archive.append(child.environment)
                 if len(self.pairs) > self.max_pair_population_size:
@@ -148,11 +177,7 @@ class POET:
         seed = self.rng.integers(100)
         child = env.create_child(seed)
 
-        mutate_height = np.random.rand()
-        if mutate_height and mutate_height < self.height_mutation_chance:
-            child.mutate_barrier_h(self.max_height_mutation)
-        else:
-            child.mutate_obs_prob(self.obs_prob_mutation_power)    
+        child.mutate_barrier_h(self.height_mutation_chance)    
 
         self.total_environments_created += 1
         return child
@@ -161,7 +186,6 @@ class POET:
     def evaluate_pair(self, pair: Pair, print_par_name = False, gens = 1):
         pop = pair.agent_pop
         env = pair.environment
-        env.generate_json("env.json")
         if print_par_name:
             print(f"----- Env {pair.environment.id}, Pop {pair.agent_pop.id} -----")
         winner = pop.run(
@@ -171,7 +195,8 @@ class POET:
             cpus = self.run_params.cpu,
             max_stagnation = self.run_params.max_stag,
             save_gen_interval = self.run_params.save_gen_interval,
-            print_results = False
+            print_results = False,
+            dynamic_env_config=env,
         )
 
         # Set fitness
@@ -221,22 +246,18 @@ class POET:
 
     def compare_envs(self, env1: EnvConfig, env2: EnvConfig):
         # Find the difference between two environments
-        diff_num = 0
-        d = env1.barrier_h - env2.barrier_h
-        diff_num += d if d>0 else -1*d
-        if diff_num == 0:
-            for i, j in zip(env1.obstacle_prob, env2.obstacle_prob):
-                d = i-j
-                diff_num += d if d>0 else -1*d
-        return diff_num
+        d_list = env1.heights_list - env2.heights_list
+        acc = 0
+        for d in d_list:
+            acc += d if d>0 else -1*d 
+        return acc
     
-    def train_agents(self):
+    def train_agents(self, n_steps, gen):
         for pair in self.pairs:
             print(f"----------------- Env {pair.environment.id}, Pop {pair.agent_pop.id} -----------------")
             # Set environments
             pop = pair.agent_pop
             env = pair.environment
-            env.generate_json("env.json")
             winner = pop.run(
                 env_name = self.run_params.env,
                 n_steps = self.run_params.steps,
@@ -244,15 +265,20 @@ class POET:
                 cpus = self.run_params.cpu,
                 max_stagnation = self.run_params.max_stag,
                 save_gen_interval = self.run_params.save_gen_interval,
-                print_results=False
+                print_results=False,
+                dynamic_env_config=env,
             )
 
             # Set fitness
             pair.fitness = winner.fitness
             print("Pair fitness: ", np.round(pair.fitness, 4), "\n")
+
+            if pair.csv is not None:
+                text = f"{gen};{pop.pop.generation};{pop.id};{winner.fitness};{len(pop.pop.species.species)}\n"
+                pair.csv.write(text)
             
     def proposal_transfer(self):
-        if len(self.pairs) >= 1:
+        if len(self.pairs) > 1:
             base_pairs = self.rng.choice(self.pairs, 1, replace=True)
             for pair in base_pairs:
                 for transfer_pair in self.pairs:
@@ -282,3 +308,22 @@ class POET:
                 if best_fitness > pair.fitness:
                     pair.agent_pop = best_agent_pop
                     pair.fitness = best_fitness
+
+
+    def proposal_transfer_strictly_better(self):
+        if len(self.pairs) > 1:
+            base_pairs = self.rng.choice(self.pairs, 1, replace=True)
+            for pair in base_pairs:
+                for transfer_pair in self.pairs:
+                    if transfer_pair.agent_pop.id != pair.agent_pop.id:
+                        test_pair = Pair(self.rng.integers(100))
+                        test_pair.environment = pair.environment
+                        test_pair.agent_pop = transfer_pair.agent_pop.create_child()
+                        _ = self.evaluate_pair(test_pair, True, gens = self.run_params.p_transfer_gens)
+
+                        test_pair.environment = transfer_pair.environment
+                        fit = self.evaluate_pair(test_pair, True, gens = 1)
+                        if fit >= transfer_pair.fitness:
+                            print(f"Successfull strictly better transfer: {transfer_pair.agent_pop.id} became {test_pair.agent_pop.id} by training on env {test_pair.environment.id}")
+                            test_pair.agent_pop.add_reporters()
+                            transfer_pair.agent_pop = test_pair.agent_pop

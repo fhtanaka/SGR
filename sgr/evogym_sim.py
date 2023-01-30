@@ -6,27 +6,36 @@ import numpy as np
 import os
 
 from dynamic_env.traverser import DynamicObstacleTraverser
+from dynamic_env.env_config import EnvConfig
 
-def get_env(robot, connections, env_name):
+def get_env(robot, connections, env_name, dynamic_env_config:EnvConfig =None):
     if env_name == "dynamic":
-        local_dir = os.path.dirname(__file__)
-        json_path = os.path.join(local_dir, "../dynamic_env/env.json")
-        env = DynamicObstacleTraverser(body=robot, connections=connections, filename=json_path)
+        if dynamic_env_config is None:
+            print("Using JSON file")
+            local_dir = os.path.dirname(__file__)
+            json_path = os.path.join(local_dir, "../dynamic_env_v2/env.json")
+            env = DynamicObstacleTraverser(body=robot, connections=connections, filename=json_path)
+        else:
+            env = DynamicObstacleTraverser(body=robot, connections=connections, env_config=dynamic_env_config)
     else:
         env = evogym.envs.gym.make(env_name, body=robot, connections=connections)
     return env
 
 def get_obs_size(robot, env_name):
+    dynamic_env_config=None
+    if env_name == "dynamic":
+        dynamic_env_config=EnvConfig(10)
+
     connections = get_full_connectivity(robot)
-    env = get_env(robot, connections, env_name)
+    env = get_env(robot, connections, env_name, dynamic_env_config)
     obs = env.reset()
     env.close()
     del env
     return len(obs)
 
-def simulate_env(robot, net, env_name, n_steps, render = False, save_gif=None):
+def simulate_env(robot, net, env_name, n_steps, dynamic_env_config:EnvConfig=None, render = False, save_gif=None):
     connections = get_full_connectivity(robot)
-    env = get_env(robot, connections, env_name)
+    env = get_env(robot, connections, env_name, dynamic_env_config)
     reward = 0
 
     obs = env.reset()
@@ -37,7 +46,7 @@ def simulate_env(robot, net, env_name, n_steps, render = False, save_gif=None):
     imgs = []
     for _ in range(n_steps):
         if render:
-            env.render('screen')
+            env.render('human')
         elif save_gif is not None:
             imgs.append(env.render(mode='img'))
         

@@ -11,10 +11,11 @@ import time
 import neat.nn
 import pathlib
 import itertools
+from neat.reporting import ReporterSet
 
 from pathos.multiprocessing import ProcessPool
 
-from hyperneat.new_hyperNEAT import create_phenotype_network
+from hyperneat.hyperNEAT import create_phenotype_network
 from sgr.custom_reporter import CustomReporter, remove_reporters
 from sgr.body_speciation import CustomGenome
 from sgr.substrates import morph_substrate, control_substrate
@@ -75,18 +76,17 @@ class SGR:
         # overwriting the num_inputs and num_outputs from the neat config file to fit the substrate
         neat_config.genome_config.num_inputs = self.input_size
         neat_config.genome_config.input_keys = [-1*i for i in range(1, self.input_size+1)]
-        neat_config.genome_config.num_outputs = 1
-        neat_config.genome_config.output_keys = [1]
+        neat_config.genome_config.num_outputs = 2
+        neat_config.genome_config.output_keys = [1, 2]
 
         return neat_config
 
     def add_reporters(self):
-        stats = neat.StatisticsReporter()
-        self.pop.add_reporter(stats)
+        self.pop.add_reporter(neat.StdOutReporter(True))
+        self.pop.add_reporter(neat.StatisticsReporter())
         if self.save_to is not "":
             pathlib.Path("/".join(self.save_to.split("/")[:-1])).mkdir(parents=True, exist_ok=True) 
             self.pop.add_reporter(CustomReporter(True, self.save_to + "_out.txt", self.save_to + "_table.csv"))
-        self.pop.add_reporter(neat.StdOutReporter(True))
 
     def create_child(self):
         new_pop = deepcopy(self)
@@ -98,13 +98,21 @@ class SGR:
         new_pop.max_stagnation = None
         new_pop.save_gen_interval = None
 
+        # new_pop.pop = neat.Population(self.neat_config)
+        new_pop.pop.reporters = ReporterSet()
+        new_pop.pop.generation = 0
+        new_pop.pop.best_genome = None
+        new_pop.pop.population = self.pop.population
         for _, ag in new_pop.pop.population.items():
             ag.fitness = None
-        new_pop.pop.best_genome = None
-        new_pop.pop.reporters.reporters = []
-        new_pop.pop.generation = 0
-        new_pop.pop.species = self.neat_config.species_set_type(self.neat_config.species_set_config, self.pop.reporters)
-        new_pop.pop.species.speciate(self.neat_config, new_pop.pop.population, 0)
+
+        config = new_pop.pop.config
+        
+        new_pop.pop.species = self.neat_config.species_set_type(config.species_set_config, new_pop.pop.reporters)
+        new_pop.pop.species.speciate(config, new_pop.pop.population, 0)
+        
+        stagnation = config.stagnation_type(config.stagnation_config,new_pop.pop.reporters)
+        new_pop.pop.reproduction = config.reproduction_type(config.reproduction_config, new_pop.pop.reporters, stagnation)
 
         return new_pop
 
@@ -113,6 +121,7 @@ class SGR:
             genome,
             n_steps,
             env_name,
+            dynamic_env_config=None,
             render=False, 
             save_gif=None,
         ):
@@ -123,7 +132,7 @@ class SGR:
             robot = genome.robot
         else:
             design_substrate = morph_substrate(self.robot_size, self.substrate_type)
-            design_net = create_phenotype_network(cppn, design_substrate)
+            design_net = create_phenotype_network(cppn, design_substrate, output_node_idx=0)
             robot = generate_robot(design_net, self.robot_size, self.substrate_type)
             genome.robot = robot
 
@@ -135,25 +144,30 @@ class SGR:
         except IndexError: # Sometimes the environment just implodes
             return -10000, False
 
-        controller_net = create_phenotype_network(cppn, controller_substrate)
+        controller_net = create_phenotype_network(cppn, controller_substrate, output_node_idx=1)
 
-        reward, done = simulate_env(robot, controller_net, env_name, n_steps, render, save_gif)
+        reward, done = simulate_env(robot, controller_net, env_name, n_steps, dynamic_env_config, render, save_gif)
 
         return reward, done
 
-    def fit_func_thread(self, genomes, n_steps, env_name):
+    def fit_func_thread(self, genomes, n_steps, env_name, dynamic_env_config=None):
         results_dict = {}
         for genome_key, genome in genomes:
-            reward, _ = self.single_genome_fit(genome, n_steps, env_name)
+            reward, _ = self.single_genome_fit(genome, n_steps, env_name, dynamic_env_config)
             results_dict[genome_key] = reward
         return results_dict
     
-    def fit_func(self, genomes, neat_config, env_name, n_steps, cpus):
+    def fit_func(
+            self, 
+            genomes, 
+            neat_config, 
+            env_name, 
+            n_steps, 
+            cpus, 
+            dynamic_env_config = None,
+        ):
+
         self.stagnation += 1
-        local_dir = os.path.dirname(__file__)
-        json_path = os.path.join(local_dir, "../dynamic_env/env.json")
-        if env_name == "dynamic" and not os.path.exists(json_path):
-            create_ObstacleTraverser_JSON(json_path)
 
         try:
             pool = ProcessPool(nodes=cpus)
@@ -162,6 +176,7 @@ class SGR:
                 np.array_split(genomes, cpus),
                 [n_steps for _ in range(cpus)],
                 [env_name for _ in range(cpus)],
+                [dynamic_env_config for _ in range(cpus)],
             )
             
             results = results_map.get(timeout=60*10)
@@ -206,18 +221,29 @@ class SGR:
         if self.save_to is not "" and self.save_gen_interval is not None and (self.pop.generation+1)% self.save_gen_interval == 0:
             dill.dump(self.pop, open(f"{self.save_to}_pop_gen_{self.pop.generation}.pkl", mode='wb'))
 
-    def run(self, env_name, n_steps, n_gens, cpus=1, max_stagnation=None, save_gen_interval=None, print_results=True):
+    def run(
+            self, 
+            env_name, 
+            n_steps, 
+            n_gens, 
+            cpus=1, 
+            max_stagnation=None, 
+            save_gen_interval=None, 
+            print_results=True, 
+            dynamic_env_config=None
+        ):
+
         self.max_stagnation = max_stagnation
         self.save_gen_interval = save_gen_interval
 
-        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus)
+        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus, dynamic_env_config)
         winner: CustomGenome = self.pop.run(neat_fit_func, n_gens)
         
         if print_results:
             print('\nBest genome:\n{!s}'.format(winner))
 
         if self.save_to is not "":
-            remove_reporters(self.pop)
+            # remove_reporters(self.pop)
             dill.dump(self.pop, open(self.save_to + "_pop.pkl", mode='wb'))
         
         return winner
