@@ -81,14 +81,14 @@ class TaskList:
         self.Balancer_v1 = Task('Balancer-v1', 600, "misc", "medium")
         self.task_list.append(self.Balancer_v1)
 
-        self.tasks_by_difficulty = {}
+        self.tasks_by_difficulty: Dict[str, List[Task]] = {}
         for t in self.task_list:
             if t.difficulty in self.tasks_by_difficulty:
                 self.tasks_by_difficulty[t.difficulty].append(t)
             else:
                 self.tasks_by_difficulty[t.difficulty] = [t]
 
-        self.tasks_by_type = {}
+        self.tasks_by_type: Dict[str, List[Task]] = {}
         for t in self.task_list:
             if t.t_type in self.tasks_by_type:
                 self.tasks_by_type[t.t_type].append(t)
