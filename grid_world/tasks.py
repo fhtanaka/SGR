@@ -1,69 +1,95 @@
-BASELINE_ENV_NAMES = [
-    'Walker-v0',
-    'BridgeWalker-v0',
-    'BidirectionalWalker-v0',
-    'Carrier-v0',
-    'Carrier-v1',
-    'Pusher-v0',
-    'Pusher-v1',
-    'Thrower-v0',
-    'Catcher-v0',
-    'BeamToppler-v0',
-    'BeamSlider-v0',
-    'Lifter-v0',
-    'Climber-v0',
-    'Climber-v1',
-    'Climber-v2',
-    'UpStepper-v0',
-    'DownStepper-v0',
-    'ObstacleTraverser-v0',
-    'ObstacleTraverser-v1',
-    'Hurdler-v0',
-    'PlatformJumper-v0',
-    'GapJumper-v0',
-    'Traverser-v0',
-    'CaveCrawler-v0',
-    'AreaMaximizer-v0',
-    'AreaMinimizer-v0',
-    'WingspanMazimizer-v0',
-    'HeightMaximizer-v0',
-    'Flipper-v0',
-    'Jumper-v0',
-    'Balancer-v0',
-    'Balancer-v1'
-]
+class Task:
+    def __init__(self, name, steps, task_type, difficulty) -> None:
+        self.name = name
+        self.n_steps = steps
+        self.t_type = task_type
+        self.difficulty = difficulty
 
-BASELINE_ENV_Steps = {
-    'Walker-v0': 500,
-    'BridgeWalker-v0': 500,
-    'BidirectionalWalker-v0': 1000,
-    'Carrier-v0': 500,
-    'Carrier-v1': 1000,
-    'Pusher-v0': 500,
-    'Pusher-v1': 600,
-    'Thrower-v0': 300,
-    'Catcher-v0': 400,
-    'BeamToppler-v0': 1000,
-    'BeamSlider-v0': 1000,
-    'Lifter-v0': 300,
-    'Climber-v0': 400,
-    'Climber-v1': 600,
-    'Climber-v2': 1000,
-    'UpStepper-v0': 600,
-    'DownStepper-v0': 500,
-    'ObstacleTraverser-v0': 1000,
-    'ObstacleTraverser-v1': 1000,
-    'Hurdler-v0': 1000,
-    'PlatformJumper-v0': 1000,
-    'GapJumper-v0': 1000,
-    'Traverser-v0': 1000,
-    'CaveCrawler-v0': 1000,
-    'AreaMaximizer-v0': 600,
-    'AreaMinimizer-v0': 600,
-    'WingspanMazimizer-v0': 600,
-    'HeightMaximizer-v0': 500,
-    'Flipper-v0': 600,
-    'Jumper-v0': 500,
-    'Balancer-v0': 600,
-    'Balancer-v1': 600
-}
+class TaskList:
+    def __init__(self) -> None:
+        self.task_list = []
+
+        # Walking Tasks
+        self.Walker_v0 = Task('Walker-v0', 500, "walking", "easy")
+        self.task_list.append(self.Walker_v0)
+        self.BridgeWalker_v0 = Task('BridgeWalker-v0', 500, "walking", "medium")
+        self.task_list.append(self.BridgeWalker_v0)
+        self.BidirectionalWalker_v0 = Task('BidirectionalWalker-v0', 1000, "walking", "medium")
+        self.task_list.append(self.BidirectionalWalker_v0)
+        # Object Manipulation Tasks
+        self.Carrier_v0 = Task('Carrier-v0', 500, "obj_manipualtion", "easy")
+        self.task_list.append(self.Carrier_v0)
+        self.Pusher_v0 = Task('Pusher-v0', 500, "obj_manipualtion", "easy")
+        self.task_list.append(self.Pusher_v0)
+        self.BeamToppler_v0 = Task('BeamToppler-v0', 1000, "obj_manipualtion", "easy")
+        self.task_list.append(self.BeamToppler_v0)
+        self.Pusher_v1 = Task('Pusher-v1', 600, "obj_manipualtion", "medium")
+        self.task_list.append(self.Pusher_v1)
+        self.Thrower_v0 = Task('Thrower-v0', 300, "obj_manipualtion", "medium")
+        self.task_list.append(self.Thrower_v0)
+        self.Catcher_v0 = Task('Catcher-v0', 400, "obj_manipualtion", "hard")
+        self.task_list.append(self.Catcher_v0)
+        self.Carrier_v1 = Task('Carrier-v1', 1000, "obj_manipualtion", "hard")
+        self.task_list.append(self.Carrier_v1)
+        self.BeamSlider_v0 = Task('BeamSlider-v0', 1000, "obj_manipualtion", "hard")
+        self.task_list.append(self.BeamSlider_v0)
+        self.Lifter_v0 = Task('Lifter-v0', 300, "obj_manipualtion", "hard")
+        self.task_list.append(self.Lifter_v0)
+        # Climbing Tasks
+        self.Climber_v0 = Task('Climber-v0', 400, "climbing", "medium")
+        self.task_list.append(self.Climber_v0)
+        self.Climber_v1 = Task('Climber-v1', 600, "climbing", "medium")
+        self.task_list.append(self.Climber_v1)
+        self.Climber_v2 = Task('Climber-v2', 1000, "climbing", "hard")
+        self.task_list.append(self.Climber_v2)
+        # Locomotion Tasks
+        self.UpStepper_v0 = Task('UpStepper-v0', 600, "locomotion", "medium")
+        self.task_list.append(self.UpStepper_v0)
+        self.DownStepper_v0 = Task('DownStepper-v0', 500, "locomotion", "easy")
+        self.task_list.append(self.DownStepper_v0)
+        self.ObstacleTraverser_v0 = Task('ObstacleTraverser-v0', 1000, "locomotion", "medium")
+        self.task_list.append(self.ObstacleTraverser_v0)
+        self.ObstacleTraverser_v1 = Task('ObstacleTraverser-v1', 1000, "locomotion", "hard")
+        self.task_list.append(self.ObstacleTraverser_v1)
+        self.Hurdler_v0 = Task('Hurdler-v0', 1000, "locomotion", "hard")
+        self.task_list.append(self.Hurdler_v0)
+        self.PlatformJumper_v0 = Task('PlatformJumper-v0', 1000, "locomotion", "hard")
+        self.task_list.append(self.PlatformJumper_v0)
+        self.GapJumper_v0 = Task('GapJumper-v0', 1000, "locomotion", "hard")
+        self.task_list.append(self.GapJumper_v0)
+        self.Traverser_v0 = Task('Traverser-v0', 1000, "locomotion", "hard")
+        self.task_list.append(self.Traverser_v0)
+        self.CaveCrawler_v0 = Task('CaveCrawler-v0', 1000, "locomotion", "medium")
+        self.task_list.append(self.CaveCrawler_v0)
+        # Shape Changer Tasks
+        self.AreaMaximizer_v0 = Task('AreaMaximizer-v0', 600, "shape_change", "easy")
+        self.task_list.append(self.AreaMaximizer_v0)
+        self.AreaMinimizer_v0 = Task('AreaMinimizer-v0', 600, "shape_change", "medium")
+        self.task_list.append(self.AreaMinimizer_v0)
+        self.WingspanMazimizer_v0 = Task('WingspanMazimizer-v0', 600, "shape_change", "easy")
+        self.task_list.append(self.WingspanMazimizer_v0)
+        self.HeightMaximizer_v0 = Task('HeightMaximizer-v0', 500, "shape_change", "easy")
+        self.task_list.append(self.HeightMaximizer_v0)
+        # Misc Tasks
+        self.Flipper_v0 = Task('Flipper-v0', 600, "misc", "easy")
+        self.task_list.append(self.Flipper_v0)
+        self.Jumper_v0 = Task('Jumper-v0', 500, "misc", "easy")
+        self.task_list.append(self.Jumper_v0)
+        self.Balancer_v0 = Task('Balancer-v0', 600, "misc", "easy")
+        self.task_list.append(self.Balancer_v0)
+        self.Balancer_v1 = Task('Balancer-v1', 600, "misc", "medium")
+        self.task_list.append(self.Balancer_v1)
+
+        self.tasks_by_difficulty = {}
+        for t in self.task_list:
+            if t.difficulty in self.tasks_by_difficulty:
+                self.tasks_by_difficulty[t.difficulty].append(t)
+            else:
+                self.tasks_by_difficulty[t.difficulty] = [t]
+
+        self.tasks_by_type = {}
+        for t in self.task_list:
+            if t.t_type in self.tasks_by_type:
+                self.tasks_by_type[t.t_type].append(t)
+            else:
+                self.tasks_by_type[t.t_type] = [t]
