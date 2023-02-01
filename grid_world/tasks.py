@@ -1,3 +1,4 @@
+from typing import List, Dict
 class Task:
     def __init__(self, name, steps, task_type, difficulty) -> None:
         self.name = name
@@ -7,7 +8,7 @@ class Task:
 
 class TaskList:
     def __init__(self) -> None:
-        self.task_list = []
+        self.task_list: List[Task] = []
 
         # Walking Tasks
         self.Walker_v0 = Task('Walker-v0', 500, "walking", "easy")
