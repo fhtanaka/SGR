@@ -2,6 +2,7 @@ import neat
 import numpy as np
 from hyperneat.hyperNEAT import create_phenotype_network
 from evogym import is_connected, has_actuator
+import itertools
 
 def robot_from_genome(genome, robot_size, substrate, robot_func, config):
     cppn = neat.nn.FeedForwardNetwork.create(genome, TempConfig(config))
@@ -24,9 +25,10 @@ class CustomGenome(neat.DefaultGenome):
     robot_func = None
     spec_genotype_weight = None
     spec_phenotype_weight = None
+    idCounter = itertools.count().__next__
 
     def __init__(self, key):
-        super().__init__(key)
+        super().__init__(self.idCounter())
         if self.robot_size is None or self.substrate is None or self.robot_func is None or self.spec_genotype_weight is None or self.spec_phenotype_weight is None:
             print("Please define superparameters of CustomGenome")
             raise
@@ -51,3 +53,19 @@ class CustomGenome(neat.DefaultGenome):
         phenotype_dist = diff/(self.robot_size**2) # Normalizing between 0 and 1
 
         return self.spec_genotype_weight*genotype_dist + self.spec_phenotype_weight*phenotype_dist
+
+class DefaultReproduction(neat.DefaultReproduction):
+    
+    def __init__(self, config, reporters, stagnation):
+        super().__init__(config, reporters, stagnation)
+
+    def create_new(self, genome_type, genome_config, num_genomes):
+        new_genomes = {}
+        for i in range(num_genomes):
+            key = next(self.genome_indexer)
+            g = genome_type(key)
+            g.configure_new(genome_config)
+            new_genomes[g.key] = g
+            self.ancestors[g.key] = tuple()
+
+        return new_genomes

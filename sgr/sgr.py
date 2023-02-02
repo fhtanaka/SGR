@@ -17,7 +17,7 @@ from pathos.multiprocessing import ProcessPool
 
 from hyperneat.hyperNEAT import create_phenotype_network
 from sgr.custom_reporter import CustomReporter, remove_reporters
-from sgr.body_speciation import CustomGenome
+from sgr.body_speciation import CustomGenome, DefaultReproduction
 from sgr.substrates import morph_substrate, control_substrate
 from sgr.generate_robot import generate_robot, eval_robot_constraint
 from sgr.evogym_sim import simulate_env
@@ -68,7 +68,7 @@ class SGR:
         self.save_gen_interval = None
 
     def create_neat_config(self, config_path, neat_genome=neat.DefaultGenome):
-        neat_config = neat.Config(neat_genome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+        neat_config = neat.Config(neat_genome, DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
         
         # ovewriting pop_size from the neat config file
         neat_config.pop_size = self.pop_size
