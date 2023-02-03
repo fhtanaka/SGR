@@ -23,7 +23,7 @@ class Node:
         self.n_steps = n_steps
 
     def add_conn(self, node_id, weight=1):
-        self.connections[node_id]: weight
+        self.connections[node_id] = weight
     
     def remove_conn(self, node_id):
         if node_id in self.connections:

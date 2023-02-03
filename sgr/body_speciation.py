@@ -54,11 +54,9 @@ class CustomGenome(neat.DefaultGenome):
 
         return self.spec_genotype_weight*genotype_dist + self.spec_phenotype_weight*phenotype_dist
 
-class DefaultReproduction(neat.DefaultReproduction):
+def custom_reproduction_method():
+    reproduction = neat.DefaultReproduction
     
-    def __init__(self, config, reporters, stagnation):
-        super().__init__(config, reporters, stagnation)
-
     def create_new(self, genome_type, genome_config, num_genomes):
         new_genomes = {}
         for i in range(num_genomes):
@@ -69,3 +67,6 @@ class DefaultReproduction(neat.DefaultReproduction):
             self.ancestors[g.key] = tuple()
 
         return new_genomes
+
+    reproduction.create_new = create_new
+    return reproduction

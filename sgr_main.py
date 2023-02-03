@@ -16,16 +16,6 @@ def main():
         params.save_to
     )
 
-    pop_2 = SGR(
-        config_path,
-        params.robot_size,
-        params.spec_genotype_weight,
-        params.spec_phenotype_weight,
-        params.pop_size,
-        params.substrate_type,
-        params.save_to
-    )
-
     pop.run(
         params.env,
         params.steps,
