@@ -1,13 +1,13 @@
 {
     "robot_size": 5,
     "steps": 600,
-    "n_threads": 4,
+    "n_threads": 10,
     "save_to": "",
     "goal_fit": 10,
     "pop_size": 4,
     "max_stag": 100,
     "neat_config": "neat_configs/grid.cfg",
-    "save_gen_interval": 5,
+    "save_gen_interval": 1000,
     "spec_genotype_weight": 1,
     "spec_phenotype_weight": 2,
     "substrate_type": "3d"

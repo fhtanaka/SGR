@@ -19,12 +19,13 @@ class Graph:
             params.spec_phenotype_weight,
             params.pop_size,
             params.substrate_type,
-            params.save_to
+            params.save_to,
+            reporters=False
         )
         task = self.tasks.task_dict[task]
         n = Node(pop, task.name, task.n_steps)
-        self.d_nodes[n.id] = n
-        return n.id
+        self.d_nodes[str(n.id)] = n
+        return str(n.id)
 
     def connect_nodes_bidirectional(self, n_id_1, n_id_2, dist=1):
         n1 = self.d_nodes[n_id_1]
