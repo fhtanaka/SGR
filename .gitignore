@@ -144,3 +144,4 @@ checkpoints/*
 .vscode
 *.txt
 multiple_env_results/
+cp_*.pkl

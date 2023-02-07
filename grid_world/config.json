@@ -1,7 +1,7 @@
 {
     "0": {
         "task": "Walker-v0",
-        "neighbors": [1,4,5, 3, 12]
+        "neighbors": [1,4,5]
     },
     "1": {
         "task": "BridgeWalker-v0",
@@ -13,7 +13,7 @@
     },
     "3": {
         "task": "UpStepper-v0",
-        "neighbors": [2,6,7,15,0]
+        "neighbors": [2,6,7]
     },
     "4": {
         "task": "DownStepper-v0",
@@ -49,7 +49,7 @@
     },
     "12": {
         "task": "ObstacleTraverser-v0",
-        "neighbors": [8,9,13,0,15]
+        "neighbors": [8,9,13]
     },
     "13": {
         "task": "ObstacleTraverser-v1",
@@ -61,6 +61,6 @@
     },
     "15": {
         "task": "Traverser-v0",
-        "neighbors": [10,11,14,3,12]
+        "neighbors": [10,11,14]
     }
 }

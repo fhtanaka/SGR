@@ -23,14 +23,18 @@ def main():
         for conn in n["neighbors"]:
             graph.connect_nodes_bidirectional(n_id, str(conn))
     
-    for i in range(10):
+    for i in range(2001):
         coord = str(graph.rng.integers(16))
-        print("Evolving coord:", coord)
+        n = graph.d_nodes[coord]
+        print("Gen ", i)
+        print(f"Evolving coord: {coord}, {n.task} for {n.n_steps} steps")
         graph.evolve_coord(coord, n_neighbors=4)
-
-        path = f"cp_{i}.pkl"
-        f = open(path, "wb")
-        pickle.dump(graph, f)
+        if i%5 == 0:
+            path = f"cp_{i}.pkl"
+            f = open(path, "wb")
+            pickle.dump(graph, f)
+        print("Best fit: ", n.sgr_pop.best_fit)
+        print()
 
 if __name__ == "__main__":
     main()

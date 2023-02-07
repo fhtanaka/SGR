@@ -3,6 +3,8 @@ from typing import Dict
 from arg_parser import Parameters
 from .tasks import *
 import numpy as np
+import copy
+import neat
 from sgr.sgr import SGR
 
 class Graph:
@@ -10,6 +12,8 @@ class Graph:
         self.d_nodes: Dict[str, Node] = {}
         self.tasks = TaskList()
         self.rng = np.random.default_rng(seed)
+        self.most_up_to_date_neat_pop: neat.Population = None
+
 
     def add_node(self, task, config_path, params: Parameters):
         pop = SGR(
@@ -22,6 +26,18 @@ class Graph:
             params.save_to,
             reporters=False
         )
+        if self.most_up_to_date_neat_pop != None:
+            neat_pop = copy.deepcopy(self.most_up_to_date_neat_pop)
+            neat_pop.generation = 0
+            neat_pop.best_genome = None
+            neat_pop.population = neat_pop.reproduction.create_new(
+                neat_pop.config.genome_type,
+                neat_pop.config.genome_config,
+                neat_pop.config.pop_size
+            )
+            neat_pop.species.speciate(neat_pop.config, neat_pop.population, neat_pop.generation)
+
+        self.most_up_to_date_neat_pop = pop.pop
         task = self.tasks.task_dict[task]
         n = Node(pop, task.name, task.n_steps)
         self.d_nodes[str(n.id)] = n
@@ -33,9 +49,16 @@ class Graph:
         n1.add_conn(n_id_2, dist)
         n2.add_conn(n_id_1, dist)
 
-    def evolve_coord(self, node_id, max_dist=1, n_neighbors=4, repeat=False):
+    def evolve_coord(self, node_id, max_dist=1, n_neighbors=4, repeat=True):
         main_node = self.d_nodes[node_id]
+
+        current_neat_pop = main_node.sgr_pop.pop.population
+        main_node.sgr_pop.pop = copy.deepcopy(self.most_up_to_date_neat_pop)
         main_pop = main_node.sgr_pop
+        
+        main_pop.generation = current_neat_pop
+        main_pop.best_genome = current_neat_pop
+        main_pop.pop.population = current_neat_pop
 
         possible_neighbors = [n_id for n_id, dist in main_node.connections.items() if dist <= max_dist]
         neighbors = self.rng.choice(possible_neighbors, n_neighbors, replace=repeat)
@@ -44,13 +67,8 @@ class Graph:
             neighbor_genomes = self.d_nodes[neighbor_id].sgr_pop.pop.population
             for g in neighbor_genomes.values():
                 main_pop.pop.population[g.key] = g
-        
-        # Gambiarra: FIX later
-        # This basically equals the indexer of the main_pop.pop.reproduction with the custom genome index
-        # This is needed so the neat.Population.population dict stays in the format [genome.id, genome]
-        current_id = [g for g in main_pop.pop.population.values()][0].idCounter()
-        while next(main_pop.pop.reproduction.genome_indexer) < current_id:
-            pass
 
         main_pop.pop.species.speciate( main_pop.pop.config,  main_pop.pop.population,  main_pop.pop.generation)
         main_pop.run(main_node.task, main_node.n_steps, 1, 4, print_results=False)
+
+        self.most_up_to_date_neat_pop = main_pop.pop

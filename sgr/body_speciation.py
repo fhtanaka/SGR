@@ -28,7 +28,7 @@ class CustomGenome(neat.DefaultGenome):
     idCounter = itertools.count().__next__
 
     def __init__(self, key):
-        super().__init__(self.idCounter())
+        super().__init__(key)
         if self.robot_size is None or self.substrate is None or self.robot_func is None or self.spec_genotype_weight is None or self.spec_phenotype_weight is None:
             print("Please define superparameters of CustomGenome")
             raise
@@ -54,19 +54,19 @@ class CustomGenome(neat.DefaultGenome):
 
         return self.spec_genotype_weight*genotype_dist + self.spec_phenotype_weight*phenotype_dist
 
-def custom_reproduction_method():
-    reproduction = neat.DefaultReproduction
+# def custom_reproduction_method():
+#     reproduction = neat.DefaultReproduction
     
-    def create_new(self, genome_type, genome_config, num_genomes):
-        new_genomes = {}
-        for i in range(num_genomes):
-            key = next(self.genome_indexer)
-            g = genome_type(key)
-            g.configure_new(genome_config)
-            new_genomes[g.key] = g
-            self.ancestors[g.key] = tuple()
+#     def create_new(self, genome_type, genome_config, num_genomes):
+#         new_genomes = {}
+#         for i in range(num_genomes):
+#             key = next(self.genome_indexer)
+#             g = genome_type(key)
+#             g.configure_new(genome_config)
+#             new_genomes[g.key] = g
+#             self.ancestors[g.key] = tuple()
 
-        return new_genomes
+#         return new_genomes
 
-    reproduction.create_new = create_new
-    return reproduction
+#     reproduction.create_new = create_new
+#     return reproduction
