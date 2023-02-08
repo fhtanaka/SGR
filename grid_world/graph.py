@@ -52,13 +52,15 @@ class Graph:
     def evolve_coord(self, node_id, max_dist=1, n_neighbors=4, repeat=True):
         main_node = self.d_nodes[node_id]
 
-        current_neat_pop = main_node.sgr_pop.pop.population
+        current_neat_pop = main_node.sgr_pop.pop
         main_node.sgr_pop.pop = copy.deepcopy(self.most_up_to_date_neat_pop)
-        main_pop = main_node.sgr_pop
         
-        main_pop.generation = current_neat_pop
-        main_pop.best_genome = current_neat_pop
-        main_pop.pop.population = current_neat_pop
+        main_pop = main_node.sgr_pop
+        main_pop.best_genome = current_neat_pop.best_genome
+        main_pop.generation = current_neat_pop.generation
+        main_pop.pop.population = current_neat_pop.population
+        main_pop.pop.best_genome = current_neat_pop.best_genome
+        main_pop.pop.generation = current_neat_pop.generation
 
         possible_neighbors = [n_id for n_id, dist in main_node.connections.items() if dist <= max_dist]
         neighbors = self.rng.choice(possible_neighbors, n_neighbors, replace=repeat)
