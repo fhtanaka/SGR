@@ -30,10 +30,10 @@ def main():
         print(f"Evolving coord: {coord}, {n.task} for {n.n_steps} steps")
         graph.evolve_coord(coord, n_neighbors=4)
         if i%5 == 0:
-            path = f"cp_{i}.pkl"
+            path = f"island_cp/cp_{i}.pkl"
             f = open(path, "wb")
             pickle.dump(graph, f)
-        print("Best fit: ", n.sgr_pop.best_fit)
+        print(f"Best fit ({n.sgr_pop.best_genome.key}): {n.sgr_pop.best_fit}")
         print()
 
 if __name__ == "__main__":

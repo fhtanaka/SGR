@@ -36,6 +36,7 @@ class Graph:
                 neat_pop.config.pop_size
             )
             neat_pop.species.speciate(neat_pop.config, neat_pop.population, neat_pop.generation)
+            pop.pop = neat_pop
 
         self.most_up_to_date_neat_pop = pop.pop
         task = self.tasks.task_dict[task]
@@ -56,8 +57,6 @@ class Graph:
         main_node.sgr_pop.pop = copy.deepcopy(self.most_up_to_date_neat_pop)
         
         main_pop = main_node.sgr_pop
-        main_pop.best_genome = current_neat_pop.best_genome
-        main_pop.generation = current_neat_pop.generation
         main_pop.pop.population = current_neat_pop.population
         main_pop.pop.best_genome = current_neat_pop.best_genome
         main_pop.pop.generation = current_neat_pop.generation
