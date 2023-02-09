@@ -8,6 +8,17 @@ import os
 from dynamic_env.traverser import DynamicObstacleTraverser
 from dynamic_env.env_config import EnvConfig
 
+# TODO: remove this and put as a parameter
+def get_env_obs(env: DynamicObstacleTraverser):
+    obs = np.array ([
+        *env.get_pos_com_obs("robot"),
+        *env.get_vel_com_obs("robot"),
+        *env.get_ort_obs("robot"),
+        *env.get_floor_obs("robot", ["ground"], 5),
+        # env.step_count%30,
+    ])
+    return obs
+
 def get_env(robot, connections, env_name, dynamic_env_config:EnvConfig =None):
     if env_name == "dynamic":
         if dynamic_env_config is None:
@@ -29,6 +40,7 @@ def get_obs_size(robot, env_name):
     connections = get_full_connectivity(robot)
     env = get_env(robot, connections, env_name, dynamic_env_config)
     obs = env.reset()
+    obs = get_env_obs(env)
     env.close()
     del env
     return len(obs)
@@ -39,6 +51,7 @@ def simulate_env(robot, net, env_name, n_steps, dynamic_env_config:EnvConfig=Non
     reward = 0
 
     obs = env.reset()
+    obs = get_env_obs(env)
     actuators = env.get_actuator_indices("robot")
     in_size = math.ceil(math.sqrt(len(obs))) # this is to be used to format the input
 
@@ -57,6 +70,7 @@ def simulate_env(robot, net, env_name, n_steps, dynamic_env_config:EnvConfig=Non
         obs, r, done, _ = env.step(action)
         reward += r
 
+        obs = get_env_obs(env)
         if done:
             finished = True
             break

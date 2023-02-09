@@ -10,6 +10,6 @@
     "save_gen_interval": 1000,
     "spec_genotype_weight": 1,
     "spec_phenotype_weight": 2,
-    "substrate_type": "3d"
+    "substrate_type": "cppn"
 }
     

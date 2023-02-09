@@ -1,5 +1,16 @@
 import json
 
+def locomotion_task():
+    def task_func(x, y):
+        aux = y%4
+        if aux == 1:
+            return "UpStepper-v0"
+        elif aux == 2:
+            return "Hurdler-v0"
+        return "Walker-v0"
+
+    create_base_grid(file_name="./locomotion.json", task_function=task_func)
+
 def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
     x, y = size
 
@@ -19,7 +30,8 @@ def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
                 "neighbors":[]
             }
             if task_function != None:
-                value["task"] = task_function(x, y)
+                value["task"] = task_function(i, j)
+                print(i, j, value["task"])
             else:
                 value["task"] = "Walker-v0"
 
@@ -35,4 +47,4 @@ def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
         json.dump(json_grid, f, indent = 4, ensure_ascii = False)
 
 if __name__ == "__main__":
-    create_base_grid()
+    locomotion_task()

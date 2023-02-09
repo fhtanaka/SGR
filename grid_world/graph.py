@@ -8,12 +8,12 @@ import neat
 from sgr.sgr import SGR
 
 class Graph:
-    def __init__(self, seed) -> None:
+    def __init__(self, seed, params) -> None:
         self.d_nodes: Dict[str, Node] = {}
         self.tasks = TaskList()
         self.rng = np.random.default_rng(seed)
         self.most_up_to_date_neat_pop: neat.Population = None
-
+        self.params = params
 
     def add_node(self, task, config_path, params: Parameters):
         pop = SGR(

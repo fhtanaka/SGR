@@ -66,6 +66,7 @@ def control_substrate_CPPN_like_shape(robot_size, in_size):
     shape = [
         [in_size, in_size, -1],
         [intermediate_layer, intermediate_layer, -2],
-        [robot_size, robot_size, -3]
+        [intermediate_layer, intermediate_layer, -3],
+        [robot_size, robot_size, -4]
     ]
     return shape
