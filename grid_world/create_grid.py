@@ -17,7 +17,7 @@ def manipulation_task():
         if aux == 1:
             return "Thrower-v0"
         elif aux == 2:
-            return "Catcher-v0"
+            return "Carrier-v1"
         return "Carrier-v0"
 
     create_base_grid(file_name="./manipulation.json", task_function=task_func)
