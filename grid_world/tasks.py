@@ -1,4 +1,7 @@
 from typing import List, Dict
+import gym
+import numpy as np
+import evogym.envs
 class Task:
     def __init__(self, name, steps, task_type, difficulty) -> None:
         self.name = name
@@ -94,3 +97,21 @@ class TaskList:
                 self.tasks_by_type[t.t_type].append(t)
             else:
                 self.tasks_by_type[t.t_type] = [t]
+
+def get_locomotion_env_obs(env: evogym.envs.WalkingFlat):
+    obs = np.array ([
+        *env.get_pos_com_obs("robot"),
+        *env.get_vel_com_obs("robot"),
+        *env.get_ort_obs("robot"),
+        *env.get_floor_obs("robot", ["ground"], 5),
+    ])
+    return obs
+
+def get_manipulation_env_obs(env: evogym.envs.CarrySmallRect):
+    obs = np.array ([
+        *env.get_pos_com_obs("robot"),
+        *env.get_vel_com_obs("robot"),
+        *env.get_ort_obs("robot"),
+        *env.get_floor_obs("robot", ["ground"], 5),
+    ])
+    return obs

@@ -11,6 +11,18 @@ def locomotion_task():
 
     create_base_grid(file_name="./locomotion.json", task_function=task_func)
 
+def manipulation_task():
+    def task_func(x, y):
+        aux = y%4
+        if aux == 1:
+            return "Thrower-v0"
+        elif aux == 2:
+            return "Catcher-v0"
+        return "Carrier-v0"
+
+    create_base_grid(file_name="./manipulation.json", task_function=task_func)
+
+
 def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
     x, y = size
 
@@ -47,4 +59,4 @@ def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
         json.dump(json_grid, f, indent = 4, ensure_ascii = False)
 
 if __name__ == "__main__":
-    locomotion_task()
+    manipulation_task()

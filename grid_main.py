@@ -12,7 +12,7 @@ def main():
 
     graph = Graph(seed=10, params=params)
 
-    with open("grid_world/locomotion.json", 'r', encoding='utf-8') as f:
+    with open("grid_world/manipulation.json", 'r', encoding='utf-8') as f:
         config_args = json.load(f)
 
     for _, n in config_args.items():
@@ -29,7 +29,7 @@ def main():
         print(f"Evolving coord: {coord}, {n.task} for {n.n_steps} steps")
         graph.evolve_coord(coord, n_neighbors=4)
         if i%5 == 0:
-            path = f"island_cp/cp_locomotion_{i}.pkl"
+            path = f"island_cp/cp_manipulation_{i}.pkl"
             f = open(path, "wb")
             pickle.dump(graph, f)
         print(f"Local gen {n.sgr_pop.pop.generation}, stag {n.sgr_pop.stagnation}")
