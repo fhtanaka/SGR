@@ -18,6 +18,7 @@ def default_values():
         "spec_genotype_weight": .8,
         "spec_phenotype_weight": 5,
         "substrate_type": "cppn",
+        "seed": 1997,
 
         # used for POET, not required 
         "height_mutation_chance": 0.35,
@@ -35,6 +36,9 @@ def default_values():
         "create_frequency": 49,
         "p_transfer_frequency": 10,
         "d_transfer_frequency": 27,
+
+        # used for grid_world]
+        "task_grid": "grid_world/config.json",
     }
 
     return default
@@ -68,9 +72,11 @@ def create_parser(default_args):
     parser.add_argument("--max_pair_population_size", nargs="?", default=default_args["max_pair_population_size"], help="", type=int)
     parser.add_argument("--n_nearest_neighbors", nargs="?", default=default_args["n_nearest_neighbors"], help="", type=int)
     parser.add_argument("--p_transfer_gens", nargs="?", default=default_args["p_transfer_gens"], help="", type=int)
+    parser.add_argument("--seed", nargs="?", default=default_args["seed"], help="", type=int)
 
     parser.add_argument("--p_transfer_frequency", nargs="?", default=default_args["p_transfer_frequency"], help="", type=int)
     parser.add_argument("--d_transfer_frequency", nargs="?", default=default_args["d_transfer_frequency"], help="", type=int)
+    parser.add_argument("--task_grid", nargs="?", default=default_args["task_grid"], help="", type=str)
 
     return parser
 
@@ -111,6 +117,7 @@ def parse_args():
     args_dict["spec_genotype_weight"] = command_line_args.spec_genotype_weight
     args_dict["spec_phenotype_weight"] = command_line_args.spec_phenotype_weight
     args_dict["substrate_type"] = command_line_args.substrate
+    args_dict["seed"] = command_line_args.seed
 
     args_dict["height_mutation_chance"] = command_line_args.height_mutation_chance
     args_dict["max_height_mutation"] = command_line_args.max_height_mutation
@@ -126,6 +133,8 @@ def parse_args():
     args_dict["p_transfer_gens"] = command_line_args.p_transfer_gens
     args_dict["p_transfer_frequency"] = command_line_args.p_transfer_frequency
     args_dict["d_transfer_frequency"] = command_line_args.d_transfer_frequency
+
+    args_dict["task_grid"] = command_line_args.task_grid
 
     return Parameters(args_dict)
     
@@ -145,6 +154,7 @@ class Parameters:
         self.spec_genotype_weight = args_dict["spec_genotype_weight"]
         self.spec_phenotype_weight = args_dict["spec_phenotype_weight"]
         self.substrate_type = args_dict["substrate_type"]
+        self.seed = args_dict["seed"]
 
         self.p_transfer_gens = args_dict["p_transfer_gens"]
         self.height_mutation_chance = args_dict["height_mutation_chance"]
@@ -161,6 +171,8 @@ class Parameters:
 
         self.p_transfer_frequency = args_dict["p_transfer_frequency"]
         self.d_transfer_frequency = args_dict["d_transfer_frequency"] 
+
+        self.task_grid = args_dict["task_grid"] 
         # if report is not None:
         for k, v in args_dict.items():
             print(f"{k}: {v}")

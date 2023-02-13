@@ -145,3 +145,4 @@ checkpoints/*
 *.txt
 multiple_env_results/
 cp_*.pkl
+island_cp/*

@@ -1,15 +1,17 @@
 {
+    "gens": 2000,
     "robot_size": 5,
     "steps": 600,
-    "n_threads": 10,
+    "n_threads": 6,
     "save_to": "",
     "goal_fit": 10,
     "pop_size": 6,
-    "max_stag": 100,
+    "max_stag": 1000,
     "neat_config": "neat_configs/grid.cfg",
-    "save_gen_interval": 1000,
+    "save_gen_interval": 5,
     "spec_genotype_weight": 1,
     "spec_phenotype_weight": 2,
-    "substrate_type": "cppn"
+    "substrate_type": "3d",
+    "task_grid": "grid_world/locomotion.json"
 }
     
