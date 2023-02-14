@@ -29,6 +29,7 @@ class Graph:
         self.most_up_to_date_neat_pop: neat.Population = None
         self.params = params
         self.save_dir = ""
+        self.report_file = None
         if self.params.save_to != "":
             self.save_dir = os.path.join(RESULTS_DIR, self.params.save_to)
             pathlib.Path(self.save_dir).mkdir(parents=True, exist_ok=True)
@@ -73,10 +74,25 @@ class Graph:
         n1.add_conn(n_id_2, dist)
         n2.add_conn(n_id_1, dist)
 
-    def evolve_coord(self, node_id, max_dist=1, n_neighbors=4, repeat=True, print_info = True):
+    def log_to_file(self, node: Node, neighbors, winner):
+        txt = f"Evolving coord: {node.id}, {node.task} for {node.n_steps} steps \n"
+        txt += f"\tImporting pop from [{neighbors}] \n"
+        txt += f"\tLocal gen {node.sgr_pop.pop.generation}, stag {node.sgr_pop.stagnation} \n"
+
+        txt += f"\tBest fit ({winner.key}) from pop {self.d_historical[winner.key]}: {winner.fitness} \n"
+
+        for g in node.sgr_pop.pop.population.values():
+            if g.fitness != None:
+                parents = node.sgr_pop.pop.reproduction.ancestors[g.key]
+                txt += f"\t\t ag {g.key}, parents ({parents}), fit {g.fitness}\n"
+
+        txt += "\n\n"
+        self.report_file.write(txt)
+
+    def evolve_coord(self, node_id, max_dist=1, n_neighbors=4, repeat=False):
 
         main_node = self.d_nodes[node_id]
-        print(f"Evolving coord: {node_id}, {main_node.task} for {main_node.n_steps} steps")
+        print(f"Evolving coord: {main_node.id}, {main_node.task} for {main_node.n_steps} steps")
 
         current_neat_pop = main_node.sgr_pop.pop
         main_node.sgr_pop.pop = copy.deepcopy(self.most_up_to_date_neat_pop)
@@ -87,7 +103,10 @@ class Graph:
         main_pop.pop.generation = current_neat_pop.generation
 
         possible_neighbors = [n_id for n_id, dist in main_node.connections.items() if dist <= max_dist]
-        neighbors = self.rng.choice(possible_neighbors, n_neighbors, replace=repeat)
+        if len(possible_neighbors) <= n_neighbors and not repeat:
+            neighbors = possible_neighbors
+        else:            
+            neighbors = self.rng.choice(possible_neighbors, n_neighbors, replace=repeat)
 
         for neighbor_id in neighbors:
             neighbor_genomes = self.d_nodes[neighbor_id].sgr_pop.pop.population
@@ -101,19 +120,24 @@ class Graph:
         print(f"Best fit ({winner.key}): {winner.fitness}")
         print()
 
+        if self.report_file != None:
+            self.log_to_file(main_node, neighbors, winner)
+
         self.most_up_to_date_neat_pop = main_pop.pop
         for g in main_pop.pop.population.values():
             if g.key in self.d_historical:
                 continue
             p1, p2 = main_pop.pop.reproduction.ancestors[g.key]
-            self.d_historical[g.key] = HistoricalMarks(g.key, main_pop.id, -1, -1)
+            self.d_historical[g.key] = HistoricalMarks(g.key, main_pop.id, p1, p2)
 
     def evolve_random_coords(self, n_gens):
         for i in range(n_gens):
             coord_id = str(self.rng.integers(len(self.d_nodes)))
-            n = self.d_nodes[coord_id]
 
             print("Gen ", i)
+            if self.report_file != None:
+                self.report_file.write(f"Gen {i}\n")
+     
             self.evolve_coord(coord_id, n_neighbors=4)
             if self.params.save_to != "" and i%self.params.save_gen_interval == 0:
                 temp_file, self.report_file = self.report_file, None 

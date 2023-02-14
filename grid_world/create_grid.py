@@ -22,6 +22,18 @@ def manipulation_task():
 
     create_base_grid(file_name="./manipulation.json", task_function=task_func)
 
+def snk_task():
+    def task_func(x, y):
+        if x == 1 and y != 0 and y != 5:
+            return "ObstacleTraverser-v1"
+        elif x == 4 and y != 0 and y != 5:
+            return "ObstacleTraverser-v1"
+        elif y == 1 and x != 0 and x != 5:
+            return "ObstacleTraverser-v1"
+        elif y == 4 and x != 0 and x != 5:
+            return "ObstacleTraverser-v1"
+        return "ObstacleTraverser-v0"
+    create_base_grid(size=(6,6), file_name="./snk.json", task_function=task_func)
 
 def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
     x, y = size
@@ -59,4 +71,4 @@ def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
         json.dump(json_grid, f, indent = 4, ensure_ascii = False)
 
 if __name__ == "__main__":
-    manipulation_task()
+    snk_task()
