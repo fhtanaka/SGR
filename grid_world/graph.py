@@ -10,6 +10,7 @@ from sgr.sgr import SGR
 import json
 import os
 import pathlib
+from sgr.body_speciation import CustomGenome
 
 RESULTS_DIR = "island_cp"
 
@@ -24,6 +25,7 @@ class Graph:
     def __init__(self, seed, params: Parameters) -> None:
         self.d_nodes: Dict[str, Node] = {}
         self.d_historical: Dict[str, HistoricalMarks] = {}
+        self.d_genomes: Dict[str, CustomGenome] = {}
         self.tasks = TaskList()
         self.rng = np.random.default_rng(seed)
         self.most_up_to_date_neat_pop: neat.Population = None
@@ -111,7 +113,7 @@ class Graph:
         for neighbor_id in neighbors:
             neighbor_genomes = self.d_nodes[neighbor_id].sgr_pop.pop.population
             for g in neighbor_genomes.values():
-                main_pop.pop.population[g.key] = g
+                main_pop.pop.population[g.key] = copy.deepcopy(g)
 
         main_pop.pop.species.speciate( main_pop.pop.config,  main_pop.pop.population,  main_pop.pop.generation)
         winner = main_pop.run(main_node.task, main_node.n_steps, 1, self.params.cpu, print_results=False)
@@ -125,10 +127,12 @@ class Graph:
 
         self.most_up_to_date_neat_pop = main_pop.pop
         for g in main_pop.pop.population.values():
-            if g.key in self.d_historical:
-                continue
-            p1, p2 = main_pop.pop.reproduction.ancestors[g.key]
-            self.d_historical[g.key] = HistoricalMarks(g.key, main_pop.id, p1, p2)
+            if g.key not in self.d_historical:
+                p1, p2 = main_pop.pop.reproduction.ancestors[g.key]
+                self.d_historical[g.key] = HistoricalMarks(g.key, main_pop.id, p1, p2)
+            if g.fitness != None and g.key not in self.d_genomes:
+                self.d_genomes[g.key] = g
+
 
     def evolve_random_coords(self, n_gens):
         for i in range(n_gens):
