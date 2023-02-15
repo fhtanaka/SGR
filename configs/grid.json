@@ -2,7 +2,7 @@
     "gens": 5001,
     "robot_size": 5,
     "steps": 600,
-    "n_threads": 6,
+    "n_threads": 10,
     "save_to": "",
     "goal_fit": 10,
     "pop_size": 6,

@@ -79,12 +79,12 @@ class Graph:
         txt += f"\tImporting pop from [{neighbors}] \n"
         txt += f"\tLocal gen {node.sgr_pop.pop.generation}, stag {node.sgr_pop.stagnation} \n"
 
-        txt += f"\tBest fit ({winner.key}) from pop {self.d_historical[winner.key]}: {winner.fitness} \n"
+        txt += f"\tBest fit ({winner.key}) from pop {self.d_historical[winner.key].pop_id}: {winner.fitness} \n"
 
         for g in node.sgr_pop.pop.population.values():
             if g.fitness != None:
                 parents = node.sgr_pop.pop.reproduction.ancestors[g.key]
-                txt += f"\t\t ag {g.key}, parents ({parents}), fit {g.fitness}\n"
+                txt += f"\t\t ag {g.key}, pop ({self.d_historical[g.key].pop_id}), parents ({parents}), fit {g.fitness}\n"
 
         txt += "\n\n"
         self.report_file.write(txt)
@@ -139,7 +139,13 @@ class Graph:
                 self.report_file.write(f"Gen {i}\n")
      
             self.evolve_coord(coord_id, n_neighbors=4)
-            if self.params.save_to != "" and i%self.params.save_gen_interval == 0:
+            if self.params.save_to != "" and (
+                i%self.params.save_gen_interval == 0 
+                or (
+                    self.d_nodes[coord_id].sgr_pop.stagnation == 0 and 
+                    self.d_nodes[coord_id].sgr_pop.pop.generation > 1
+                )
+            ):
                 temp_file, self.report_file = self.report_file, None 
                 path = f"{self.save_dir}/grid_gen_{i}.pkl"
                 f = open(path, "wb")
