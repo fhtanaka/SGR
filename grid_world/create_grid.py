@@ -1,5 +1,6 @@
 import json
-
+from tasks import Task
+import numpy as np
 def locomotion_task():
     def task_func(x, y):
         aux = y%4
@@ -34,6 +35,25 @@ def snk_task():
             return "ObstacleTraverser-v1"
         return "ObstacleTraverser-v0"
     create_base_grid(size=(6,6), file_name="./snk.json", task_function=task_func)
+
+def random_locomotion_task():
+
+    possible_tasks = [
+        "Walker-v0",
+        "BridgeWalker-v0",
+        "UpStepper-v0",
+        "DownStepper-v0",
+        "ObstacleTraverser-v0",
+        "ObstacleTraverser-v1",
+        "Hurdler-v0",
+        "PlatformJumper-v0",
+        "GapJumper-v0",
+    ]
+    def task_func(x, y):
+        task =  np.random.choice(possible_tasks, 1)[0]
+        print(task)
+        return task
+    create_base_grid(size=(6,6), file_name="./random_loc.json", task_function=task_func)
 
 def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
     x, y = size
@@ -71,4 +91,4 @@ def create_base_grid(size=(4,4), file_name="./temp.json", task_function=None):
         json.dump(json_grid, f, indent = 4, ensure_ascii = False)
 
 if __name__ == "__main__":
-    snk_task()
+    random_locomotion_task()

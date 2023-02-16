@@ -11,6 +11,9 @@ import json
 import os
 import pathlib
 from sgr.body_speciation import CustomGenome
+from generate_gif import generate_grid
+from matplotlib import pyplot as plt
+from tasks import get_locomotion_env_obs, get_manipulation_env_obs
 
 RESULTS_DIR = "island_cp"
 
@@ -47,7 +50,7 @@ class Graph:
             pop_size=params.pop_size,
             substrate_type=params.substrate_type,
             save_to="",
-            reporters=False
+            reporters=False,
         )
         if self.most_up_to_date_neat_pop != None:
             neat_pop = copy.deepcopy(self.most_up_to_date_neat_pop)
@@ -116,7 +119,14 @@ class Graph:
                 main_pop.pop.population[g.key] = copy.deepcopy(g)
 
         main_pop.pop.species.speciate( main_pop.pop.config,  main_pop.pop.population,  main_pop.pop.generation)
-        winner = main_pop.run(main_node.task, main_node.n_steps, 1, self.params.cpu, print_results=False)
+        winner = main_pop.run(
+            env_name = main_node.task, 
+            n_steps = main_node.n_steps, 
+            n_gens = 1, 
+            cpus = self.params.cpu, 
+            print_results = False, 
+            get_env_obs = get_locomotion_env_obs # TODO: literal value
+        )
         
         print(f"Local gen {main_pop.pop.generation}, stag {main_pop.stagnation}")
         print(f"Best fit ({winner.key}): {winner.fitness}")
@@ -150,14 +160,22 @@ class Graph:
                     self.d_nodes[coord_id].sgr_pop.pop.generation > 1
                 )
             ):
-                temp_file, self.report_file = self.report_file, None 
-                path = f"{self.save_dir}/grid_gen_{i}.pkl"
-                f = open(path, "wb")
-                pickle.dump(self, f)
-                f.close()
-                self.report_file = temp_file
+                self.save_grid_pkl(f"grid_gen_{i}.pkl")
+                self.save_grid_img(f"gen_{i}_img.jpeg")
 
-    # def write_report
+
+    def save_grid_pkl(self, file_name):
+        temp_file, self.report_file = self.report_file, None 
+        path = f"{self.save_dir}/{file_name}"
+        f = open(path, "wb")
+        pickle.dump(self, f)
+        f.close()
+        self.report_file = temp_file
+
+    def save_grid_img(self, file_name):
+        fig = generate_grid(self, 6, 6, self.params.substrate_type) # TODO: literal value, grid size
+        fig.savefig(f"{self.save_dir}/{file_name}", pad_inches= 0.01)
+        plt.clf()
 
     def interpret_json(self, file_name, neat_config_path):
         with open(file_name, 'r', encoding='utf-8') as f:

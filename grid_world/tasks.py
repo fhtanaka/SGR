@@ -18,14 +18,14 @@ class TaskList:
         self.task_dict["Walker-v0"]=self.Walker_v0
         self.BridgeWalker_v0 = Task('BridgeWalker-v0', 500, "walking", "medium")
         self.task_dict["BridgeWalker-v0"]=self.BridgeWalker_v0
-        self.BidirectionalWalker_v0 = Task('BidirectionalWalker-v0', 1000, "walking", "medium")
+        self.BidirectionalWalker_v0 = Task('BidirectionalWalker-v0', 800, "walking", "medium")
         self.task_dict["BidirectionalWalker-v0"]=self.BidirectionalWalker_v0
         # Object Manipulation Tasks
         self.Carrier_v0 = Task('Carrier-v0', 500, "obj_manipualtion", "easy")
         self.task_dict["Carrier-v0"]=self.Carrier_v0
         self.Pusher_v0 = Task('Pusher-v0', 500, "obj_manipualtion", "easy")
         self.task_dict["Pusher-v0"]=self.Pusher_v0
-        self.BeamToppler_v0 = Task('BeamToppler-v0', 1000, "obj_manipualtion", "easy")
+        self.BeamToppler_v0 = Task('BeamToppler-v0', 800, "obj_manipualtion", "easy")
         self.task_dict["BeamToppler-v0"]=self.BeamToppler_v0
         self.Pusher_v1 = Task('Pusher-v1', 600, "obj_manipualtion", "medium")
         self.task_dict["Pusher-v1"]=self.Pusher_v1
@@ -33,9 +33,9 @@ class TaskList:
         self.task_dict["Thrower-v0"]=self.Thrower_v0
         self.Catcher_v0 = Task('Catcher-v0', 400, "obj_manipualtion", "hard")
         self.task_dict["Catcher-v0"]=self.Catcher_v0
-        self.Carrier_v1 = Task('Carrier-v1', 1000, "obj_manipualtion", "hard")
+        self.Carrier_v1 = Task('Carrier-v1', 800, "obj_manipualtion", "hard")
         self.task_dict["Carrier-v1"]=self.Carrier_v1
-        self.BeamSlider_v0 = Task('BeamSlider-v0', 1000, "obj_manipualtion", "hard")
+        self.BeamSlider_v0 = Task('BeamSlider-v0', 800, "obj_manipualtion", "hard")
         self.task_dict["BeamSlider-v0"]=self.BeamSlider_v0
         self.Lifter_v0 = Task('Lifter-v0', 300, "obj_manipualtion", "hard")
         self.task_dict["Lifter-v0"]=self.Lifter_v0
@@ -44,7 +44,7 @@ class TaskList:
         self.task_dict["Climber-v0"]=self.Climber_v0
         self.Climber_v1 = Task('Climber-v1', 600, "climbing", "medium")
         self.task_dict["Climber-v1"]=self.Climber_v1
-        self.Climber_v2 = Task('Climber-v2', 1000, "climbing", "hard")
+        self.Climber_v2 = Task('Climber-v2', 800, "climbing", "hard")
         self.task_dict["Climber-v2"]=self.Climber_v2
         # Locomotion Tasks
         self.UpStepper_v0 = Task('UpStepper-v0', 600, "locomotion", "medium")
@@ -55,15 +55,15 @@ class TaskList:
         self.task_dict["ObstacleTraverser-v0"]=self.ObstacleTraverser_v0
         self.ObstacleTraverser_v1 = Task('ObstacleTraverser-v1', 800, "locomotion", "hard")
         self.task_dict["ObstacleTraverser-v1"]=self.ObstacleTraverser_v1
-        self.Hurdler_v0 = Task('Hurdler-v0', 1000, "locomotion", "hard")
+        self.Hurdler_v0 = Task('Hurdler-v0', 800, "locomotion", "hard")
         self.task_dict["Hurdler-v0"]=self.Hurdler_v0
-        self.PlatformJumper_v0 = Task('PlatformJumper-v0', 1000, "locomotion", "hard")
+        self.PlatformJumper_v0 = Task('PlatformJumper-v0', 800, "locomotion", "hard")
         self.task_dict["PlatformJumper-v0"]=self.PlatformJumper_v0
-        self.GapJumper_v0 = Task('GapJumper-v0', 1000, "locomotion", "hard")
+        self.GapJumper_v0 = Task('GapJumper-v0', 800, "locomotion", "hard")
         self.task_dict["GapJumper-v0"]=self.GapJumper_v0
-        self.Traverser_v0 = Task('Traverser-v0', 1000, "locomotion", "hard")
+        self.Traverser_v0 = Task('Traverser-v0', 800, "locomotion", "hard")
         self.task_dict["Traverser-v0"]=self.Traverser_v0
-        self.CaveCrawler_v0 = Task('CaveCrawler-v0', 1000, "locomotion", "medium")
+        self.CaveCrawler_v0 = Task('CaveCrawler-v0', 800, "locomotion", "medium")
         self.task_dict["CaveCrawler-v0"]=self.CaveCrawler_v0
         # Shape Changer Tasks
         self.AreaMaximizer_v0 = Task('AreaMaximizer-v0', 600, "shape_change", "easy")
