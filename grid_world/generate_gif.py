@@ -26,7 +26,6 @@ from sgr.substrates import morph_substrate, control_substrate
 from sgr.generate_robot import generate_robot, eval_robot_constraint
 from sgr.evogym_sim import simulate_env
 from sgr.body_speciation import CustomGenome
-from grid_world.graph import Graph
 from grid_world.node import Node
 from grid_world.tasks import *
 from copy import deepcopy
@@ -99,20 +98,25 @@ def fig2img(fig):
     img = Image.frombytes(mode='RGB', size=(w, h), data=buf, decoder_name='raw')
     return img
 
-n_rows=6
-n_cols=6
-file_name = "snk_cppn"
+def main():
+    n_rows=6
+    n_cols=6
+    file_name = "snk_cppn"
 
 
-img_arr = []
-for i in range(200, 300, 10):
-    print(i)
-    with open(f"../island_cp/{file_name}/grid_gen_{i}.pkl", "rb") as file:
-        grid: Graph = pkl.load(file)
-    fig = generate_grid(grid, n_rows, n_cols, grid.params.substrate_type)
-    fig.text(0.50, 0.25,  'Generation {i}', horizontalalignment='center', wrap=True, size="xx-large" ) 
-    img_arr.append(fig2img(fig))
-    plt.clf()
+    img_arr = []
+    for i in range(200, 300, 10):
+        print(i)
+        with open(f"../island_cp/{file_name}/grid_gen_{i}.pkl", "rb") as file:
+            grid = pkl.load(file)
+        fig = generate_grid(grid, n_rows, n_cols, grid.params.substrate_type)
+        fig.text(0.50, 0.25,  'Generation {i}', horizontalalignment='center', wrap=True, size="xx-large" ) 
+        img_arr.append(fig2img(fig))
+        plt.clf()
 
 
-imageio.mimsave("test" + ".gif", img_arr, duration=(1/2))
+    imageio.mimsave("test" + ".gif", img_arr, duration=(1/2))
+
+
+if __name__ == "__main__":
+    main()

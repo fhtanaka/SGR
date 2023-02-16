@@ -13,7 +13,7 @@ import pathlib
 from sgr.body_speciation import CustomGenome
 from .generate_gif import generate_grid
 from matplotlib import pyplot as plt
-from tasks import get_locomotion_env_obs, get_manipulation_env_obs
+from .tasks import get_locomotion_env_obs, get_manipulation_env_obs
 
 RESULTS_DIR = "island_cp"
 
