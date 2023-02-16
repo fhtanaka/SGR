@@ -38,7 +38,7 @@ def default_values():
         "d_transfer_frequency": 27,
 
         # used for grid_world]
-        "task_grid": "grid_world/config.json",
+        "task_grid": "grid_world/grids/config.json",
     }
 
     return default
