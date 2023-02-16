@@ -95,7 +95,6 @@ def parse_args():
         with open(path, 'r', encoding='utf-8') as f:
             file_args = json.load(f)
             for k, v in file_args.items():
-                print(k, v)
                 default_args[k] = v
 
     # "real" parser to get the values from the command line that have priority over the

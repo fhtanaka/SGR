@@ -73,11 +73,14 @@ def generate_grid(grid, n_rows, n_cols, genome_type):
                 best_genome = g
                 best_genome_fit = g.fitness
         # best_genome = value.sgr_pop.best_genome
+
+        if best_genome == None:
+            best_genome = g
         fit = np.round(best_genome_fit, 2)
         task = {value.task}
-        print(f" {best_genome.key} {fit}", end="\t")
-        if cont%n_cols==n_cols-1:
-            print()
+        # print(f" {best_genome.key} {fit}", end="\t")
+        # if cont%n_cols==n_cols-1:
+        #     print()
         
         robot, img = get_robot(best_genome, value.sgr_pop.neat_config, value.task, genome_type) 
         if img is not None:
@@ -103,14 +106,16 @@ def fig2img(fig):
 
 n_rows=6
 n_cols=6
-file_name = "snk_3d"
+file_name = "snk_cppn"
 
 
 img_arr = []
-for i in range(0, 3000):
+for i in range(200, 300, 10):
+    print(i)
     with open(f"../island_cp/{file_name}/grid_gen_{i}.pkl", "rb") as file:
         grid: Graph = pkl.load(file)
     fig = generate_grid(grid, n_rows, n_cols, grid.params.substrate_type)
+    fig.text(0.5, 0.5, f"Generation {i}", ha="center")
     img_arr.append(fig2img(fig))
 
 
