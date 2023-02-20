@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -a arr=("snk_cppn" "snk_3d" "random_loc_3d" "random_loc_cppn")
+declare -a arr=("locomotion_cppn" "snk_cppn" "random_loc_cppn" "snk_3d" "random_loc_3d" )
 
 # Set the directory path
 dir_path="island_cp/"
