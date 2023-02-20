@@ -169,10 +169,13 @@ class Graph:
         f.close()
         self.report_file = temp_file
 
-    def save_grid_img(self, file_name):
-        fig = generate_grid(self, 6, 6, self.params.substrate_type) # TODO: literal value, grid size
+    def save_grid_img(self, rows, cols, file_name, title = ""):
+        fig = generate_grid(self, rows, cols, self.params.substrate_type)
+        if title != "":
+            fig.text(0.50, 0.25,  title, horizontalalignment='center', wrap=True, size="xx-large" ) 
         fig.savefig(f"{self.save_dir}/{file_name}", pad_inches= 0.01)
         plt.clf()
+        del fig
 
     def interpret_json(self, file_name, neat_config_path):
         with open(file_name, 'r', encoding='utf-8') as f:
