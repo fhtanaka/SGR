@@ -10,7 +10,7 @@ def locomotion_task():
             return "Hurdler-v0"
         return "Walker-v0"
 
-    create_base_grid(file_name="./locomotion.json", task_function=task_func)
+    create_base_grid(size=(4,4), file_name="./locomotion.json", task_function=task_func)
 
 def manipulation_task():
     def task_func(x, y):

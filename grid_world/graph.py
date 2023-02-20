@@ -28,7 +28,6 @@ class Graph:
     def __init__(self, seed, params: Parameters) -> None:
         self.d_nodes: Dict[str, Node] = {}
         self.d_historical: Dict[str, HistoricalMarks] = {}
-        self.d_genomes: Dict[str, CustomGenome] = {}
         self.tasks = TaskList()
         self.rng = np.random.default_rng(seed)
         self.most_up_to_date_neat_pop: neat.Population = None
@@ -140,8 +139,6 @@ class Graph:
             if g.key not in self.d_historical:
                 p1, p2 = main_pop.pop.reproduction.ancestors[g.key]
                 self.d_historical[g.key] = HistoricalMarks(g.key, main_pop.id, p1, p2)
-            if g.fitness != None and g.key not in self.d_genomes:
-                self.d_genomes[g.key] = g
 
 
     def evolve_random_coords(self, n_gens):
@@ -161,7 +158,7 @@ class Graph:
                 )
             ):
                 self.save_grid_pkl(f"grid_gen_{i}.pkl")
-                self.save_grid_img(f"gen_{i}_img.jpeg")
+                # self.save_grid_img(f"gen_{i}_img.jpeg")
 
 
     def save_grid_pkl(self, file_name):
