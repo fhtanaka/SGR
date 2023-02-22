@@ -113,7 +113,7 @@ def generate_grid(grid, n_rows, n_cols, genome_type):
                 best_genome = g
                 best_genome_fit = g.fitness
         # best_genome = value.sgr_pop.best_genome
-
+        best_genome_fit = np.round(best_genome_fit, 2)
         if best_genome == None:
             best_genome = g
         

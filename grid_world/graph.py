@@ -172,7 +172,8 @@ class Graph:
     def save_grid_img(self, rows, cols, file_name, title = ""):
         fig = generate_grid(self, rows, cols, self.params.substrate_type)
         if title != "":
-            fig.text(0.50, 0.25,  title, horizontalalignment='center', wrap=True, size="xx-large" ) 
+            plt.rcParams.update({'font.size': 100})
+            fig.text(0.50, 0.25,  title, horizontalalignment='center', wrap=True) 
         fig.savefig(f"{self.save_dir}/{file_name}", pad_inches= 0.01)
         plt.clf()
         del fig
