@@ -29,51 +29,79 @@ from sgr.body_speciation import CustomGenome
 from grid_world.node import Node
 from grid_world.tasks import *
 from copy import deepcopy
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageChops
 from mpl_toolkits.axes_grid1 import ImageGrid
 import imageio
 
-def generate_sub_image_caption(pil_img, node, grid, best_genome, best_fit):
+def apply_mas_by_task(pil_img, task_name):
+    t = TaskList()
+    level = t.task_dict[task_name].difficulty
+    
+    
+    # Apply the red filter
+    # Convert to grayscale
+    gray_image = pil_img.convert('L')
+
+    # Create a mask of the white parts of the image
+    threshold = 240  # You can adjust this value to capture more or less white
+    white_mask = gray_image.point(lambda x: x > threshold or 255)
+
+    
+    # Create a colored mask version of the white mask
+    img_filter = (0, 0, 0)
+    if level== "easy":
+        img_filter = (0, 255, 0)
+    if level== "medium":
+        img_filter = (255, 255, 0)
+    if level== "hard":
+        img_filter = (255, 0, 0)
+        
+    mask = ImageOps.colorize(white_mask, black=img_filter, white=(255, 255, 255))
+
+    # Blend the red-tinted mask with the original image
+    new_img = ImageChops.blend(pil_img, mask, 0.1)
+    
+    return new_img
+
+def generate_sub_image_caption(pil_img, node, grid, best_genome, best_fit): 
     draw = ImageDraw.Draw(pil_img)
 
     # Define the caption text
     caption_text = f"{node.id}"
-    font = ImageFont.truetype("notebooks/impact.ttf", size=100)
+    font = ImageFont.truetype("notebooks/impact.ttf", size=150)
     caption_size = draw.textsize(caption_text, font)
-    caption_position = (10, 10)
+    caption_position = (20, 10)
     draw.text(caption_position, caption_text, font=font, fill="red")
     
-    caption_text = f"{node.task}"
-    font = ImageFont.truetype("notebooks/arial.ttf", size=40)
-    caption_size = draw.textsize(caption_text, font)
-    caption_position = (pil_img.width // 2 - caption_size[0] // 2,15)
-    draw.text(caption_position, caption_text, font=font, fill="red")
-    
-
     history = grid.d_historical[best_genome.key]
     caption_text = f"{best_genome.key} ({history.pop_id})"
-    font = ImageFont.truetype("notebooks/impact.ttf", size=50)
+    font = ImageFont.truetype("notebooks/arial.ttf", size=100)
     caption_size = draw.textsize(caption_text, font)
     caption_position = (pil_img.width - caption_size[0] - 25, 10)
     draw.text(caption_position, caption_text, font=font, fill="green")
     
+    # caption_text = f"{node.task}"
+    # font = ImageFont.truetype("notebooks/arial.ttf", size=40)
+    # caption_size = draw.textsize(caption_text, font)
+    # caption_position = (pil_img.width // 2 - caption_size[0] // 2,15)
+    # draw.text(caption_position, caption_text, font=font, fill="red")
     
-    history = grid.d_historical[best_genome.key]
-    caption_text = f"g_id: {best_genome.key}, original_pop: {history.pop_id}, fit: {best_fit}"
-    font = ImageFont.truetype("notebooks/arial.ttf", size=40)
-    caption_size = draw.textsize(caption_text, font)
-    caption_position = (pil_img.width // 2 - caption_size[0] // 2,15+caption_size[1])
-    draw.text(caption_position, caption_text, font=font, fill="black")
+    # history = grid.d_historical[best_genome.key]
+    # caption_text = f"g_id: {best_genome.key}, original_pop: {history.pop_id}, fit: {best_fit}"
+    # font = ImageFont.truetype("notebooks/arial.ttf", size=40)
+    # caption_size = draw.textsize(caption_text, font)
+    # caption_position = (pil_img.width // 2 - caption_size[0] // 2,15+caption_size[1])
+    # draw.text(caption_position, caption_text, font=font, fill="black")
     
-    p1, p2 = history.parent_1, history.parent_2
-    if p1 != -1 and p2 != -1:
-        caption_text = f"p1: {p1} ({grid.d_historical[p1].pop_id}), p2: {p2} ({grid.d_historical[p2].pop_id})"
-    else:
-        caption_text = f"First of their name"
-    font = ImageFont.truetype("notebooks/arial.ttf", size=40)
-    caption_size = draw.textsize(caption_text, font)
-    caption_position = (pil_img.width // 2 - caption_size[0] // 2, 30+caption_size[1]*2)
-    draw.text(caption_position, caption_text, font=font, fill="black")
+    # p1, p2 = history.parent_1, history.parent_2
+    # if p1 != -1 and p2 != -1:
+    #     caption_text = f"p1: {p1} ({grid.d_historical[p1].pop_id}), p2: {p2} ({grid.d_historical[p2].pop_id})"
+    # else:
+    #     caption_text = f"First of their name"
+    # font = ImageFont.truetype("notebooks/arial.ttf", size=40)
+    # caption_size = draw.textsize(caption_text, font)
+    # caption_position = (pil_img.width // 2 - caption_size[0] // 2, 30+caption_size[1]*2)
+    # draw.text(caption_position, caption_text, font=font, fill="black")
 
 def get_robot(genome, neat_config, env, genome_type):
     if genome.robot is not None:
@@ -121,6 +149,7 @@ def generate_grid(grid, n_rows, n_cols, genome_type):
         if img is not None:
             # print(ag.robot)
             pil_img = Image.fromarray(img, 'RGB')
+            pil_img = apply_mas_by_task(pil_img, value.task)
             generate_sub_image_caption(pil_img, value, grid, best_genome, best_genome_fit)
             grid_img[cont].imshow(pil_img,interpolation='none')
         cont += 1

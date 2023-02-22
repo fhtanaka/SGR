@@ -14,10 +14,15 @@ def main(file_path):
         with open(file_path, "rb") as file:
             grid: Graph  = pkl.load(file)
     except:
-        print("COuldnt open the pkl")
+        print("Couldnt open the pkl")
         return
     img_name = file_name.split(".")[0] 
-    grid.save_grid_img(6,6, img_name+ ".jpeg", img_name.replace("_", " "))
+
+    n_rows, n_cols = 6, 6
+    if "locomotion" in file_path:
+        n_rows, n_cols = 4, 4
+
+    grid.save_grid_img(n_rows, n_cols, img_name+ ".jpeg", img_name.replace("_", " "))
 
 
 if __name__ == "__main__":
