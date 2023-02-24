@@ -14,16 +14,16 @@ class TaskList:
         self.task_dict: Dict[str, Task] = {}
 
         # Walking Tasks
-        self.Walker_v0 = Task('Walker-v0', 500, "walking", "easy")
+        self.Walker_v0 = Task('Walker-v0', 600, "walking", "easy")
         self.task_dict["Walker-v0"]=self.Walker_v0
-        self.BridgeWalker_v0 = Task('BridgeWalker-v0', 500, "walking", "medium")
+        self.BridgeWalker_v0 = Task('BridgeWalker-v0', 600, "walking", "medium")
         self.task_dict["BridgeWalker-v0"]=self.BridgeWalker_v0
         self.BidirectionalWalker_v0 = Task('BidirectionalWalker-v0', 800, "walking", "medium")
         self.task_dict["BidirectionalWalker-v0"]=self.BidirectionalWalker_v0
         # Object Manipulation Tasks
-        self.Carrier_v0 = Task('Carrier-v0', 500, "obj_manipualtion", "easy")
+        self.Carrier_v0 = Task('Carrier-v0', 600, "obj_manipualtion", "easy")
         self.task_dict["Carrier-v0"]=self.Carrier_v0
-        self.Pusher_v0 = Task('Pusher-v0', 500, "obj_manipualtion", "easy")
+        self.Pusher_v0 = Task('Pusher-v0', 600, "obj_manipualtion", "easy")
         self.task_dict["Pusher-v0"]=self.Pusher_v0
         self.BeamToppler_v0 = Task('BeamToppler-v0', 800, "obj_manipualtion", "easy")
         self.task_dict["BeamToppler-v0"]=self.BeamToppler_v0
@@ -49,7 +49,7 @@ class TaskList:
         # Locomotion Tasks
         self.UpStepper_v0 = Task('UpStepper-v0', 600, "locomotion", "medium")
         self.task_dict["UpStepper-v0"]=self.UpStepper_v0
-        self.DownStepper_v0 = Task('DownStepper-v0', 500, "locomotion", "easy")
+        self.DownStepper_v0 = Task('DownStepper-v0', 600, "locomotion", "easy")
         self.task_dict["DownStepper-v0"]=self.DownStepper_v0
         self.ObstacleTraverser_v0 = Task('ObstacleTraverser-v0', 800, "locomotion", "medium")
         self.task_dict["ObstacleTraverser-v0"]=self.ObstacleTraverser_v0
@@ -72,12 +72,12 @@ class TaskList:
         self.task_dict["AreaMinimizer-v0"]=self.AreaMinimizer_v0
         self.WingspanMazimizer_v0 = Task('WingspanMazimizer-v0', 600, "shape_change", "easy")
         self.task_dict["WingspanMazimizer-v0"]=self.WingspanMazimizer_v0
-        self.HeightMaximizer_v0 = Task('HeightMaximizer-v0', 500, "shape_change", "easy")
+        self.HeightMaximizer_v0 = Task('HeightMaximizer-v0', 600, "shape_change", "easy")
         self.task_dict["HeightMaximizer-v0"]=self.HeightMaximizer_v0
         # Misc Tasks
         self.Flipper_v0 = Task('Flipper-v0', 600, "misc", "easy")
         self.task_dict["Flipper-v0"]=self.Flipper_v0
-        self.Jumper_v0 = Task('Jumper-v0', 500, "misc", "easy")
+        self.Jumper_v0 = Task('Jumper-v0', 600, "misc", "easy")
         self.task_dict["Jumper-v0"]=self.Jumper_v0
         self.Balancer_v0 = Task('Balancer-v0', 600, "misc", "easy")
         self.task_dict["Balancer-v0"]=self.Balancer_v0

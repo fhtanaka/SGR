@@ -126,8 +126,12 @@ class SGR:
             dynamic_env_config=None,
             render=False, 
             save_gif=None,
+            skip_evaluated = False
         ):
 
+        if skip_evaluated and genome.fitness != None:
+            return skip_evaluated, False
+        
         cppn = neat.nn.FeedForwardNetwork.create(genome, self.neat_config)
 
         if hasattr(genome, 'robot'):
@@ -152,10 +156,10 @@ class SGR:
 
         return reward, done
 
-    def fit_func_thread(self, genomes, n_steps, env_name, get_env_obs=None, dynamic_env_config=None):
+    def fit_func_thread(self, genomes, n_steps, env_name, get_env_obs=None, dynamic_env_config=None, skip_evaluated=False):
         results_dict = {}
         for genome_key, genome in genomes:
-            reward, _ = self.single_genome_fit(genome, n_steps, env_name, get_env_obs, dynamic_env_config)
+            reward, _ = self.single_genome_fit(genome, n_steps, env_name, get_env_obs, dynamic_env_config, skip_evaluated)
             results_dict[genome_key] = reward
         return results_dict
     
@@ -168,10 +172,11 @@ class SGR:
             cpus, 
             get_env_obs=None,
             dynamic_env_config = None,
+            skip_evaluated = False
         ):
 
         self.stagnation += 1
-
+        self.generation += 1
         try:
             pool = ProcessPool(nodes=cpus)
             results_map = pool.amap(
@@ -181,6 +186,7 @@ class SGR:
                 [env_name for _ in range(cpus)],
                 [get_env_obs for _ in range(cpus)],
                 [dynamic_env_config for _ in range(cpus)],
+                [skip_evaluated for _ in range(cpus)]
             )
             
             results = results_map.get(timeout=60*10)
@@ -235,13 +241,14 @@ class SGR:
             save_gen_interval=None, 
             print_results=True, 
             get_env_obs: Callable[[gym.Env], float] =None,
-            dynamic_env_config=None
+            dynamic_env_config=None,
+            skip_evaluated=False
         ):
 
         self.max_stagnation = max_stagnation
         self.save_gen_interval = save_gen_interval
 
-        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus, get_env_obs, dynamic_env_config)
+        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus, get_env_obs, dynamic_env_config, skip_evaluated)
         winner: CustomGenome = self.pop.run(neat_fit_func, n_gens)
         
         if print_results:

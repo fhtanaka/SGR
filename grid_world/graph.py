@@ -14,8 +14,9 @@ from sgr.body_speciation import CustomGenome
 from .generate_gif import generate_grid
 from matplotlib import pyplot as plt
 from .tasks import get_locomotion_env_obs, get_manipulation_env_obs
+from PIL import Image
 
-RESULTS_DIR = "island_cp"
+RESULTS_DIR = "island_cp_v2"
 
 class HistoricalMarks:
     def __init__(self, genome_id, original_pop_id, parent1, parent2):
@@ -157,7 +158,7 @@ class Graph:
                     self.d_nodes[coord_id].sgr_pop.pop.generation > 1
                 )
             ):
-                self.save_grid_pkl(f"grid_gen_{i}.pkl")
+                self.save_grid_pkl(f"grid_gen_{str(i).zfill(4)}.pkl")
                 # self.save_grid_img(f"gen_{i}_img.jpeg")
 
 
@@ -170,13 +171,19 @@ class Graph:
         self.report_file = temp_file
 
     def save_grid_img(self, rows, cols, file_name, title = ""):
+        fig_path = f"{self.save_dir}/{file_name}"
         fig = generate_grid(self, rows, cols, self.params.substrate_type)
         if title != "":
             plt.rcParams.update({'font.size': 100})
             fig.text(0.50, 0.25,  title, horizontalalignment='center', wrap=True) 
-        fig.savefig(f"{self.save_dir}/{file_name}", pad_inches= 0.01)
+        fig.savefig(fig_path, pad_inches= 0.01)
         plt.clf()
         del fig
+
+        #TODO: Gambiarra to crop the image
+
+        img_cropped = Image.open(fig_path).crop((1225.0, 3100.0, 9025.0, 7600.0))
+        img_cropped.save(fig_path)
 
     def interpret_json(self, file_name, neat_config_path):
         with open(file_name, 'r', encoding='utf-8') as f:

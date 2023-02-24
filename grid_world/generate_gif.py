@@ -63,7 +63,7 @@ def apply_mas_by_task(pil_img, task_name):
     
     return new_img
 
-def generate_sub_image_caption(pil_img, node, grid, best_genome, best_fit): 
+def generate_sub_image_caption(pil_img, node: Node, grid, best_genome, best_fit): 
     draw = ImageDraw.Draw(pil_img)
 
     # Define the caption text
@@ -75,10 +75,10 @@ def generate_sub_image_caption(pil_img, node, grid, best_genome, best_fit):
     
     history = grid.d_historical[best_genome.key]
     caption_text = f"{best_genome.key} ({history.pop_id})"
-    font = ImageFont.truetype("notebooks/arial.ttf", size=100)
+    font = ImageFont.truetype("notebooks/arial.ttf", size=60)
     caption_size = draw.textsize(caption_text, font)
     caption_position = (pil_img.width - caption_size[0] - 25, 10)
-    draw.text(caption_position, caption_text, font=font, fill="green")
+    draw.text(caption_position, caption_text, font=font, fill="black")
     
     # caption_text = f"{node.task}"
     # font = ImageFont.truetype("notebooks/arial.ttf", size=40)
@@ -86,22 +86,22 @@ def generate_sub_image_caption(pil_img, node, grid, best_genome, best_fit):
     # caption_position = (pil_img.width // 2 - caption_size[0] // 2,15)
     # draw.text(caption_position, caption_text, font=font, fill="red")
     
-    # history = grid.d_historical[best_genome.key]
-    # caption_text = f"g_id: {best_genome.key}, original_pop: {history.pop_id}, fit: {best_fit}"
-    # font = ImageFont.truetype("notebooks/arial.ttf", size=40)
-    # caption_size = draw.textsize(caption_text, font)
-    # caption_position = (pil_img.width // 2 - caption_size[0] // 2,15+caption_size[1])
-    # draw.text(caption_position, caption_text, font=font, fill="black")
+    history = grid.d_historical[best_genome.key]
+    caption_text = f"gen: {node.sgr_pop.pop.generation}, stag: {node.sgr_pop.stagnation}, fit: {best_fit}"
+    font = ImageFont.truetype("notebooks/arial.ttf", size=40)
+    caption_size = draw.textsize(caption_text, font)
+    caption_position = (pil_img.width // 2 - caption_size[0] // 2,15+caption_size[1])
+    draw.text(caption_position, caption_text, font=font, fill="black")
     
-    # p1, p2 = history.parent_1, history.parent_2
-    # if p1 != -1 and p2 != -1:
-    #     caption_text = f"p1: {p1} ({grid.d_historical[p1].pop_id}), p2: {p2} ({grid.d_historical[p2].pop_id})"
-    # else:
-    #     caption_text = f"First of their name"
-    # font = ImageFont.truetype("notebooks/arial.ttf", size=40)
-    # caption_size = draw.textsize(caption_text, font)
-    # caption_position = (pil_img.width // 2 - caption_size[0] // 2, 30+caption_size[1]*2)
-    # draw.text(caption_position, caption_text, font=font, fill="black")
+    p1, p2 = history.parent_1, history.parent_2
+    if p1 != -1 and p2 != -1:
+        caption_text = f"p1: {p1} ({grid.d_historical[p1].pop_id}), p2: {p2} ({grid.d_historical[p2].pop_id})"
+    else:
+        caption_text = f"First of their name"
+    font = ImageFont.truetype("notebooks/arial.ttf", size=40)
+    caption_size = draw.textsize(caption_text, font)
+    caption_position = (pil_img.width // 2 - caption_size[0] // 2, 30+caption_size[1]*2)
+    draw.text(caption_position, caption_text, font=font, fill="black")
 
 def get_robot(genome, neat_config, env, genome_type):
     if genome.robot is not None:
@@ -141,7 +141,7 @@ def generate_grid(grid, n_rows, n_cols, genome_type):
                 best_genome = g
                 best_genome_fit = g.fitness
         # best_genome = value.sgr_pop.best_genome
-        best_genome_fit = np.round(best_genome_fit, 2)
+        best_genome_fit = np.round(best_genome_fit, 4)
         if best_genome == None:
             best_genome = g
         
@@ -177,7 +177,7 @@ def main():
     img_arr = []
     for i in range(200, 300, 10):
         print(i)
-        with open(f"../island_cp/{file_name}/grid_gen_{i}.pkl", "rb") as file:
+        with open(f"../island_cp_v2/{file_name}/grid_gen_{i}.pkl", "rb") as file:
             grid = pkl.load(file)
         fig = generate_grid(grid, n_rows, n_cols, grid.params.substrate_type)
         fig.text(0.50, 0.25,  'Generation {i}', horizontalalignment='center', wrap=True, size="xx-large" ) 
