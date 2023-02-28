@@ -23,7 +23,7 @@ from sgr.substrates import morph_substrate, control_substrate
 from sgr.generate_robot import generate_robot, eval_robot_constraint
 from sgr.evogym_sim import simulate_env
 from dynamic_env.generateJSON import create_ObstacleTraverser_JSON
-from typing import Callable
+from typing import Callable, Dict
 class SGR:
     idCounter = itertools.count().__next__
 
@@ -63,10 +63,13 @@ class SGR:
         self.voxel_types = ['empty', 'rigid', 'soft', 'hori', 'vert']
 
         self.best_fit = -10000.0
+        self.best_genome = None
         self.stagnation = 0
         self.generation = 0
         self.max_stagnation = None
         self.save_gen_interval = None
+
+        self.fitness_cache: Dict[Dict[str, float]]= {} # task_name -> genome_id -> fitness
 
     def create_neat_config(self, config_path, neat_genome=neat.DefaultGenome):
         neat_config = neat.Config(neat_genome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
@@ -98,6 +101,7 @@ class SGR:
         new_pop.best_genome = None
         new_pop.max_stagnation = None
         new_pop.save_gen_interval = None
+        new_pop.fitness_cache: Dict[Dict[str, float]]={}
 
         # new_pop.pop = neat.Population(self.neat_config)
         new_pop.pop.reporters = ReporterSet()
@@ -129,8 +133,8 @@ class SGR:
             skip_evaluated = False
         ):
 
-        if skip_evaluated and genome.fitness != None:
-            return skip_evaluated, False
+        if skip_evaluated and env_name in self.fitness_cache and genome.key in self.fitness_cache[env_name]:
+            return self.fitness_cache[env_name][genome.key], False
         
         cppn = neat.nn.FeedForwardNetwork.create(genome, self.neat_config)
 
@@ -159,7 +163,7 @@ class SGR:
     def fit_func_thread(self, genomes, n_steps, env_name, get_env_obs=None, dynamic_env_config=None, skip_evaluated=False):
         results_dict = {}
         for genome_key, genome in genomes:
-            reward, _ = self.single_genome_fit(genome, n_steps, env_name, get_env_obs, dynamic_env_config, skip_evaluated)
+            reward, _ = self.single_genome_fit(genome, n_steps, env_name, get_env_obs, dynamic_env_config, skip_evaluated = skip_evaluated)
             results_dict[genome_key] = reward
         return results_dict
     
@@ -197,9 +201,11 @@ class SGR:
                     fitness_dict[k] = v
 
             for g_id, genome in genomes:
-                genome.fitness = fitness_dict[g_id]
-                if genome.fitness > self.best_fit:
-                    self.best_fit = genome.fitness
+                fit = fitness_dict[g_id]
+                genome.fitness = fit
+                self.fitness_cache[env_name][g_id] = fit
+                if fit > self.best_fit:
+                    self.best_fit = fit
                     self.stagnation = 0
                     self.best_genome: CustomGenome = genome
 

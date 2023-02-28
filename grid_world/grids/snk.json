@@ -76,7 +76,7 @@
             13,
             14
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "8": {
         "neighbors": [
@@ -89,7 +89,7 @@
             14,
             15
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "9": {
         "neighbors": [
@@ -102,7 +102,7 @@
             15,
             16
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "10": {
         "neighbors": [
@@ -115,7 +115,7 @@
             16,
             17
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "11": {
         "neighbors": [
@@ -148,7 +148,7 @@
             19,
             20
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "14": {
         "neighbors": [
@@ -187,7 +187,7 @@
             22,
             23
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "17": {
         "neighbors": [
@@ -220,7 +220,7 @@
             25,
             26
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "20": {
         "neighbors": [
@@ -259,7 +259,7 @@
             28,
             29
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "23": {
         "neighbors": [
@@ -292,7 +292,7 @@
             31,
             32
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "26": {
         "neighbors": [
@@ -305,7 +305,7 @@
             32,
             33
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "27": {
         "neighbors": [
@@ -318,7 +318,7 @@
             33,
             34
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "28": {
         "neighbors": [
@@ -331,7 +331,7 @@
             34,
             35
         ],
-        "task": "ObstacleTraverser-v1"
+        "task": "Hurdler-v0"
     },
     "29": {
         "neighbors": [
