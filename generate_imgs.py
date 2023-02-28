@@ -10,17 +10,21 @@ def main(file_path):
         print("Not a pkl file")
         return
 
+    file_name = file_name.split(".")[0] 
+    p1, p2, test_number = file_name.split("_")
+    test_number = test_number.zfill(4)
+    img_name = f"{p1}_{p2}_{test_number}"
+
+    if os.path.exists(f"{results_dir}/{test_dir}/{img_name}.jpeg"):
+        print("Image already exists")
+        return
+
     try:
         with open(file_path, "rb") as file:
             grid: Graph  = pkl.load(file)
     except:
         print("Couldnt open the pkl")
         return
-    file_name = file_name.split(".")[0] 
-
-    p1, p2, test_number = file_name.split("_")
-    test_number = test_number.zfill(4)
-    img_name = f"{p1}_{p2}_{test_number}"
 
     n_rows, n_cols = 6, 6
     if "locomotion" in file_path:
