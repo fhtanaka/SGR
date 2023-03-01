@@ -203,6 +203,8 @@ class SGR:
             for g_id, genome in genomes:
                 fit = fitness_dict[g_id]
                 genome.fitness = fit
+                if env_name not in self.fitness_cache:
+                    self.fitness_cache[env_name]: Dict[str, float] = {}
                 self.fitness_cache[env_name][g_id] = fit
                 if fit > self.best_fit:
                     self.best_fit = fit

@@ -67,7 +67,7 @@ class Graph:
             pop.pop = neat_pop
 
         for g in pop.pop.population.values():
-            self.d_historical[g.key] = HistoricalMarks(g.key, pop.id, -1, -1)
+            self.d_historical[g.key] = HistoricalMarks(g.key, pop.id, -1, -1, 0)
 
         self.most_up_to_date_neat_pop = pop.pop
         task = self.tasks.task_dict[task]
