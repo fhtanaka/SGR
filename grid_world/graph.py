@@ -19,9 +19,10 @@ from PIL import Image
 RESULTS_DIR = "island_cp_v2"
 
 class HistoricalMarks:
-    def __init__(self, genome_id, original_pop_id, parent1, parent2):
+    def __init__(self, genome_id, original_pop_id, parent1, parent2, gen):
         self.id = genome_id
         self.pop_id = original_pop_id
+        self.generation = gen
         self.parent_1 = parent1
         self.parent_2 = parent2
 
@@ -35,6 +36,7 @@ class Graph:
         self.params = params
         self.save_dir = ""
         self.report_file = None
+        self.gen = 0
         if self.params.save_to != "":
             self.save_dir = os.path.join(RESULTS_DIR, self.params.save_to)
             pathlib.Path(self.save_dir).mkdir(parents=True, exist_ok=True)
@@ -65,7 +67,7 @@ class Graph:
             pop.pop = neat_pop
 
         for g in pop.pop.population.values():
-            self.d_historical[g.key] = HistoricalMarks(g.key, pop.id, -1, -1)
+            self.d_historical[g.key] = HistoricalMarks(g.key, pop.id, -1, -1, 0)
 
         self.most_up_to_date_neat_pop = pop.pop
         task = self.tasks.task_dict[task]
@@ -125,7 +127,8 @@ class Graph:
             n_gens = 1, 
             cpus = self.params.cpu, 
             print_results = False, 
-            get_env_obs = get_locomotion_env_obs # TODO: literal value
+            get_env_obs = get_locomotion_env_obs, # TODO: literal value
+            skip_evaluated=True,
         )
         
         print(f"Local gen {main_pop.pop.generation}, stag {main_pop.stagnation}")
@@ -139,7 +142,8 @@ class Graph:
         for g in main_pop.pop.population.values():
             if g.key not in self.d_historical:
                 p1, p2 = main_pop.pop.reproduction.ancestors[g.key]
-                self.d_historical[g.key] = HistoricalMarks(g.key, main_pop.id, p1, p2)
+                self.d_historical[g.key] = HistoricalMarks(g.key, main_pop.id, p1, p2, self.gen)
+        self.gen += 1
 
 
     def evolve_random_coords(self, n_gens):

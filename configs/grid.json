@@ -1,5 +1,5 @@
 {
-    "gens": 5001,
+    "gens": 3001,
     "robot_size": 5,
     "steps": 600,
     "n_threads": 12,
