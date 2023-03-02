@@ -51,9 +51,9 @@ class TaskList:
         self.task_dict["UpStepper-v0"]=self.UpStepper_v0
         self.DownStepper_v0 = Task('DownStepper-v0', 600, "locomotion", "easy")
         self.task_dict["DownStepper-v0"]=self.DownStepper_v0
-        self.ObstacleTraverser_v0 = Task('ObstacleTraverser-v0', 800, "locomotion", "medium")
+        self.ObstacleTraverser_v0 = Task('ObstacleTraverser-v0', 600, "locomotion", "medium")
         self.task_dict["ObstacleTraverser-v0"]=self.ObstacleTraverser_v0
-        self.ObstacleTraverser_v1 = Task('ObstacleTraverser-v1', 800, "locomotion", "hard")
+        self.ObstacleTraverser_v1 = Task('ObstacleTraverser-v1', 600, "locomotion", "hard")
         self.task_dict["ObstacleTraverser-v1"]=self.ObstacleTraverser_v1
         self.Hurdler_v0 = Task('Hurdler-v0', 800, "locomotion", "hard")
         self.task_dict["Hurdler-v0"]=self.Hurdler_v0
