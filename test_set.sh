@@ -1,11 +1,8 @@
-python poet_test.py --substrate cppn -c configs/poet_sgr.json --save_to new_cppn_1 | tee new_cppn_result_1.txt
-python poet_test.py --substrate 3d -c configs/poet_sgr.json --save_to new_3d_1 | tee new_3D_result_1.txt
+python grid_main.py -c configs/grid.json --save_to snk_3d_3 --task_grid grid_world/grids/snk.json
+./generate_img.sh island_cp_v2 snk_3d_3 2> error.txt 1> output.txt &
 
+python grid_main.py -c configs/grid.json --save_to snk_3d_4 --task_grid grid_world/grids/snk.json
+./generate_img.sh island_cp_v2 snk_3d_4 2> error.txt 1> output.txt &
 
-python poet_test.py --substrate cppn -c configs/poet_sgr.json --save_to new_cppn_2 | tee new_cppn_result_2.txt
-python poet_test.py --substrate 3d -c configs/poet_sgr.json --save_to new_3d_2 | tee new_3D_result_2.txt
-
-
-python poet_test.py --substrate cppn -c configs/poet_sgr.json --save_to new_cppn_3 | tee new_cppn_result_3.txt
-python poet_test.py --substrate 3d -c configs/poet_sgr.json --save_to new_3d_3 | tee new_3D_result_3.txt
-
+python grid_main.py -c configs/grid.json --save_to snk_3d_5 --task_grid grid_world/grids/snk.json
+./generate_img.sh island_cp_v2 snk_3d_5 2> error.txt 1> output.txt &

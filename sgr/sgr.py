@@ -14,6 +14,7 @@ import itertools
 from neat.reporting import ReporterSet
 
 from pathos.multiprocessing import ProcessPool
+import gym
 
 from hyperneat.hyperNEAT import create_phenotype_network
 from sgr.custom_reporter import CustomReporter, remove_reporters
@@ -22,7 +23,7 @@ from sgr.substrates import morph_substrate, control_substrate
 from sgr.generate_robot import generate_robot, eval_robot_constraint
 from sgr.evogym_sim import simulate_env
 from dynamic_env.generateJSON import create_ObstacleTraverser_JSON
-
+from typing import Callable, Dict
 class SGR:
     idCounter = itertools.count().__next__
 
@@ -61,11 +62,14 @@ class SGR:
         
         self.voxel_types = ['empty', 'rigid', 'soft', 'hori', 'vert']
 
-        self.best_fit = -10000
+        self.best_fit = -10000.0
+        self.best_genome = None
         self.stagnation = 0
         self.generation = 0
         self.max_stagnation = None
         self.save_gen_interval = None
+
+        self.fitness_cache: Dict[Dict[str, float]]= {} # task_name -> genome_id -> fitness
 
     def create_neat_config(self, config_path, neat_genome=neat.DefaultGenome):
         neat_config = neat.Config(neat_genome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
@@ -97,6 +101,7 @@ class SGR:
         new_pop.best_genome = None
         new_pop.max_stagnation = None
         new_pop.save_gen_interval = None
+        new_pop.fitness_cache: Dict[Dict[str, float]]={}
 
         # new_pop.pop = neat.Population(self.neat_config)
         new_pop.pop.reporters = ReporterSet()
@@ -121,11 +126,16 @@ class SGR:
             genome,
             n_steps,
             env_name,
+            get_env_obs=None,
             dynamic_env_config=None,
             render=False, 
             save_gif=None,
+            skip_evaluated = False
         ):
 
+        if skip_evaluated and env_name in self.fitness_cache and genome.key in self.fitness_cache[env_name]:
+            return self.fitness_cache[env_name][genome.key], False
+        
         cppn = neat.nn.FeedForwardNetwork.create(genome, self.neat_config)
 
         if hasattr(genome, 'robot'):
@@ -146,14 +156,14 @@ class SGR:
 
         controller_net = create_phenotype_network(cppn, controller_substrate, output_node_idx=1)
 
-        reward, done = simulate_env(robot, controller_net, env_name, n_steps, dynamic_env_config, render, save_gif)
+        reward, done = simulate_env(robot, controller_net, env_name, n_steps, dynamic_env_config, get_env_obs, render, save_gif)
 
         return reward, done
 
-    def fit_func_thread(self, genomes, n_steps, env_name, dynamic_env_config=None):
+    def fit_func_thread(self, genomes, n_steps, env_name, get_env_obs=None, dynamic_env_config=None, skip_evaluated=False):
         results_dict = {}
         for genome_key, genome in genomes:
-            reward, _ = self.single_genome_fit(genome, n_steps, env_name, dynamic_env_config)
+            reward, _ = self.single_genome_fit(genome, n_steps, env_name, get_env_obs, dynamic_env_config, skip_evaluated = skip_evaluated)
             results_dict[genome_key] = reward
         return results_dict
     
@@ -164,11 +174,13 @@ class SGR:
             env_name, 
             n_steps, 
             cpus, 
+            get_env_obs=None,
             dynamic_env_config = None,
+            skip_evaluated = False
         ):
 
         self.stagnation += 1
-
+        self.generation += 1
         try:
             pool = ProcessPool(nodes=cpus)
             results_map = pool.amap(
@@ -176,7 +188,9 @@ class SGR:
                 np.array_split(genomes, cpus),
                 [n_steps for _ in range(cpus)],
                 [env_name for _ in range(cpus)],
+                [get_env_obs for _ in range(cpus)],
                 [dynamic_env_config for _ in range(cpus)],
+                [skip_evaluated for _ in range(cpus)]
             )
             
             results = results_map.get(timeout=60*10)
@@ -187,11 +201,15 @@ class SGR:
                     fitness_dict[k] = v
 
             for g_id, genome in genomes:
-                genome.fitness = fitness_dict[g_id]
-                if genome.fitness > self.best_fit:
-                    self.best_fit = genome.fitness
+                fit = fitness_dict[g_id]
+                genome.fitness = fit
+                if env_name not in self.fitness_cache:
+                    self.fitness_cache[env_name]: Dict[str, float] = {}
+                self.fitness_cache[env_name][g_id] = fit
+                if fit > self.best_fit:
+                    self.best_fit = fit
                     self.stagnation = 0
-                    self.best_genome = genome
+                    self.best_genome: CustomGenome = genome
 
         except IOError as e:  # Sometimes the environment just implodes
             if e.errno == errno.EPIPE:
@@ -230,13 +248,15 @@ class SGR:
             max_stagnation=None, 
             save_gen_interval=None, 
             print_results=True, 
-            dynamic_env_config=None
+            get_env_obs: Callable[[gym.Env], float] =None,
+            dynamic_env_config=None,
+            skip_evaluated=False
         ):
 
         self.max_stagnation = max_stagnation
         self.save_gen_interval = save_gen_interval
 
-        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus, dynamic_env_config)
+        neat_fit_func = lambda genomes, config: self.fit_func(genomes, config, env_name, n_steps, cpus, get_env_obs, dynamic_env_config, skip_evaluated)
         winner: CustomGenome = self.pop.run(neat_fit_func, n_gens)
         
         if print_results:

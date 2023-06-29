@@ -144,3 +144,6 @@ checkpoints/*
 .vscode
 *.txt
 multiple_env_results/
+cp_*.pkl
+island_cp/*
+island_cp_v2/*

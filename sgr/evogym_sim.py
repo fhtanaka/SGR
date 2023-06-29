@@ -8,6 +8,7 @@ import os
 from dynamic_env.traverser import DynamicObstacleTraverser
 from dynamic_env.env_config import EnvConfig
 
+
 def get_env(robot, connections, env_name, dynamic_env_config:EnvConfig =None):
     if env_name == "dynamic":
         if dynamic_env_config is None:
@@ -21,7 +22,7 @@ def get_env(robot, connections, env_name, dynamic_env_config:EnvConfig =None):
         env = evogym.envs.gym.make(env_name, body=robot, connections=connections)
     return env
 
-def get_obs_size(robot, env_name):
+def get_obs_size(robot, env_name, get_env_obs=None):
     dynamic_env_config=None
     if env_name == "dynamic":
         dynamic_env_config=EnvConfig(10)
@@ -29,11 +30,22 @@ def get_obs_size(robot, env_name):
     connections = get_full_connectivity(robot)
     env = get_env(robot, connections, env_name, dynamic_env_config)
     obs = env.reset()
+    if get_env_obs != None:
+        obs = get_env_obs(env)
     env.close()
     del env
     return len(obs)
 
-def simulate_env(robot, net, env_name, n_steps, dynamic_env_config:EnvConfig=None, render = False, save_gif=None):
+def simulate_env(
+        robot, 
+        net, 
+        env_name, 
+        n_steps,
+        get_env_obs=None,
+        dynamic_env_config:EnvConfig=None, 
+        render = False, 
+        save_gif=None
+    ):
     connections = get_full_connectivity(robot)
     env = get_env(robot, connections, env_name, dynamic_env_config)
     reward = 0
@@ -49,7 +61,10 @@ def simulate_env(robot, net, env_name, n_steps, dynamic_env_config:EnvConfig=Non
             env.render('human')
         elif save_gif is not None:
             imgs.append(env.render(mode='img'))
-        
+
+        if get_env_obs != None:
+            obs = get_env_obs(env)
+
         obs.resize(in_size**2, refcheck=False)
         action_by_actuator = net.activate(obs)
         action = np.array([action_by_actuator[i] for i in actuators])
